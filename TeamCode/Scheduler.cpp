@@ -1,10 +1,10 @@
 #include "Scheduler.h"(
 
 
-ScheduledFunction::ScheduledFunction(std::function<bool()> backingFunction, char requirementFlags)
+Scheduler::ScheduledFunction::ScheduledFunction(std::function<bool()> backingFunction, char requirementFlags)
 	:backingFunction{ backingFunction }, RequirementFlags{requirementFlags} {}
 
-bool ScheduledFunction::Run()
+bool Scheduler::ScheduledFunction::Run()
 {
 	return backingFunction();
 }
@@ -18,6 +18,22 @@ Scheduler::Scheduler()
 	{
 		requirementDeques[i] = std::deque<std::unique_ptr<ScheduledFunction>>();
 	}
+}
+
+Scheduler& Scheduler::GetInstance()
+{
+	static Scheduler scheduler;
+	return scheduler;
+}
+
+void Scheduler::Schedule(std::function<bool()> function, char requirementFlags)
+{
+
+}
+
+void Scheduler::Update()
+{
+
 }
 
 void Scheduler::Run()
@@ -40,9 +56,4 @@ void Scheduler::Run()
 			}
 		}
 	}
-}
-
-void Scheduler::Update()
-{
-
 }

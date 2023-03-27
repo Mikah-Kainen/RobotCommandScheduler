@@ -1,0 +1,48 @@
+
+FunctionScheduling via Dictionary:
+
+Instead of scheduling functions directly, maybe they should be scheduled through a dictionary that maps their ID to the proper scheduledFunction
+This allows multiple deques to have the same function scheduled
+I can have an ID pool and clear functions and return their ID to the pool after they finish running
+Additionally, I can schedule functions before I know what they map to, and just remap their ID once I've figured it out
+Default mapping could go to a function that returns false
+This also allows custom behavior because I can map placeholder functions to some preparation behavior until they are overriden
+Critical factor: Once a function has finished running, remove it from the dictionary
+Downside: We need to constantly rehash the same value because the functions are unique pointers
+Consideration: We can avoid hashing by using a big array since the keys are numbers anyway
+Downside: If the array is not managed properly, it could end up taking much more space
+Upside: We don't have to store the same function multiple times if it requires multiple systems
+Critical upside: It is much easier to replace functions or branch
+
+
+Scheduling Command Groups Directly Instead of Unwrapping Them:
+
+Instead of unwrapping command groups (i.e. a sequential command group is just all the invidual commands with the requirements of the whole group)
+	^I can have my command groups be custom commands that have some logic in them 
+Upside: It is easy to implement and allows easy addition of branching and complex commands
+Downside: It convolutes the scheduling systems because multiple parts are doing the scheduling
+Downside: Debugging becomes more difficult
+Other possible solution: By giving functions the right requirements, I should be able to control whether they run in parallel or in sequence
+							^so I can just schedule commands after logic blocks for branching
+
+
+
+Important to remember!!
+I need to add a special wait command to ensure that a parallel command group within a sequential command group stops the next command in the sequential command group from running
+^even if it uses a different system! The wait command should simply run the default behavior for whichever system it requires until the commands in the parallel command group have finished
+Make sure commands and command groups don't go out of scope after they are scheduled!
+Having an array that Command IDs index into would be nice, so make sure to test how big the array gets once the code is done(to prevent resizing in the middle of a match, I should start the array at the right size, which I can figure out since the code is doing pretty much the same thing ever time)
+	^The array shouldn't get too big because I want to make a function manager similar to the memory allocator that re-uses unused space
+		^This might be one of those times where I should just go with something a little sub-optimal in order to work on more critical tasks
+
+
+
+Using Wait Commands to implement Sequential Command Groups instead of Adding Extra Requirements:
+
+All sequential command groups could simply run wait commands for systems that the current command is not using but that are required for later commands in the sequental command group
+Parallel command groups inside of sequential command groups could simply not have wait commands!
+To make this idea work, I need a way for the wait commands to efficiently check whether other commands have finished
+	^Idea 1: The wait commands remember the command IDs for the commands they are waiting to finish and check when the IDs have been mapped back to default commands(probably not good because I don't want to guarentee that they haven't been reassigned to other commands or were ever even set to default after they finished)
+	^Idea 2: Wait commands have a char for the requirements they are waiting to finish
+				^ScheduledCommand can have an optional parameter for a list of command IDs(in this case used with wait command IDs) to inform when the ScheduledCommand finishes
+				^Scheduler.Schedule should return the ID of the function it just scheduled so that sequential command groups can give their actual commands the IDs of their wait commands

@@ -1,4 +1,5 @@
 #include <functional>
+#include <exception>
 
 //class IScheduleable
 //{
@@ -53,9 +54,8 @@ public:
 
 	void Schedule(Ts... params)
 	{
-		//make scheduler a singleton
+		throw std::exception("Not implemented");
 		//have a function in scheduler that takes in a backing function and requirements and makes a scheduledFunction
 		//^also it adds the scheduledFunction to the proper deques
-		//make scheduledFunction a private class inside of scheduler as opposed to something exposed everywhere
 	}
 };

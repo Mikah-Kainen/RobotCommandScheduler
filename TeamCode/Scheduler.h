@@ -4,32 +4,35 @@
 #include <vector>
 #include <memory>
 
-class ScheduledFunction
+static class Scheduler
 {
-public:
-	char AvailableSystems;
-	char RequirementFlags;
-
-	ScheduledFunction(std::function<bool()> backingFunction, char requirementFlags);
-
-	bool Run();
-
 private:
-	std::function<bool()> backingFunction;
-};
+	class ScheduledFunction
+	{
+	public:
+		char AvailableSystems;
+		char RequirementFlags;
 
-class Scheduler
-{
+		ScheduledFunction(std::function<bool()> backingFunction, char requirementFlags);
 
-private:
+		bool Run();
+
+	private:
+		std::function<bool()> backingFunction;
+	};
+
 	std::deque<std::unique_ptr<ScheduledFunction>>* requirementDeques; //probably change these to linked lists at some point
 	std::vector<std::unique_ptr<ScheduledFunction>> runningFunctions;
 	char currentlyRunningSystems;
 
+	Scheduler();
+
 public:
 	int SystemsCount;
 
-	Scheduler();
+	static Scheduler& GetInstance();
+
+	void Schedule(std::function<bool()> function, char requirementFlags);
 
 	void Update();
 
