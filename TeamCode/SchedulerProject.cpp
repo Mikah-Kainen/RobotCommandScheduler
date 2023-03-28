@@ -1,6 +1,8 @@
 #include <iostream>
 #include "Command.cpp"
 #include <string>
+#include <list>
+#include "Scheduler.h"
 
 
 class Cat
@@ -42,10 +44,17 @@ int main()
     //Func1<Cat> func1 = Func1<Cat>(CatFunction);
     //func1.Activate(cat);
 
+    std::list<int> linkedList = std::list<int>();
+    int value = 5;
+    std::make_unique<int>(value);
+
     char mask = 9;
     char otherMask = 12;
     mask |= otherMask;
     char nothing = 0;
     otherMask |= nothing;
     nothing |= otherMask;
+
+    Scheduler scheduler = Scheduler::GetInstance();
+    scheduler.Run();
 }

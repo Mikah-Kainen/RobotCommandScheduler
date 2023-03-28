@@ -129,6 +129,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Command.cpp" />
+    <ClCompile Include="Manager.cpp" />
     <ClCompile Include="Scheduler.cpp" />
     <ClCompile Include="SchedulerProject.cpp" />
   </ItemGroup>

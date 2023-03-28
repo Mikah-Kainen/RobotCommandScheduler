@@ -1,8 +1,8 @@
 #include "Scheduler.h"(
 
 
-Scheduler::ScheduledFunction::ScheduledFunction(std::function<bool()> backingFunction, char requirementFlags)
-	:backingFunction{ backingFunction }, RequirementFlags{requirementFlags} {}
+Scheduler::ScheduledFunction::ScheduledFunction(std::function<bool()>& backingFunction, char requirementFlags)
+	:backingFunction{ backingFunction }, RequirementFlags{ requirementFlags } {}
 
 bool Scheduler::ScheduledFunction::Run()
 {
@@ -11,12 +11,11 @@ bool Scheduler::ScheduledFunction::Run()
 
 
 Scheduler::Scheduler()
+	:SystemsCount{ (int)Systems::Other }, schedule{ new std::list<int>[SystemsCount] }, functions{Manager<ScheduledFunction>()}
 {	
-	SystemsCount = (int)Systems::Other;
-	requirementDeques = new std::deque<std::unique_ptr<ScheduledFunction>>[SystemsCount];
 	for (int i = 0; i < SystemsCount; i ++)
 	{
-		requirementDeques[i] = std::deque<std::unique_ptr<ScheduledFunction>>();
+		schedule[i] = std::list<int>();
 	}
 }
 
@@ -26,7 +25,7 @@ Scheduler& Scheduler::GetInstance()
 	return scheduler;
 }
 
-void Scheduler::Schedule(std::function<bool()> function, char requirementFlags)
+void Scheduler::Schedule(std::function<bool()>& function, char requirementFlags)
 {
 
 }
@@ -40,16 +39,17 @@ void Scheduler::Run()
 {
 	for (int i = 0; i < SystemsCount; i ++)
 	{
-		//using currentFunction = requirementDeques[i].front(); Ask Stan if there is a way to alias this
-		if (requirementDeques[i].front()->RequirementFlags & currentlyRunningSystems == 0)
+		std::list<int>& currentSystemSchedule = schedule[i];
+		std::unique_ptr<ScheduledFunction>& currentFunction = functions.Get(currentSystemSchedule.front());
+		if (currentFunction->RequirementFlags & currentlyRunningSystems == 0)
 		{
-			requirementDeques[i].front()->AvailableSystems |= (1 << i);
-			if (requirementDeques[i].front()->AvailableSystems == requirementDeques[i].front()->RequirementFlags)
+			currentFunction->AvailableSystems |= (1 << i);
+			if (currentFunction->AvailableSystems == currentFunction->RequirementFlags)
 			{
-				currentlyRunningSystems |= requirementDeques[i].front()->RequirementFlags;
-				if (requirementDeques[i].front()->Run())
+				currentlyRunningSystems |= currentFunction->RequirementFlags;
+				if (currentFunction->Run())
 				{
-					requirementDeques[i].pop_front();
+					currentSystemSchedule.pop_front();
 				}
 				//think about if I should ever reset the AvailableSystems of a function(maybe in Update?)
 				//(i.e. does a system which was once available for ever become unavailable for that function before that function finishes?)

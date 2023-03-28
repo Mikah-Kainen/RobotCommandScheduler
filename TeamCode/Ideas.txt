@@ -34,6 +34,7 @@ Make sure commands and command groups don't go out of scope after they are sched
 Having an array that Command IDs index into would be nice, so make sure to test how big the array gets once the code is done(to prevent resizing in the middle of a match, I should start the array at the right size, which I can figure out since the code is doing pretty much the same thing ever time)
 	^The array shouldn't get too big because I want to make a function manager similar to the memory allocator that re-uses unused space
 		^This might be one of those times where I should just go with something a little sub-optimal in order to work on more critical tasks
+Making a visualizer for my scheduler would help a ton with debugging
 
 
 

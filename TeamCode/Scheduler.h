@@ -2,7 +2,8 @@
 #include "Command.cpp"
 #include <deque>
 #include <vector>
-#include <memory>
+#include <list>
+#include "Manager.cpp"
 
 static class Scheduler
 {
@@ -13,7 +14,7 @@ private:
 		char AvailableSystems;
 		char RequirementFlags;
 
-		ScheduledFunction(std::function<bool()> backingFunction, char requirementFlags);
+		ScheduledFunction(std::function<bool()>& backingFunction, char requirementFlags);
 
 		bool Run();
 
@@ -21,8 +22,8 @@ private:
 		std::function<bool()> backingFunction;
 	};
 
-	std::deque<std::unique_ptr<ScheduledFunction>>* requirementDeques; //probably change these to linked lists at some point
-	std::vector<std::unique_ptr<ScheduledFunction>> runningFunctions;
+	std::list<int>* schedule; //probably change these to linked lists at some point
+	Manager<ScheduledFunction> functions;
 	char currentlyRunningSystems;
 
 	Scheduler();
@@ -32,7 +33,7 @@ public:
 
 	static Scheduler& GetInstance();
 
-	void Schedule(std::function<bool()> function, char requirementFlags);
+	void Schedule(std::function<bool()>& function, char requirementFlags);
 
 	void Update();
 
