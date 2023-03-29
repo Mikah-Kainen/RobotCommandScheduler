@@ -129,11 +129,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Command.cpp" />
+    <ClCompile Include="FunctionManager.cpp" />
     <ClCompile Include="Manager.cpp" />
     <ClCompile Include="Scheduler.cpp" />
     <ClCompile Include="SchedulerProject.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FunctionManager.h" />
     <ClInclude Include="Scheduler.h" />
   </ItemGroup>
   <ItemGroup>

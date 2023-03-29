@@ -20,9 +20,9 @@ public:
 	Manager()
 		: nextAvailableID{ 0 }, backingMap{ std::unordered_map<int, std::unique_ptr<T>>() } {}
 
-	std::unique_ptr<T>& Get(int ID)
+	void Get(int ID)
 	{
-		return backingMap[ID];
+		//return &backingMap[ID];
 	}
 
 	void Release(int ID)
@@ -33,7 +33,8 @@ public:
 	int Add(T& value)
 	{
 		int newID = nextAvailableID++;
-		backingMap.insert(newID, std::make_unique<T>(value));
+		std::unique_ptr<T> unique = std::make_unique<T>(value);
+		backingMap.insert(newID, std::move(unique));
 		return newID;
 	}
 
