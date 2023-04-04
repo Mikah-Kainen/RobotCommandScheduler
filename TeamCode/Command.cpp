@@ -28,7 +28,7 @@ static enum class Systems
 	Other, //Other should always be last because it is used to track the length of Systems
 };
 
-//Link about Variadic Templates: https://en.cppreference.com/w/cpp/language/parameter_pack
+//Link about Parameter Packs: https://en.cppreference.com/w/cpp/language/parameter_pack
 template <typename... Ts>
 class Command
 {

@@ -27,34 +27,22 @@ bool CatFunction(Cat cat)
     return true;
 }
 
+bool CoolCatFunction()
+{
+    Cat bobCat = Cat(10, "Bob");
+    return CatFunction(bobCat);
+}
 
 
 int main()
 {
-    //Command<> beCool = Command<>(CoolFunction);
-    //beCool.Activate();
-
-    //Cat cat = Cat(0, "Zero");
-    //Command<Cat> catCat = Command<Cat>(CatFunction);
-    //catCat.Activate(cat);
-    //std::cout << "Hello World!\n";
-    //Func0 func0 = Func0(&CoolFunction);b
-    //func0.Activate();
-    //Cat cat = Cat(0, "Zero");
-    //Func1<Cat> func1 = Func1<Cat>(CatFunction);
-    //func1.Activate(cat);
-
-    std::list<int> linkedList = std::list<int>();
-    int value = 5;
-    std::make_unique<int>(value);
-
-    char mask = 9;
-    char otherMask = 12;
-    mask |= otherMask;
-    char nothing = 0;
-    otherMask |= nothing;
-    nothing |= otherMask;
-
     Scheduler scheduler = Scheduler::GetInstance();
-    scheduler.Run();
+    scheduler.Schedule(CoolFunction, (char)1);
+    scheduler.Schedule(CoolCatFunction, (char)1);
+    scheduler.Schedule(CoolFunction, (char)1);
+    for(int i = 0; i < 4; i ++)
+    {
+        scheduler.Run();
+        std::cout << "\n";
+    }
 }

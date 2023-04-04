@@ -4,15 +4,9 @@
 #include <memory>
 #include <exception>
 
+//Interesting link: https://jguegant.github.io/blogs/tech/performing-try-emplace.html
 class FunctionManager
 {
-public:
-	class IScheduleable;
-
-private:
-	std::unordered_map<int, std::unique_ptr<IScheduleable>> database;
-	int nextAvailableID;
-
 public:
 	class IScheduleable
 	{
@@ -22,19 +16,32 @@ public:
 		std::function<bool()> backingFunction;
 
 	public:
+		bool IsDead;
 		IScheduleable(std::function<bool()> backingFunction, char requirementFlags);
 
 		IScheduleable(std::function<bool()> backingFunction);
+
+		IScheduleable();
+
+		~IScheduleable();
 
 		void AddRequirement(char newRequirementFlags);
 
 		bool RunIfReady(char availableSystem);
 	};
 
+private:
+	std::unordered_map<int, IScheduleable> database;
+	int nextAvailableID;
+
+public:
+
 	FunctionManager();
 
-	int AddToDatabase(IScheduleable& scheduledItem);
+	int AddToDatabase(IScheduleable scheduledItem);
 
-	bool RunIfReady(int scheduledID, char availableSystem);
+	bool RunIfReady(int scheduledID, char availableSystem); //Runs the IScheduleable with the specified ID if the system requirements are met
+
+	void Remove(int ID);
 };
 

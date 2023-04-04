@@ -1,21 +1,23 @@
-#include "Scheduler.h"(
+#include "Scheduler.h"
 
 
-Scheduler::ScheduledFunction::ScheduledFunction(std::function<bool()>& backingFunction, char requirementFlags)
-	:backingFunction{ backingFunction }, RequirementFlags{ requirementFlags } {}
+//Scheduler::ScheduledFunction::ScheduledFunction(std::function<bool()>& backingFunction, char requirementFlags)
+//	:backingFunction{ backingFunction }, RequirementFlags{ requirementFlags } {}
 
-bool Scheduler::ScheduledFunction::Run()
-{
-	return backingFunction();
-}
+//bool Scheduler::ScheduledFunction::Run()
+//{
+//	return backingFunction();
+//}
 
 
 Scheduler::Scheduler()
-	:SystemsCount{ (int)Systems::Other }, schedule{ new std::list<int>[SystemsCount] }, functions{Manager<ScheduledFunction>()}
+	:SystemsCount{ (int)Systems::Other + 1 }, functionManager{FunctionManager()}
 {	
+	schedule = new std::list<int>[SystemsCount];
 	for (int i = 0; i < SystemsCount; i ++)
 	{
-		schedule[i] = std::list<int>();
+		std::list<int> newList = std::list<int>();
+		schedule[i] = newList;
 	}
 }
 
@@ -25,25 +27,34 @@ Scheduler& Scheduler::GetInstance()
 	return scheduler;
 }
 
-void Scheduler::Schedule(std::function<bool()>& function, char requirementFlags)
+void Scheduler::Schedule(std::function<bool()> function, char requirementFlags)
 {
-
+	int newID = functionManager.AddToDatabase(FunctionManager::IScheduleable(function, requirementFlags));
+	schedule[0].push_back(newID); //DEFINITELY CHANGE THIS!!!!!!!!
+	//Definitely put stuff here
 }
 
 void Scheduler::Update()
 {
-
+	//This is probably unnecessary
 }
 
 void Scheduler::Run()
 {
+	char availableSystem = (char)0x1;
 	for (int i = 0; i < SystemsCount; i ++)
 	{
 		std::list<int>& currentSystemSchedule = schedule[i];
-		auto func = std::function<bool()>([]() {return true; });
-		ScheduledFunction tempFunc = ScheduledFunction(func, (char)1);
-		int ID = functions.Add(tempFunc);
-		functions.Release(ID);
+		if (currentSystemSchedule.size() == 0)
+		{
+			std::cout << "No functions are schedule for System-" << i << "\n";
+		}
+		else if (functionManager.RunIfReady(currentSystemSchedule.front(), availableSystem))
+		{
+			functionManager.Remove(currentSystemSchedule.front());
+			currentSystemSchedule.pop_front();
+		}
+		availableSystem << 1;
 		//std::unique_ptr<ScheduledFunction>& currentFunction = functions.Get(currentSystemSchedule.front());
 		//if (currentFunction->RequirementFlags & currentlyRunningSystems == 0)
 		//{

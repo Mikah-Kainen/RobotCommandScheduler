@@ -3,27 +3,30 @@
 #include <deque>
 #include <vector>
 #include <list>
-#include "Manager.cpp"
+#include <iostream>
+#include "FunctionManager.h"
+//#include "Manager.cpp"
 
 static class Scheduler
 {
 private:
-	class ScheduledFunction
-	{
-	public:
-		char AvailableSystems;
-		char RequirementFlags;
+	//class ScheduledFunction
+	//{
+	//public:
+	//	char AvailableSystems;
+	//	char RequirementFlags;
 
-		ScheduledFunction(std::function<bool()>& backingFunction, char requirementFlags);
+	//	ScheduledFunction(std::function<bool()>& backingFunction, char requirementFlags);
 
-		bool Run();
+	//	bool Run();
 
-	private:
-		std::function<bool()> backingFunction;
-	};
+	//private:
+	//	std::function<bool()> backingFunction;
+	//};
 
-	std::list<int>* schedule; //probably change these to linked lists at some point
-	Manager<ScheduledFunction> functions;
+	//Manager<ScheduledFunction> functions;
+	std::list<int>* schedule;
+	FunctionManager functionManager;
 	char currentlyRunningSystems;
 
 	Scheduler();
@@ -33,7 +36,7 @@ public:
 
 	static Scheduler& GetInstance();
 
-	void Schedule(std::function<bool()>& function, char requirementFlags);
+	void Schedule(std::function<bool()> function, char requirementFlags);
 
 	void Update();
 

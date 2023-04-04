@@ -12,37 +12,37 @@ Manager should have a subscribe function, which subscribes an ID to the end func
 ScheduledFunction should be in Manager, not in Scheduler
 */
 
-template <typename T>
-class Manager
-{
-public:
-
-	Manager()
-		: nextAvailableID{ 0 }, backingMap{ std::unordered_map<int, std::unique_ptr<T>>() } {}
-
-	void Get(int ID)
-	{
-		//return &backingMap[ID];
-	}
-
-	void Release(int ID)
-	{
-		backingMap.erase(ID);
-	}
-
-	int Add(T& value)
-	{
-		int newID = nextAvailableID++;
-		std::unique_ptr<T> unique = std::make_unique<T>(value);
-		backingMap.insert(newID, std::move(unique));
-		return newID;
-	}
-
-private:
-	int nextAvailableID;
-	std::unordered_map<int, std::unique_ptr<T>> backingMap;
-
-};
+//template <typename T>
+//class Manager
+//{
+//public:
+//
+//	Manager()
+//		: nextAvailableID{ 0 }, backingMap{ std::unordered_map<int, std::unique_ptr<T>>() } {}
+//
+//	void Get(int ID)
+//	{
+//		//return &backingMap[ID];
+//	}
+//
+//	void Release(int ID)
+//	{
+//		backingMap.erase(ID);
+//	}
+//
+//	int Add(T& value)
+//	{
+//		int newID = nextAvailableID++;
+//		std::unique_ptr<T> unique = std::make_unique<T>(value);
+//		backingMap.insert(newID, std::move(unique));
+//		return newID;
+//	}
+//
+//private:
+//	int nextAvailableID;
+//	std::unordered_map<int, std::unique_ptr<T>> backingMap;
+//
+//};
 
 //template <typename T>
 //class Manager
