@@ -36,6 +36,11 @@ Having an array that Command IDs index into would be nice, so make sure to test 
 		^This might be one of those times where I should just go with something a little sub-optimal in order to work on more critical tasks
 Making a visualizer for my scheduler would help a ton with debugging
 
+Testing:
+Make some fake systems with commands that use boolean member variables to run twice before returning true. 
+Write a different character the first and second time each function runs.
+Schedule two functions like this that use different systems.
+Check Console to make sure messages are written in the right order!
 
 
 Using Wait Commands to implement Sequential Command Groups instead of Adding Extra Requirements:
