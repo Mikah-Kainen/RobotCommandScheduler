@@ -30,7 +30,9 @@ Scheduler& Scheduler::GetInstance()
 void Scheduler::Schedule(std::function<bool()> function, char requirementFlags)
 {
 	int newID = functionManager.AddToDatabase(FunctionManager::IScheduleable(function, requirementFlags));
-	schedule[0].push_back(newID); //DEFINITELY CHANGE THIS!!!!!!!!
+	float requirementNumber = (float)requirementFlags;
+	int functionIndex = log(requirementNumber) / log(2);
+	schedule[functionIndex].push_back(newID); //DEFINITELY CHANGE THIS!!!!!!!!
 	//Definitely put stuff here
 }
 
@@ -47,14 +49,15 @@ void Scheduler::Run()
 		std::list<int>& currentSystemSchedule = schedule[i];
 		if (currentSystemSchedule.size() == 0)
 		{
-			std::cout << "No functions are schedule for System-" << i << "\n";
+			//std::cout << "No functions are schedule for System-" << i << "\n";
 		}
 		else if (functionManager.RunIfReady(currentSystemSchedule.front(), availableSystem))
 		{
 			functionManager.Remove(currentSystemSchedule.front());
 			currentSystemSchedule.pop_front();
 		}
-		availableSystem << 1;
+		availableSystem <<= 1;
+		;
 		//std::unique_ptr<ScheduledFunction>& currentFunction = functions.Get(currentSystemSchedule.front());
 		//if (currentFunction->RequirementFlags & currentlyRunningSystems == 0)
 		//{

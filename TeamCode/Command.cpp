@@ -16,11 +16,11 @@
 //	char AvailableSystems; //used by scheduler to track if all the required systems are available
 //};
 
-static enum class Systems
+static enum class Systems : char
 {
-	Zero,
-	One,
-	Two,
+	MotorA = 1,
+	MotorB = 2,
+	MotorC = 4,
 	Three,
 	Four,
 	Five,
