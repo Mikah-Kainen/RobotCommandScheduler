@@ -10,26 +10,34 @@
 //}
 
 
-Scheduler::Scheduler()
-	:IScheduleable(std::function<bool()>([&]() {return Run(); })), SystemsCount{ (int)Systems::Other + 1 }, functionManager{ FunctionManager() }
+//make it so that Schedulers take in a char for their requirement flags
+//make it so commands can be scheduled with their parameters passed in(and the FunctionManager properly owns everything)
+
+Scheduler::Scheduler(std::vector<Systems> schedulerSystems)
+	:Scheduleable(std::function<bool()>([&]() {return Run(); })), SchedulerSystems{schedulerSystems}, functionManager {
+	FunctionManager()
+}
 {	
-	schedule = new std::list<int>[SystemsCount];
-	for (int i = 0; i < SystemsCount; i ++)
+	schedule = std::unordered_map<Systems, std::list<int>>();
+	for(Systems system : schedulerSystems)
 	{
-		std::list<int> newList = std::list<int>();
-		schedule[i] = newList;
+		schedule.emplace(system, std::list<int>());
 	}
 }
 
-Scheduler& Scheduler::GetInstance()
+//add additional scheduler constructors
+Scheduler::Scheduler()
 {
-	static Scheduler scheduler;
-	return scheduler;
+
 }
 
+//add additional scheduling functions to handle scheduling Schedulers
+//also think about how conditional functions could work(maybe a placeholder function that is replaced by a Scheduler that handles whichever branch it is currently on)
+//also add functionality to remove systems from the scheduler when all the system's commands have been completed, so that the parent scheduler can start scheduling things with that system(but don't remove systems from the original scheduler!)
+//make different types of schedulers or have information in the schedulers which decides whether a system should be removed or its default functions should be run when the scheduler runs out of scheduled functions for that system
 void Scheduler::Schedule(std::function<bool()> function, char requirementFlags)
 {
-	int newID = functionManager.AddToDatabase(FunctionManager::IScheduleable(function, requirementFlags));
+	int newID = functionManager.AddToDatabase(FunctionManager::Scheduleable(function, requirementFlags));
 	float requirementNumber = (float)requirementFlags;
 	int functionIndex = log(requirementNumber) / log(2);
 	schedule[functionIndex].push_back(newID);

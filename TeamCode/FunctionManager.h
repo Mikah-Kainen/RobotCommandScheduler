@@ -4,28 +4,13 @@
 #include <memory>
 #include <exception>
 
-//change for loop to not need Other
-//change functions to have Systems instead of char
 
-
-static enum class Systems : char
-{
-	MotorA = 1,
-	MotorB = 2,
-	MotorC = 4,
-	Three = 8,
-	Four = 16,
-	Five = 32,
-	Six = 64,
-	Other = 128, //Other should always be last System because it is used to track the length of Systems
-	All = 255,
-};
 
 //Interesting link: https://jguegant.github.io/blogs/tech/performing-try-emplace.html
 class FunctionManager
 {
 public:
-	class IScheduleable
+	class Scheduleable
 	{
 	private:
 		char availableSystems;
@@ -34,13 +19,13 @@ public:
 
 	public:
 		bool IsDead;
-		IScheduleable(std::function<bool()> backingFunction, char requirementFlags);
+		Scheduleable(std::function<bool()> backingFunction, char requirementFlags);
 
-		IScheduleable(std::function<bool()> backingFunction);
+		Scheduleable(std::function<bool()> backingFunction);
 
-		IScheduleable();
+		Scheduleable();
 
-		~IScheduleable();
+		~Scheduleable();
 
 		void AddRequirement(char newRequirementFlags);
 
@@ -48,14 +33,14 @@ public:
 	};
 
 private:
-	std::unordered_map<int, IScheduleable> database;
+	std::unordered_map<int, Scheduleable> database;
 	int nextAvailableID;
 
 public:
 
 	FunctionManager();
 
-	int AddToDatabase(IScheduleable scheduledItem);
+	int AddToDatabase(Scheduleable scheduledItem);
 
 	bool RunIfReady(int scheduledID, char availableSystem); //Runs the IScheduleable with the specified ID if the system requirements are met
 

@@ -1,25 +1,25 @@
 #include "FunctionManager.h"
 
 #pragma region IScheduleable
-FunctionManager::IScheduleable::IScheduleable(std::function<bool()> backingFunction, char requirementFlags)
+FunctionManager::Scheduleable::Scheduleable(std::function<bool()> backingFunction, char requirementFlags)
 	:backingFunction{ backingFunction }, requirementFlags{ requirementFlags }, availableSystems{(char)0}, IsDead{ false } {}
 
-FunctionManager::IScheduleable::IScheduleable(std::function<bool()> backingFunction)
-	:IScheduleable(backingFunction, (char)255) {}
+FunctionManager::Scheduleable::Scheduleable(std::function<bool()> backingFunction)
+	:Scheduleable(backingFunction, (char)255) {}
 
-FunctionManager::IScheduleable::IScheduleable() {}
+FunctionManager::Scheduleable::Scheduleable() {}
 
-FunctionManager::IScheduleable::~IScheduleable() 
+FunctionManager::Scheduleable::~Scheduleable() 
 {
 	IsDead = true;
 };
 
-void FunctionManager::IScheduleable::AddRequirement(char newRequirementFlags)
+void FunctionManager::Scheduleable::AddRequirement(char newRequirementFlags)
 {
 	requirementFlags |= newRequirementFlags;
 }
 
-bool FunctionManager::IScheduleable::RunIfReady(char availableSystem) 
+bool FunctionManager::Scheduleable::RunIfReady(char availableSystem) 
 //An IScheduleable that doesn't require any systems will never run because RunIfReady always adds an available system before checking the requirements
 {
 	if (IsDead)
@@ -42,9 +42,9 @@ bool FunctionManager::IScheduleable::RunIfReady(char availableSystem)
 #pragma region FunctionManager
 
 FunctionManager::FunctionManager()
-	:database{ std::unordered_map<int, IScheduleable>() }, nextAvailableID{ 0 } {}
+	:database{ std::unordered_map<int, Scheduleable>() }, nextAvailableID{ 0 } {}
 
-int FunctionManager::AddToDatabase(IScheduleable scheduledItem)
+int FunctionManager::AddToDatabase(Scheduleable scheduledItem)
 {
 	int ID = nextAvailableID++;
 	database.emplace(ID, scheduledItem);

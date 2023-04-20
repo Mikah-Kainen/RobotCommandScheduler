@@ -7,34 +7,21 @@
 #include "FunctionManager.h"
 //#include "Manager.cpp"
 
-static class Scheduler : public FunctionManager::IScheduleable
+static class Scheduler : public FunctionManager::Scheduleable
 {
 private:
-	//class ScheduledFunction
-	//{
-	//public:
-	//	char AvailableSystems;
-	//	char RequirementFlags;
-
-	//	ScheduledFunction(std::function<bool()>& backingFunction, char requirementFlags);
-
-	//	bool Run();
-
-	//private:
-	//	std::function<bool()> backingFunction;
-	//};
-
-	//Manager<ScheduledFunction> functions;
-	std::list<int>* schedule;
+	std::unordered_map<Systems, std::list<int>> schedule;
 	FunctionManager functionManager;
 	char currentlyRunningSystems;
 
-	Scheduler();
-
 public:
-	int SystemsCount;
+	std::vector<Systems> SchedulerSystems;
 
-	static Scheduler& GetInstance();
+	Scheduler(std::vector<Systems> schedulerSystems);
+
+	Scheduler(std::vector<char> schedulerSystems);
+
+	Scheduler(char systemFlags);
 
 	void Schedule(std::function<bool()> function, char requirementFlags);
 

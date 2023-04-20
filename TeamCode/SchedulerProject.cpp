@@ -3,6 +3,7 @@
 #include <string>
 #include <list>
 #include "Scheduler.h"
+#include "Static.h"
 
 #pragma region CatStuff
 class Cat
@@ -91,7 +92,7 @@ int main()
 {
 
     Scheduler scheduler = Scheduler::GetInstance();
-    scheduler.Schedule(MotorA.Display, (char)Systems::MotorA);
+    //scheduler.Schedule(MotorA.Display, (char)Systems::MotorA);
     scheduler.Schedule([&]() {return MotorA.MultiStepMove(3); }, (char)Systems::MotorA);
     scheduler.Schedule([&]() {return MotorA.ResetCurrentStep(); }, (char)Systems::MotorA);
     scheduler.Schedule(test, (char)Systems::MotorA);
