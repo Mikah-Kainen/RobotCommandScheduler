@@ -7,7 +7,7 @@
 #include "FunctionManager.h"
 //#include "Manager.cpp"
 
-static class Scheduler
+static class Scheduler : public FunctionManager::IScheduleable
 {
 private:
 	//class ScheduledFunction
@@ -40,6 +40,6 @@ public:
 
 	void Update();
 
-	void Run();
+	bool Run();
 };
 

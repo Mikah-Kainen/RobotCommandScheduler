@@ -5,7 +5,7 @@ FunctionManager::IScheduleable::IScheduleable(std::function<bool()> backingFunct
 	:backingFunction{ backingFunction }, requirementFlags{ requirementFlags }, availableSystems{(char)0}, IsDead{ false } {}
 
 FunctionManager::IScheduleable::IScheduleable(std::function<bool()> backingFunction)
-	:IScheduleable(backingFunction, (char)0) {}
+	:IScheduleable(backingFunction, (char)255) {}
 
 FunctionManager::IScheduleable::IScheduleable() {}
 

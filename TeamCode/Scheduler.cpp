@@ -11,7 +11,7 @@
 
 
 Scheduler::Scheduler()
-	:SystemsCount{ (int)Systems::Other + 1 }, functionManager{FunctionManager()}
+	:IScheduleable(std::function<bool()>([&]() {return Run(); })), SystemsCount{ (int)Systems::Other + 1 }, functionManager{ FunctionManager() }
 {	
 	schedule = new std::list<int>[SystemsCount];
 	for (int i = 0; i < SystemsCount; i ++)
@@ -32,7 +32,7 @@ void Scheduler::Schedule(std::function<bool()> function, char requirementFlags)
 	int newID = functionManager.AddToDatabase(FunctionManager::IScheduleable(function, requirementFlags));
 	float requirementNumber = (float)requirementFlags;
 	int functionIndex = log(requirementNumber) / log(2);
-	schedule[functionIndex].push_back(newID); //DEFINITELY CHANGE THIS!!!!!!!!
+	schedule[functionIndex].push_back(newID);
 	//Definitely put stuff here
 }
 
@@ -41,7 +41,7 @@ void Scheduler::Update()
 	//This is probably unnecessary
 }
 
-void Scheduler::Run()
+bool Scheduler::Run()
 {
 	char availableSystem = (char)0x1;
 	for (int i = 0; i < SystemsCount; i ++)
@@ -57,7 +57,6 @@ void Scheduler::Run()
 			currentSystemSchedule.pop_front();
 		}
 		availableSystem <<= 1;
-		;
 		//std::unique_ptr<ScheduledFunction>& currentFunction = functions.Get(currentSystemSchedule.front());
 		//if (currentFunction->RequirementFlags & currentlyRunningSystems == 0)
 		//{
@@ -74,4 +73,6 @@ void Scheduler::Run()
 		//	}
 		//}
 	}
+
+	return false; //Change this!!
 }

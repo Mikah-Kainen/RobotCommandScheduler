@@ -2,32 +2,6 @@
 #include <functional>
 #include <exception>
 
-//class IScheduleable
-//{
-//private:
-//
-//public:
-//	
-//	IScheduleable()
-//	{
-//	}
-//
-//	char RequirementFlags;
-//	char AvailableSystems; //used by scheduler to track if all the required systems are available
-//};
-
-static enum class Systems : char
-{
-	MotorA = 1,
-	MotorB = 2,
-	MotorC = 4,
-	Three,
-	Four,
-	Five,
-	Six,
-	Other, //Other should always be last because it is used to track the length of Systems
-};
-
 //Link about Parameter Packs: https://en.cppreference.com/w/cpp/language/parameter_pack
 template <typename... Ts>
 class Command

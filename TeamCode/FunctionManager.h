@@ -4,6 +4,23 @@
 #include <memory>
 #include <exception>
 
+//change for loop to not need Other
+//change functions to have Systems instead of char
+
+
+static enum class Systems : char
+{
+	MotorA = 1,
+	MotorB = 2,
+	MotorC = 4,
+	Three = 8,
+	Four = 16,
+	Five = 32,
+	Six = 64,
+	Other = 128, //Other should always be last System because it is used to track the length of Systems
+	All = 255,
+};
+
 //Interesting link: https://jguegant.github.io/blogs/tech/performing-try-emplace.html
 class FunctionManager
 {
