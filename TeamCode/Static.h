@@ -18,18 +18,38 @@ static enum class Systems : char
 
 static const int SystemsCount = 8;
 
+//Untested
 static std::vector<Systems> GetSystems(char systemFlags)
 {
 	std::vector<Systems> returnSystems;
 	for (int i = 0; i < SystemsCount; i ++)
 	{
-		char currentFlag = systemFlags << (SystemsCount - 1);
-		int //make these functions work
+		char currentFlag = systemFlags << (i - 1);
+		currentFlag = currentFlag >> (i - 1);
+		returnSystems.push_back((Systems)currentFlag);
 	}
+	return returnSystems;
 }
 
+//Untested
+static std::vector<Systems> GetSystems(std::vector<char> systemFlags)
+{
+	std::vector<Systems> returnSystems;
+	for (char flag : systemFlags)
+	{
+		returnSystems.push_back((Systems)flag);
+	}
+	return returnSystems;
+}
+
+//Untested
 static char CreateFlag(std::vector<Systems> systems)
 {
-
+	char flag = 0;
+	for (Systems system : systems)
+	{
+		flag |= (char)system;
+	}
+	return flag;
 }
 

@@ -10,14 +10,16 @@
 //}
 
 
-//make it so that Schedulers take in a char for their requirement flags
-//make it so commands can be scheduled with their parameters passed in(and the FunctionManager properly owns everything)
-
-Scheduler::Scheduler(std::vector<Systems> schedulerSystems)
-	:Scheduleable(std::function<bool()>([&]() {return Run(); })), SchedulerSystems{schedulerSystems}, functionManager {
-	FunctionManager()
+Scheduler::Scheduler()
+	: Scheduler(GetSystems(255), SchedulerTypes::Base)
+{
 }
+
+Scheduler::Scheduler(std::vector<Systems> schedulerSystems, SchedulerTypes type)
+	:Scheduleable(std::function<bool()>([&]() {return Run(); })), SchedulerSystems{schedulerSystems}, functionManager {FunctionManager()}
 {	
+	schedulerType = type;
+
 	schedule = std::unordered_map<Systems, std::list<int>>();
 	for(Systems system : schedulerSystems)
 	{
@@ -25,11 +27,18 @@ Scheduler::Scheduler(std::vector<Systems> schedulerSystems)
 	}
 }
 
-//add additional scheduler constructors
-Scheduler::Scheduler()
+Scheduler::Scheduler(char systemFlags, SchedulerTypes type)
+	:Scheduler(GetSystems(systemFlags), type)
 {
-
 }
+
+Scheduler::Scheduler(std::vector<char> systemFlags, SchedulerTypes type)
+	:Scheduler(GetSystems(systemFlags), type)
+{
+}
+
+
+//make it so commands can be scheduled with their parameters passed in(and the FunctionManager properly owns everything)
 
 //add additional scheduling functions to handle scheduling Schedulers
 //also think about how conditional functions could work(maybe a placeholder function that is replaced by a Scheduler that handles whichever branch it is currently on)
@@ -38,10 +47,31 @@ Scheduler::Scheduler()
 void Scheduler::Schedule(std::function<bool()> function, char requirementFlags)
 {
 	int newID = functionManager.AddToDatabase(FunctionManager::Scheduleable(function, requirementFlags));
+	for (int i = 0; i < SystemsCount; i++)
+	{
+		char currentFlag = requirementFlags << (i - 1);
+		currentFlag = currentFlag >> (i - 1);
+		if (currentFlag == 1)
+		{
+
+			schedule[(Systems)pow(2, i)].push_back(newID); //MAKE SURE TO TEST THIS
+			int //Test ^
+		}
+	}
 	float requirementNumber = (float)requirementFlags;
 	int functionIndex = log(requirementNumber) / log(2);
-	schedule[functionIndex].push_back(newID);
 	//Definitely put stuff here
+}
+
+void Scheduler::Schedule(std::function<bool()> function, std::vector<Systems> requiredSystems)
+{
+	Schedule(function, CreateFlag(requiredSystems));
+}
+
+Scheduler& Scheduler::GetInstance()
+{
+	static Scheduler scheduler = Scheduler();
+	return scheduler;
 }
 
 void Scheduler::Update()
