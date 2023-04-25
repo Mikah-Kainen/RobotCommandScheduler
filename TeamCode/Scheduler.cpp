@@ -1,7 +1,7 @@
 #include "Scheduler.h"
 
 
-//Scheduler::ScheduledFunction::ScheduledFunction(std::function<bool()>& backingFunction, char requirementFlags)
+//Scheduler::ScheduledFunction::ScheduledFunction(std::function<bool()>& backingFunction, unsigned char requirementFlags)
 //	:backingFunction{ backingFunction }, RequirementFlags{ requirementFlags } {}
 
 //bool Scheduler::ScheduledFunction::Run()
@@ -27,12 +27,12 @@ Scheduler::Scheduler(std::vector<Systems> schedulerSystems, SchedulerTypes type)
 	}
 }
 
-Scheduler::Scheduler(char systemFlags, SchedulerTypes type)
+Scheduler::Scheduler(unsigned char systemFlags, SchedulerTypes type)
 	:Scheduler(GetSystems(systemFlags), type)
 {
 }
 
-Scheduler::Scheduler(std::vector<char> systemFlags, SchedulerTypes type)
+Scheduler::Scheduler(std::vector<unsigned char> systemFlags, SchedulerTypes type)
 	:Scheduler(GetSystems(systemFlags), type)
 {
 }
@@ -44,12 +44,39 @@ Scheduler::Scheduler(std::vector<char> systemFlags, SchedulerTypes type)
 //also think about how conditional functions could work(maybe a placeholder function that is replaced by a Scheduler that handles whichever branch it is currently on)
 //also add functionality to remove systems from the scheduler when all the system's commands have been completed, so that the parent scheduler can start scheduling things with that system(but don't remove systems from the original scheduler!)
 //make different types of schedulers or have information in the schedulers which decides whether a system should be removed or its default functions should be run when the scheduler runs out of scheduled functions for that system
-void Scheduler::Schedule(std::function<bool()> function, char requirementFlags)
+void Scheduler::Schedule(std::function<bool()> function, unsigned char requirementFlags)
 {
+#pragma region workingTheory
+	/*
+	* char needs to be unsigned
+	* use masks instead of shifting
+	void SchedulerTest(unsigned char requirementFlags)
+{
+	for (int i = 0; i < 8; i++)
+	{
+		if (i == 7)
+		{
+			unsigned char temp = requirementFlags;
+			requirementFlags = 'a';
+			requirementFlags = temp;
+		}
+		//unsigned char currentFlag = requirementFlags << (8 - 1 - i);
+		//currentFlag = currentFlag >> (8 - 1 - i);
+		unsigned char currentMask = 1 << i;
+		if ((requirementFlags & currentMask) >> i == 1)
+		{
+			std::cout << (pow(2, i)) << std::endl;
+			//schedule[(Systems)pow(2, i)].push_back(newID); //MAKE SURE TO TEST THIS
+			//int //Test ^
+		}
+	}
+	//Definitely put stuff here
+}*/
+#pragma endregion
 	int newID = functionManager.AddToDatabase(FunctionManager::Scheduleable(function, requirementFlags));
 	for (int i = 0; i < SystemsCount; i++)
 	{
-		char currentFlag = requirementFlags << (i - 1);
+		unsigned char currentFlag = requirementFlags << (i - 1);
 		currentFlag = currentFlag >> (i - 1);
 		if (currentFlag == 1)
 		{
@@ -81,7 +108,7 @@ void Scheduler::Update()
 
 bool Scheduler::Run()
 {
-	char availableSystem = (char)0x1;
+	unsigned char availableSystem = (unsigned char)0x1;
 	for (int i = 0; i < SystemsCount; i ++)
 	{
 		std::list<int>& currentSystemSchedule = schedule[i];

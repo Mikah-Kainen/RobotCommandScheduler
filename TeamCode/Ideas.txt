@@ -38,7 +38,7 @@ Making a visualizer for my scheduler would help a ton with debugging
 
 Testing:
 Make some fake systems with commands that use boolean member variables to run twice before returning true. 
-Write a different character the first and second time each function runs.
+Write a different unsigned character the first and second time each function runs.
 Schedule two functions like this that use different systems.
 Check Console to make sure messages are written in the right order!
 
@@ -49,6 +49,6 @@ All sequential command groups could simply run wait commands for systems that th
 Parallel command groups inside of sequential command groups could simply not have wait commands!
 To make this idea work, I need a way for the wait commands to efficiently check whether other commands have finished
 	^Idea 1: The wait commands remember the command IDs for the commands they are waiting to finish and check when the IDs have been mapped back to default commands(probably not good because I don't want to guarentee that they haven't been reassigned to other commands or were ever even set to default after they finished)
-	^Idea 2: Wait commands have a char for the requirements they are waiting to finish
+	^Idea 2: Wait commands have a unsigned char for the requirements they are waiting to finish
 				^ScheduledCommand can have an optional parameter for a list of command IDs(in this case used with wait command IDs) to inform when the ScheduledCommand finishes
 				^Scheduler.Schedule should return the ID of the function it just scheduled so that sequential command groups can give their actual commands the IDs of their wait commands

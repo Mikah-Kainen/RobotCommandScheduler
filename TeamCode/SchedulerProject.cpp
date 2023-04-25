@@ -92,12 +92,12 @@ int main()
 {
 
     Scheduler scheduler = Scheduler::GetInstance();
-    //scheduler.Schedule(MotorA.Display, (char)Systems::MotorA);
-    scheduler.Schedule([&]() {return MotorA.MultiStepMove(3); }, (char)Systems::MotorA);
-    scheduler.Schedule([&]() {return MotorA.ResetCurrentStep(); }, (char)Systems::MotorA);
-    scheduler.Schedule(test, (char)Systems::MotorA);
-    scheduler.Schedule([&]() {return MotorB.MultiStepMove(4); }, (char)Systems::MotorB);
-    scheduler.Schedule([&]() {return MotorC.MultiStepMove(5); }, (char)Systems::MotorC);
+    //scheduler.Schedule(MotorA.Display, (unsigned char)Systems::MotorA);
+    scheduler.Schedule([&]() {return MotorA.MultiStepMove(3); }, (unsigned char)Systems::MotorA);
+    scheduler.Schedule([&]() {return MotorA.ResetCurrentStep(); }, (unsigned char)Systems::MotorA);
+    scheduler.Schedule(test, (unsigned char)Systems::MotorA);
+    scheduler.Schedule([&]() {return MotorB.MultiStepMove(4); }, (unsigned char)Systems::MotorB);
+    scheduler.Schedule([&]() {return MotorC.MultiStepMove(5); }, (unsigned char)Systems::MotorC);
 
     while (true) //scheduler needs a bool for when it is done
     {
@@ -107,9 +107,9 @@ int main()
 
 
 
-    //scheduler.Schedule(CoolFunction, (char)1);
-    //scheduler.Schedule(CoolCatFunction, (char)1);
-    //scheduler.Schedule(CoolFunction, (char)1);
+    //scheduler.Schedule(CoolFunction, (unsigned char)1);
+    //scheduler.Schedule(CoolCatFunction, (unsigned char)1);
+    //scheduler.Schedule(CoolFunction, (unsigned char)1);
     //for(int i = 0; i < 4; i ++)
     //{
     //    scheduler.Run();

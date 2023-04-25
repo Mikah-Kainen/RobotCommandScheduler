@@ -2,7 +2,7 @@
 #include <vector>
 
 
-static enum class Systems : char
+static enum class Systems : unsigned char
 {
 	None = 0,
 	MotorA = 1,
@@ -19,12 +19,12 @@ static enum class Systems : char
 static const int SystemsCount = 8;
 
 //Untested
-static std::vector<Systems> GetSystems(char systemFlags)
+static std::vector<Systems> GetSystems(unsigned char systemFlags)
 {
 	std::vector<Systems> returnSystems;
 	for (int i = 0; i < SystemsCount; i ++)
 	{
-		char currentFlag = systemFlags << (i - 1);
+		unsigned char currentFlag = systemFlags << (i - 1);
 		currentFlag = currentFlag >> (i - 1);
 		returnSystems.push_back((Systems)currentFlag);
 	}
@@ -32,10 +32,10 @@ static std::vector<Systems> GetSystems(char systemFlags)
 }
 
 //Untested
-static std::vector<Systems> GetSystems(std::vector<char> systemFlags)
+static std::vector<Systems> GetSystems(std::vector<unsigned char> systemFlags)
 {
 	std::vector<Systems> returnSystems;
-	for (char flag : systemFlags)
+	for (unsigned char flag : systemFlags)
 	{
 		returnSystems.push_back((Systems)flag);
 	}
@@ -43,12 +43,12 @@ static std::vector<Systems> GetSystems(std::vector<char> systemFlags)
 }
 
 //Untested
-static char CreateFlag(std::vector<Systems> systems)
+static unsigned char CreateFlag(std::vector<Systems> systems)
 {
-	char flag = 0;
+	unsigned char flag = 0;
 	for (Systems system : systems)
 	{
-		flag |= (char)system;
+		flag |= (unsigned char)system;
 	}
 	return flag;
 }
