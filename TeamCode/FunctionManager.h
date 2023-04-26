@@ -20,15 +20,16 @@ public:
 		std::function<bool()> backingFunction;
 
 	protected:
-		virtual void ThisIsAbstract() = 0;
+		//virtual void ThisIsAbstract() = 0;
 
-	public:
-		bool IsDead;
 		Scheduleable(std::function<bool()> backingFunction, unsigned char requirementFlags);
 
 		//Scheduleable(std::function<bool()> backingFunction);
 
 		Scheduleable();
+
+	public:
+		bool IsDead;
 
 		~Scheduleable();
 
@@ -38,7 +39,7 @@ public:
 	};
 
 private:
-	std::unordered_map<int, Scheduleable*> database;
+	std::unordered_map<int, std::shared_ptr<Scheduleable>> database;
 	int nextAvailableID;
 
 public:

@@ -43,7 +43,7 @@ bool FunctionManager::Scheduleable::RunIfReady(unsigned char availableSystem)
 #pragma region FunctionManager
 
 FunctionManager::FunctionManager()
-	:database{ std::unordered_map<int, Scheduleable*>() }, nextAvailableID{ 0 } {}
+	:database{ std::unordered_map<int, std::shared_ptr<Scheduleable>>() }, nextAvailableID{ 0 } {}
 
 int FunctionManager::AddToDatabase(Scheduleable* scheduledItem)
 {

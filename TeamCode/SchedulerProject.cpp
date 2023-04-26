@@ -104,15 +104,13 @@ int main()
         scheduler.Run();
         //std::cout << "\n";
     }
-
-
-
-    //scheduler.Schedule(CoolFunction, (unsigned char)1);
-    //scheduler.Schedule(CoolCatFunction, (unsigned char)1);
-    //scheduler.Schedule(CoolFunction, (unsigned char)1);
-    //for(int i = 0; i < 4; i ++)
-    //{
-    //    scheduler.Run();
-    //    std::cout << "\n";
-    //}
 }
+
+//scheduler.Schedule(CoolFunction, (unsigned char)1);
+//scheduler.Schedule(CoolCatFunction, (unsigned char)1);
+//scheduler.Schedule(CoolFunction, (unsigned char)1);
+//for(int i = 0; i < 4; i ++)
+//{
+//    scheduler.Run();
+//    std::cout << "\n";
+//}

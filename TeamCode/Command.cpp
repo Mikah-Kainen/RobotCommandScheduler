@@ -1,6 +1,7 @@
 #pragma once
 #include <functional>
 #include <exception>
+#include "FunctionManager.h"
 
 //#include "Scheduler.h"
 //these two are included in Scheduler.h
@@ -13,6 +14,15 @@
 //	ScheduleableCommand(std::function<bool()> backingFunction, unsigned char requirementFlags)
 //		:FunctionManager::Scheduleable(backingFunction, requirementFlags) {}
 //};
+
+class ScheduledCommand : public FunctionManager::Scheduleable
+{
+
+public:
+
+	ScheduledCommand(std::function<bool()> backingFunction, unsigned char requirementFlags)
+		: FunctionManager::Scheduleable(backingFunction, requirementFlags) {}
+};
 
 //Link about Parameter Packs: https://en.cppreference.com/w/cpp/language/parameter_pack
 template <typename... Ts>

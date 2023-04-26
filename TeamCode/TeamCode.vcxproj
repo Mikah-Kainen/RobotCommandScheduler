@@ -131,13 +131,19 @@
     <ClCompile Include="Command.cpp" />
     <ClCompile Include="FunctionManager.cpp" />
     <ClCompile Include="Manager.cpp" />
+    <ClCompile Include="ParallelGroup.cpp" />
     <ClCompile Include="Scheduler.cpp" />
+    <ClCompile Include="SchedulerBase.cpp" />
     <ClCompile Include="SchedulerProject.cpp" />
+    <ClCompile Include="SequentialGroup.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FunctionManager.h" />
-    <ClInclude Include="Static.h" />
+    <ClInclude Include="ParallelGroup.h" />
     <ClInclude Include="Scheduler.h" />
+    <ClInclude Include="SequentialGroup.h" />
+    <ClInclude Include="Static.h" />
+    <ClInclude Include="SchedulerBase.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Ideas.txt" />
