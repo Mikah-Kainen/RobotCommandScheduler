@@ -13,15 +13,20 @@ public:
 	class Scheduleable
 	{
 	private:
-		unsigned char availableSystems;
+		unsigned char availableSystems;  //Right now this is never reset. Is there ever a case where a system that is available becomes unavailable? 
+		//Yes, interrupting commands. Therefore, interrupting commands need a way to reset the available systems of commands they interrupt. Remember to do this future me 
+		
 		unsigned char requirementFlags;
 		std::function<bool()> backingFunction;
+
+	protected:
+		virtual void ThisIsAbstract() = 0;
 
 	public:
 		bool IsDead;
 		Scheduleable(std::function<bool()> backingFunction, unsigned char requirementFlags);
 
-		Scheduleable(std::function<bool()> backingFunction);
+		//Scheduleable(std::function<bool()> backingFunction);
 
 		Scheduleable();
 
@@ -33,14 +38,14 @@ public:
 	};
 
 private:
-	std::unordered_map<int, Scheduleable> database;
+	std::unordered_map<int, Scheduleable*> database;
 	int nextAvailableID;
 
 public:
 
 	FunctionManager();
 
-	int AddToDatabase(Scheduleable scheduledItem);
+	int AddToDatabase(Scheduleable* scheduledItem);
 
 	bool RunIfReady(int scheduledID, unsigned char availableSystem); //Runs the IScheduleable with the specified ID if the system requirements are met
 

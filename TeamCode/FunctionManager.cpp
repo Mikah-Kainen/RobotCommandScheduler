@@ -4,8 +4,9 @@
 FunctionManager::Scheduleable::Scheduleable(std::function<bool()> backingFunction, unsigned char requirementFlags)
 	:backingFunction{ backingFunction }, requirementFlags{ requirementFlags }, availableSystems{(unsigned char)0}, IsDead{ false } {}
 
-FunctionManager::Scheduleable::Scheduleable(std::function<bool()> backingFunction)
-	:Scheduleable(backingFunction, (unsigned char)255) {}
+//I don't think these constructors have good use cases (maybe second one required for unordered_map?)
+//FunctionManager::Scheduleable::Scheduleable(std::function<bool()> backingFunction)
+//	:Scheduleable(backingFunction, (unsigned char)255) {}
 
 FunctionManager::Scheduleable::Scheduleable() {}
 
@@ -20,7 +21,7 @@ void FunctionManager::Scheduleable::AddRequirement(unsigned char newRequirementF
 }
 
 bool FunctionManager::Scheduleable::RunIfReady(unsigned char availableSystem) 
-//An IScheduleable that doesn't require any systems will never run because RunIfReady always adds an available system before checking the requirements
+//An IScheduleable that doesn't require any systems will never run(unless availableSystem is 0) because RunIfReady always adds an available system before checking the requirements 
 {
 	if (IsDead)
 	{
@@ -42,9 +43,9 @@ bool FunctionManager::Scheduleable::RunIfReady(unsigned char availableSystem)
 #pragma region FunctionManager
 
 FunctionManager::FunctionManager()
-	:database{ std::unordered_map<int, Scheduleable>() }, nextAvailableID{ 0 } {}
+	:database{ std::unordered_map<int, Scheduleable*>() }, nextAvailableID{ 0 } {}
 
-int FunctionManager::AddToDatabase(Scheduleable scheduledItem)
+int FunctionManager::AddToDatabase(Scheduleable* scheduledItem)
 {
 	int ID = nextAvailableID++;
 	database.emplace(ID, scheduledItem);
@@ -53,7 +54,7 @@ int FunctionManager::AddToDatabase(Scheduleable scheduledItem)
 
 bool FunctionManager::RunIfReady(int scheduledID, unsigned char availableSystem)
 {
-	bool result = database[scheduledID].RunIfReady(availableSystem);
+	bool result = database[scheduledID]->RunIfReady(availableSystem);
 	if (result)
 	{
 		//do end of function logic

@@ -8,7 +8,11 @@
 #include "Static.h"
 //#include "Manager.cpp"
 
-static class Scheduler : public FunctionManager::Scheduleable
+int
+//Schedulers should not be made in the main project; rather, a static scheduler(the only Base) can be part of another class and shared with the user via that
+//Have a different scheduler class for each SchedulerType. The base is what I have now. BaseScheduler is a singleton and can just be called Scheduler. Parallel and Sequential Schedulers take in a list of Scheduleables and create a scheduler.
+//P.S. Make Scheduleable a unique_pointer instead of a raw pointer in FunctionManager
+class Scheduler : public FunctionManager::Scheduleable
 {
 	static enum class SchedulerTypes
 	{
@@ -25,15 +29,17 @@ private:
 	
 	Scheduler();
 
+protected:
+	void ThisIsAbstract() override;
 
 public:
-	std::vector<Systems> SchedulerSystems; //this defeats the point of having flags. Add a unsigned char and when I loop, just make sure current index is zero. Also test GetSystems in Static because it is a pretty useful loop
-
-	Scheduler(std::vector<Systems> schedulerSystems, SchedulerTypes type);
+	//Test GetSystems in Static because it is a pretty useful loop
 
 	Scheduler(unsigned char systemFlags, SchedulerTypes type);
 
 	Scheduler(std::vector<unsigned char> systemFlags, SchedulerTypes type);
+
+	Scheduler(std::vector<Systems> schedulerSystems, SchedulerTypes type);
 
 
 	void Schedule(std::function<bool()> function, std::vector<Systems> requiredSystems);

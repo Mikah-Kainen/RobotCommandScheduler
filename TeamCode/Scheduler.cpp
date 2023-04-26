@@ -10,32 +10,36 @@
 //}
 
 
+void Scheduler::ThisIsAbstract(){}
+
 Scheduler::Scheduler()
-	: Scheduler(GetSystems(255), SchedulerTypes::Base)
+	: Scheduler((unsigned char)Systems::All, SchedulerTypes::Base)
 {
 }
 
-Scheduler::Scheduler(std::vector<Systems> schedulerSystems, SchedulerTypes type)
-	:Scheduleable(std::function<bool()>([&]() {return Run(); })), SchedulerSystems{schedulerSystems}, functionManager {FunctionManager()}
-{	
+
+Scheduler::Scheduler(unsigned char systemFlags, SchedulerTypes type) //change this to be the main constructor that the other constructors call
+	:Scheduleable(std::function<bool()>([&]() {return Run(); }), systemFlags), functionManager{ FunctionManager() }
+{
 	schedulerType = type;
 
 	schedule = std::unordered_map<Systems, std::list<int>>();
-	for(Systems system : schedulerSystems)
+	for (int i = 0; i < SystemsCount; i++)
 	{
-		schedule.emplace(system, std::list<int>());
+		unsigned char currentMask = 1 << i;
+		if ((systemFlags & currentMask) >> i == 1)
+		{
+			Systems currentSystem = (Systems)(unsigned char)pow(2, i);
+			schedule.emplace(currentSystem, std::list<int>());
+		}
 	}
 }
 
-Scheduler::Scheduler(unsigned char systemFlags, SchedulerTypes type)
-	:Scheduler(GetSystems(systemFlags), type)
-{
-}
-
 Scheduler::Scheduler(std::vector<unsigned char> systemFlags, SchedulerTypes type)
-	:Scheduler(GetSystems(systemFlags), type)
-{
-}
+	:Scheduler(CreateFlag(systemFlags), type) {}
+
+Scheduler::Scheduler(std::vector<Systems> schedulerSystems, SchedulerTypes type)
+	:Scheduler(CreateFlag(schedulerSystems), type) {}
 
 
 //make it so commands can be scheduled with their parameters passed in(and the FunctionManager properly owns everything)
@@ -54,40 +58,31 @@ void Scheduler::Schedule(std::function<bool()> function, unsigned char requireme
 {
 	for (int i = 0; i < 8; i++)
 	{
-		if (i == 7)
-		{
-			unsigned char temp = requirementFlags;
-			requirementFlags = 'a';
-			requirementFlags = temp;
-		}
-		//unsigned char currentFlag = requirementFlags << (8 - 1 - i);
-		//currentFlag = currentFlag >> (8 - 1 - i);
 		unsigned char currentMask = 1 << i;
 		if ((requirementFlags & currentMask) >> i == 1)
 		{
 			std::cout << (pow(2, i)) << std::endl;
-			//schedule[(Systems)pow(2, i)].push_back(newID); //MAKE SURE TO TEST THIS
-			//int //Test ^
+			//schedule[(Systems)pow(2, i)].push_back(newID);
 		}
 	}
 	//Definitely put stuff here
 }*/
 #pragma endregion
-	int newID = functionManager.AddToDatabase(FunctionManager::Scheduleable(function, requirementFlags));
-	for (int i = 0; i < SystemsCount; i++)
-	{
-		unsigned char currentFlag = requirementFlags << (i - 1);
-		currentFlag = currentFlag >> (i - 1);
-		if (currentFlag == 1)
-		{
-
-			schedule[(Systems)pow(2, i)].push_back(newID); //MAKE SURE TO TEST THIS
-			int //Test ^
-		}
-	}
-	float requirementNumber = (float)requirementFlags;
-	int functionIndex = log(requirementNumber) / log(2);
-	//Definitely put stuff here
+//	int newID = functionManager.AddToDatabase(FunctionManager::Scheduleable(function, requirementFlags));
+//	for (int i = 0; i < SystemsCount; i++)
+//	{
+//		unsigned char currentFlag = requirementFlags << (i - 1);
+//		currentFlag = currentFlag >> (i - 1);
+//		if (currentFlag == 1)
+//		{
+//
+//			schedule[(Systems)pow(2, i)].push_back(newID); //MAKE SURE TO TEST THIS
+//			int //Test ^
+//		}
+//	}
+//	float requirementNumber = (float)requirementFlags;
+//	int functionIndex = log(requirementNumber) / log(2);
+//	//Definitely put stuff here
 }
 
 void Scheduler::Schedule(std::function<bool()> function, std::vector<Systems> requiredSystems)
@@ -108,36 +103,36 @@ void Scheduler::Update()
 
 bool Scheduler::Run()
 {
-	unsigned char availableSystem = (unsigned char)0x1;
-	for (int i = 0; i < SystemsCount; i ++)
-	{
-		std::list<int>& currentSystemSchedule = schedule[i];
-		if (currentSystemSchedule.size() == 0)
-		{
-			//std::cout << "No functions are schedule for System-" << i << "\n";
-		}
-		else if (functionManager.RunIfReady(currentSystemSchedule.front(), availableSystem))
-		{
-			functionManager.Remove(currentSystemSchedule.front());
-			currentSystemSchedule.pop_front();
-		}
-		availableSystem <<= 1;
-		//std::unique_ptr<ScheduledFunction>& currentFunction = functions.Get(currentSystemSchedule.front());
-		//if (currentFunction->RequirementFlags & currentlyRunningSystems == 0)
-		//{
-		//	currentFunction->AvailableSystems |= (1 << i);
-		//	if (currentFunction->AvailableSystems == currentFunction->RequirementFlags)
-		//	{
-		//		currentlyRunningSystems |= currentFunction->RequirementFlags;
-		//		if (currentFunction->Run())
-		//		{
-		//			currentSystemSchedule.pop_front();
-		//		}
-		//		//think about if I should ever reset the AvailableSystems of a function(maybe in Update?)
-		//		//(i.e. does a system which was once available for ever become unavailable for that function before that function finishes?)
-		//	}
-		//}
-	}
+	//unsigned char availableSystem = (unsigned char)0x1;
+	//for (int i = 0; i < SystemsCount; i ++)
+	//{
+	//	std::list<int>& currentSystemSchedule = schedule[i];
+	//	if (currentSystemSchedule.size() == 0)
+	//	{
+	//		//std::cout << "No functions are schedule for System-" << i << "\n";
+	//	}
+	//	else if (functionManager.RunIfReady(currentSystemSchedule.front(), availableSystem))
+	//	{
+	//		functionManager.Remove(currentSystemSchedule.front());
+	//		currentSystemSchedule.pop_front();
+	//	}
+	//	availableSystem <<= 1;
+	//	//std::unique_ptr<ScheduledFunction>& currentFunction = functions.Get(currentSystemSchedule.front());
+	//	//if (currentFunction->RequirementFlags & currentlyRunningSystems == 0)
+	//	//{
+	//	//	currentFunction->AvailableSystems |= (1 << i);
+	//	//	if (currentFunction->AvailableSystems == currentFunction->RequirementFlags)
+	//	//	{
+	//	//		currentlyRunningSystems |= currentFunction->RequirementFlags;
+	//	//		if (currentFunction->Run())
+	//	//		{
+	//	//			currentSystemSchedule.pop_front();
+	//	//		}
+	//	//		//think about if I should ever reset the AvailableSystems of a function(maybe in Update?)
+	//	//		//(i.e. does a system which was once available for ever become unavailable for that function before that function finishes?)
+	//	//	}
+	//	//}
+	//}
 
 	return false; //Change this!!
 }

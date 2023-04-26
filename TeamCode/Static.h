@@ -12,37 +12,54 @@ static enum class Systems : unsigned char
 	Four = 16,
 	Five = 32,
 	Six = 64,
-	Other = 128, //Other should always be last System because it is used to track the length of Systems
+	Other = 128,
 	All = 255,
 };
 
 static const int SystemsCount = 8;
 
-//Untested
+template <typename T>
+static bool Contains(std::vector<T> list, T value)
+{
+	for (T val : list)
+	{
+		if (val == value)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 static std::vector<Systems> GetSystems(unsigned char systemFlags)
 {
 	std::vector<Systems> returnSystems;
-	for (int i = 0; i < SystemsCount; i ++)
+	for (int i = 0; i < SystemsCount; i++)
 	{
-		unsigned char currentFlag = systemFlags << (i - 1);
-		currentFlag = currentFlag >> (i - 1);
-		returnSystems.push_back((Systems)currentFlag);
+		unsigned char currentMask = 1 << i;
+		if ((systemFlags & currentMask) >> i == 1)
+		{
+			Systems currentSystem = (Systems)(unsigned char)pow(2, i);
+			returnSystems.push_back(currentSystem);
+		}
 	}
 	return returnSystems;
 }
 
-//Untested
+
 static std::vector<Systems> GetSystems(std::vector<unsigned char> systemFlags)
 {
 	std::vector<Systems> returnSystems;
 	for (unsigned char flag : systemFlags)
 	{
-		returnSystems.push_back((Systems)flag);
+		if (!Contains<Systems>(returnSystems, (Systems)flag))
+		{
+			returnSystems.push_back((Systems)flag);
+		}
 	}
 	return returnSystems;
 }
 
-//Untested
 static unsigned char CreateFlag(std::vector<Systems> systems)
 {
 	unsigned char flag = 0;
@@ -53,3 +70,13 @@ static unsigned char CreateFlag(std::vector<Systems> systems)
 	return flag;
 }
 
+
+static unsigned char CreateFlag(std::vector<unsigned char> systems)
+{
+	unsigned char flag = 0;
+	for (unsigned char systemID : systems)
+	{
+		flag |= systemID;
+	}
+	return flag;
+}
