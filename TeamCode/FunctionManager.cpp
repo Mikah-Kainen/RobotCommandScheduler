@@ -33,7 +33,7 @@ bool FunctionManager::Scheduleable::RunIfReady(unsigned char availableSystem)
 		throw std::exception("This is not alive");
 	}
 	availableSystems |= availableSystem;
-	if (availableSystems == requirementFlags)
+	if (availableSystems & requirementFlags == requirementFlags)
 	{
 		return backingFunction();
 	}

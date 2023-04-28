@@ -12,7 +12,7 @@
 
 unsigned char SchedulerBase::GetRequirementFlags(std::vector<FunctionManager::Scheduleable*> scheduleables)
 {
-	unsigned char requirementFlag;
+	unsigned char requirementFlag = 0;
 	for (FunctionManager::Scheduleable* scheduleable : scheduleables)
 	{
 		requirementFlag |= scheduleable->GetRequirementFlags();
@@ -113,7 +113,7 @@ bool SchedulerBase::Run()
 			{
 				schedule.erase(currentSystem);
 				requirementFlags = requirementFlags & (255 - currentMask); //Test this
-				std::cout << "DeletedSystem: " << (int)currentSystem << " Size: " << schedule.size() << std::endl;
+				std::cout << "DeletedSystem: " << (int)currentSystem << ", Size: " << schedule.size() << std::endl;
 				//std::cout << "No functions are schedule for System-" << i << "\n";
 			}
 			else if (functionManager.RunIfReady(currentSystemSchedule.front(), availableSystem))

@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Schedulers">
+      <UniqueIdentifier>{6561061b-c09d-4517-a007-062f7f9c42b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Schedulers">
+      <UniqueIdentifier>{ab3d3542-b2b5-4b55-8718-6567eef9b549}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SchedulerProject.cpp">
@@ -21,25 +27,43 @@
     <ClCompile Include="Command.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Scheduler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Manager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FunctionManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ParallelGroup.cpp">
+      <Filter>Source Files\Schedulers</Filter>
+    </ClCompile>
+    <ClCompile Include="Scheduler.cpp">
+      <Filter>Source Files\Schedulers</Filter>
+    </ClCompile>
+    <ClCompile Include="SchedulerBase.cpp">
+      <Filter>Source Files\Schedulers</Filter>
+    </ClCompile>
+    <ClCompile Include="SequentialGroup.cpp">
+      <Filter>Source Files\Schedulers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Scheduler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="FunctionManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Static.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scheduler.h">
+      <Filter>Header Files\Schedulers</Filter>
+    </ClInclude>
+    <ClInclude Include="ParallelGroup.h">
+      <Filter>Header Files\Schedulers</Filter>
+    </ClInclude>
+    <ClInclude Include="SequentialGroup.h">
+      <Filter>Header Files\Schedulers</Filter>
+    </ClInclude>
+    <ClInclude Include="SchedulerBase.h">
+      <Filter>Header Files\Schedulers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

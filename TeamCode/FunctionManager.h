@@ -13,9 +13,8 @@ public:
 	class Scheduleable
 	{
 	private:
-		unsigned char availableSystems;  //Right now this is never reset. Is there ever a case where a system that is available becomes unavailable? 
-		//Yes, interrupting commands. Therefore, interrupting commands need a way to reset the available systems of commands they interrupt. Remember to do this future me 
-		
+		unsigned char availableSystems;
+
 		std::function<bool()> backingFunction;
 
 	protected:

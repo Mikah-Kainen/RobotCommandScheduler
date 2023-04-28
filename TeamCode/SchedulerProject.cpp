@@ -89,7 +89,7 @@ bool test()
     return MotorA.MultiStepMove(5);
 }
 
-int main()
+int main() //Unit tests with GoogleTest
 {
 
     Scheduler scheduler = Scheduler::GetInstance();
@@ -101,11 +101,20 @@ int main()
     //scheduler.Schedule([&]() {return MotorC.MultiStepMove(5); }, (unsigned char)Systems::MotorC);
 
     ParallelGroup* parallelGroup = new ParallelGroup(std::vector<FunctionManager::Scheduleable*>({
-        new ScheduledCommand([&]() {return MotorA.MultiStepMove(3); }, (unsigned char)Systems::MotorA),
-        new ScheduledCommand([&]() {return MotorA.ResetCurrentStep(); }, (unsigned char)Systems::MotorA),
-        new ScheduledCommand(test, (unsigned char)Systems::MotorA),
+
+        //new ParallelGroup(std::vector<FunctionManager::Scheduleable*>({
+        //new ScheduledCommand([&]() {return MotorA.MultiStepMove(3); }, (unsigned char)Systems::MotorA),
+        //new ScheduledCommand([&]() {return MotorA.ResetCurrentStep(); }, (unsigned char)Systems::MotorA)
+        //})),
+
+        //new ScheduledCommand(test, (unsigned char)Systems::MotorA),
+
+        new ParallelGroup(std::vector<FunctionManager::Scheduleable*>({
         new ScheduledCommand([&]() {return MotorB.MultiStepMove(4); }, (unsigned char)Systems::MotorB),
-        new ScheduledCommand([&]() {return MotorC.MultiStepMove(5); }, (unsigned char)Systems::MotorC) }));
+        new ScheduledCommand([&]() {return MotorC.MultiStepMove(5); }, (unsigned char)Systems::MotorC) 
+        })) 
+        
+        }));
 
     scheduler.Schedule(parallelGroup);
     while (true) //scheduler needs a bool for when it is done
