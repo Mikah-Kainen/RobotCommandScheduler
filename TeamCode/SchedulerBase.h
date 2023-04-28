@@ -15,6 +15,8 @@
 class SchedulerBase : public FunctionManager::Scheduleable
 {
 protected:
+	static unsigned char GetRequirementFlags(std::vector<FunctionManager::Scheduleable*> scheduleables);
+
 	static enum class SchedulerTypes
 	{
 		Base,
@@ -35,13 +37,13 @@ protected:
 
 	SchedulerBase(std::vector<Systems> schedulerSystems, SchedulerTypes type);
 
-public:
-	//Test GetSystems in Static because it is a pretty useful loop
-
-	void Schedule(std::function<bool()> function, std::vector<Systems> requiredSystems);
+	void Schedule(Scheduleable* scheduleable);
 
 	void Schedule(std::function<bool()> function, unsigned char requirementFlags);
 
+	void Schedule(std::function<bool()> function, std::vector<Systems> requiredSystems);
+
+public:
 
 	void Update();
 

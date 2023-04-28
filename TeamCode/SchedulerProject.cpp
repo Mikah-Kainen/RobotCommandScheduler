@@ -4,6 +4,7 @@
 #include <list>
 #include "Scheduler.h"
 #include "Static.h"
+#include "ParallelGroup.h"
 
 #pragma region CatStuff
 class Cat
@@ -93,12 +94,20 @@ int main()
 
     Scheduler scheduler = Scheduler::GetInstance();
     //scheduler.Schedule(MotorA.Display, (unsigned char)Systems::MotorA);
-    scheduler.Schedule([&]() {return MotorA.MultiStepMove(3); }, (unsigned char)Systems::MotorA);
-    scheduler.Schedule([&]() {return MotorA.ResetCurrentStep(); }, (unsigned char)Systems::MotorA);
-    scheduler.Schedule(test, (unsigned char)Systems::MotorA);
-    scheduler.Schedule([&]() {return MotorB.MultiStepMove(4); }, (unsigned char)Systems::MotorB);
-    scheduler.Schedule([&]() {return MotorC.MultiStepMove(5); }, (unsigned char)Systems::MotorC);
+    //scheduler.Schedule([&]() {return MotorA.MultiStepMove(3); }, (unsigned char)Systems::MotorA);
+    //scheduler.Schedule([&]() {return MotorA.ResetCurrentStep(); }, (unsigned char)Systems::MotorA);
+    //scheduler.Schedule(test, (unsigned char)Systems::MotorA);
+    //scheduler.Schedule([&]() {return MotorB.MultiStepMove(4); }, (unsigned char)Systems::MotorB);
+    //scheduler.Schedule([&]() {return MotorC.MultiStepMove(5); }, (unsigned char)Systems::MotorC);
 
+    ParallelGroup* parallelGroup = new ParallelGroup(std::vector<FunctionManager::Scheduleable*>({
+        new ScheduledCommand([&]() {return MotorA.MultiStepMove(3); }, (unsigned char)Systems::MotorA),
+        new ScheduledCommand([&]() {return MotorA.ResetCurrentStep(); }, (unsigned char)Systems::MotorA),
+        new ScheduledCommand(test, (unsigned char)Systems::MotorA),
+        new ScheduledCommand([&]() {return MotorB.MultiStepMove(4); }, (unsigned char)Systems::MotorB),
+        new ScheduledCommand([&]() {return MotorC.MultiStepMove(5); }, (unsigned char)Systems::MotorC) }));
+
+    scheduler.Schedule(parallelGroup);
     while (true) //scheduler needs a bool for when it is done
     {
         scheduler.Run();

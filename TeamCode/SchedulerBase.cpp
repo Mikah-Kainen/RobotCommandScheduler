@@ -10,6 +10,16 @@
 //}
 
 
+unsigned char SchedulerBase::GetRequirementFlags(std::vector<FunctionManager::Scheduleable*> scheduleables)
+{
+	unsigned char requirementFlag;
+	for (FunctionManager::Scheduleable* scheduleable : scheduleables)
+	{
+		requirementFlag |= scheduleable->GetRequirementFlags();
+	}
+	return requirementFlag;
+}
+
 SchedulerBase::SchedulerBase(unsigned char systemFlags, SchedulerTypes type) //change this to be the main constructor that the other constructors call
 	:Scheduleable(std::function<bool()>([&]() {return Run(); }), systemFlags), functionManager{ FunctionManager() }
 {
@@ -28,10 +38,10 @@ SchedulerBase::SchedulerBase(unsigned char systemFlags, SchedulerTypes type) //c
 }
 
 SchedulerBase::SchedulerBase(std::vector<unsigned char> systemFlags, SchedulerTypes type)
-	:SchedulerBase(CreateFlag(systemFlags), type) {}
+	:SchedulerBase(GetRequirementFlag(systemFlags), type) {}
 
 SchedulerBase::SchedulerBase(std::vector<Systems> schedulerSystems, SchedulerTypes type)
-	:SchedulerBase(CreateFlag(schedulerSystems), type) {}
+	:SchedulerBase(GetRequirementFlag(schedulerSystems), type) {}
 
 
 //make it so commands can be scheduled with their parameters passed in(and the FunctionManager properly owns everything)
@@ -40,7 +50,7 @@ SchedulerBase::SchedulerBase(std::vector<Systems> schedulerSystems, SchedulerTyp
 //also think about how conditional functions could work(maybe a placeholder function that is replaced by a Scheduler that handles whichever branch it is currently on)
 //also add functionality to remove systems from the scheduler when all the system's commands have been completed, so that the parent scheduler can start scheduling things with that system(but don't remove systems from the original scheduler!)
 //make different types of schedulers or have information in the schedulers which decides whether a system should be removed or its default functions should be run when the scheduler runs out of scheduled functions for that system
-void SchedulerBase::Schedule(std::function<bool()> function, unsigned char requirementFlags)
+void SchedulerBase::Schedule(Scheduleable* scheduleable)
 {
 #pragma region workingTheory
 	/*
@@ -60,7 +70,8 @@ void SchedulerBase::Schedule(std::function<bool()> function, unsigned char requi
 	//Definitely put stuff here
 }*/
 #pragma endregion
-	int newID = functionManager.AddToDatabase(new ScheduledCommand(function, requirementFlags));
+	unsigned char requirementFlags = scheduleable->GetRequirementFlags();
+	int newID = functionManager.AddToDatabase(scheduleable);
 	for (int i = 0; i < SystemsCount; i++)
 	{
 		unsigned char currentMask = 1 << i;
@@ -73,9 +84,14 @@ void SchedulerBase::Schedule(std::function<bool()> function, unsigned char requi
 	//Definitely put stuff here
 }
 
+void SchedulerBase::Schedule(std::function<bool()> function, unsigned char requirementFlags)
+{
+	Schedule(new ScheduledCommand(function, requirementFlags));
+}
+
 void SchedulerBase::Schedule(std::function<bool()> function, std::vector<Systems> requiredSystems)
 {
-	Schedule(function, CreateFlag(requiredSystems));
+	Schedule(function, GetRequirementFlag(requiredSystems));
 }
 
 void SchedulerBase::Update()
@@ -88,18 +104,25 @@ bool SchedulerBase::Run()
 	unsigned char availableSystem = (unsigned char)0x1;
 	for (int i = 0; i < SystemsCount; i ++)
 	{
-		Systems currentSystem = (Systems)(unsigned char)pow(2, i);
-		std::list<int>& currentSystemSchedule = schedule[currentSystem];
-		if (currentSystemSchedule.size() == 0)
+		unsigned char currentMask = 1 << i;
+		if ((requirementFlags & currentMask) >> i == 1)
 		{
-			//std::cout << "No functions are schedule for System-" << i << "\n";
+			Systems currentSystem = (Systems)(unsigned char)pow(2, i);
+			std::list<int>& currentSystemSchedule = schedule[currentSystem];
+			if (currentSystemSchedule.size() == 0) //Optimally, this check should be nested right after functions are removed from the functionManager, but I'll keep it here for now because the BaseScheduler doesn't run default functions yet, meaning schedules of size 0 exist in the BaseScheduler
+			{
+				schedule.erase(currentSystem);
+				requirementFlags = requirementFlags & (255 - currentMask); //Test this
+				std::cout << "DeletedSystem: " << (int)currentSystem << " Size: " << schedule.size() << std::endl;
+				//std::cout << "No functions are schedule for System-" << i << "\n";
+			}
+			else if (functionManager.RunIfReady(currentSystemSchedule.front(), availableSystem))
+			{
+				functionManager.Remove(currentSystemSchedule.front());
+				currentSystemSchedule.pop_front();
+			}
+			availableSystem <<= 1;
 		}
-		else if (functionManager.RunIfReady(currentSystemSchedule.front(), availableSystem))
-		{
-			functionManager.Remove(currentSystemSchedule.front());
-			currentSystemSchedule.pop_front();
-		}
-		availableSystem <<= 1;
 		//std::unique_ptr<ScheduledFunction>& currentFunction = functions.Get(currentSystemSchedule.front());
 		//if (currentFunction->RequirementFlags & currentlyRunningSystems == 0)
 		//{
@@ -116,6 +139,5 @@ bool SchedulerBase::Run()
 		//	}
 		//}
 	}
-
-	return false; //Change this!!
+	return schedule.size() == 0;
 }

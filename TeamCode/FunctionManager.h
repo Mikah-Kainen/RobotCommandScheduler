@@ -16,22 +16,24 @@ public:
 		unsigned char availableSystems;  //Right now this is never reset. Is there ever a case where a system that is available becomes unavailable? 
 		//Yes, interrupting commands. Therefore, interrupting commands need a way to reset the available systems of commands they interrupt. Remember to do this future me 
 		
-		unsigned char requirementFlags;
 		std::function<bool()> backingFunction;
 
 	protected:
 		//virtual void ThisIsAbstract() = 0;
 
+		unsigned char requirementFlags;
 		Scheduleable(std::function<bool()> backingFunction, unsigned char requirementFlags);
 
 		//Scheduleable(std::function<bool()> backingFunction);
 
-		Scheduleable();
+		//Scheduleable();
 
 	public:
 		bool IsDead;
 
 		~Scheduleable();
+
+		unsigned char GetRequirementFlags();
 
 		void AddRequirement(unsigned char newRequirementFlags);
 

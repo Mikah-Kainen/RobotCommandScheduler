@@ -60,7 +60,7 @@ static std::vector<Systems> GetSystems(std::vector<unsigned char> systemFlags)
 	return returnSystems;
 }
 
-static unsigned char CreateFlag(std::vector<Systems> systems)
+static unsigned char GetRequirementFlag(std::vector<Systems> systems)
 {
 	unsigned char flag = 0;
 	for (Systems system : systems)
@@ -71,7 +71,7 @@ static unsigned char CreateFlag(std::vector<Systems> systems)
 }
 
 
-static unsigned char CreateFlag(std::vector<unsigned char> systems)
+static unsigned char GetRequirementFlag(std::vector<unsigned char> systems)
 {
 	unsigned char flag = 0;
 	for (unsigned char systemID : systems)

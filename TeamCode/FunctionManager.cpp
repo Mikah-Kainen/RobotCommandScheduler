@@ -8,12 +8,17 @@ FunctionManager::Scheduleable::Scheduleable(std::function<bool()> backingFunctio
 //FunctionManager::Scheduleable::Scheduleable(std::function<bool()> backingFunction)
 //	:Scheduleable(backingFunction, (unsigned char)255) {}
 
-FunctionManager::Scheduleable::Scheduleable() {}
+//FunctionManager::Scheduleable::Scheduleable() {}
 
 FunctionManager::Scheduleable::~Scheduleable() 
 {
 	IsDead = true;
 };
+
+unsigned char FunctionManager::Scheduleable::GetRequirementFlags()
+{
+	return requirementFlags;
+}
 
 void FunctionManager::Scheduleable::AddRequirement(unsigned char newRequirementFlags)
 {
