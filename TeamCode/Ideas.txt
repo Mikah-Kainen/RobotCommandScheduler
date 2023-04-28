@@ -27,6 +27,15 @@ Other possible solution: By giving functions the right requirements, I should be
 
 
 
+SequentialCommandGroup should rely on the FunctionManager notification system rather than adding extra requirements.
+CommandGroups should not remove their System requirements until the whole CommandGroup is done, instead they can use the "run next function" return behavior described a few lines down.
+Maybe an interruptable command can just be a command that has a default behavior to run until another command is scheduled.
+FunctionManager might need to return some enum for next behavior along with the bool if the function is done(bool for whether the function is done, enum for if additional action is required like run the next function or delete if another function is scheduled).
+Maybe RunIfReady should have an optional parameter that is an enum with extra information(basically to re-call functions that are marked interruptable if there are no future functions which interrupt them and cases like that)
+RunIfReady should just become Run. The IfReady part should be handled by the scheduler itself by making a map between a functionID and the systems currently marked available. This map should be recalculated every time to prevent events like a function running early but then more functions being scheduled before it mess up the future availability requirements)
+The return enum should be stored with the scheduleable's place in the scheduling list and also its System, so that it is possible to re-call functions multiple times
+
+
 Important to remember!!
 I need to add a special wait command to ensure that a parallel command group within a sequential command group stops the next command in the sequential command group from running
 ^even if it uses a different system! The wait command should simply run the default behavior for whichever system it requires until the commands in the parallel command group have finished
