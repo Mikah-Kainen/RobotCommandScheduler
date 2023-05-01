@@ -1,5 +1,14 @@
 #pragma once
-class SequentialGroup
+#include "SchedulerBase.h"
+
+class SequentialGroup : public SchedulerBase
 {
+private:
+
+protected:
+
+public:
+	SequentialGroup(std::vector<FunctionManager::Scheduleable*> scheduleablesToSchedule);
+
 };
 

@@ -29,6 +29,7 @@ private:
 	FunctionManager functionManager;
 	SchedulerTypes schedulerType;
 	unsigned char currentlyRunningSystems;
+	int schedulerID;
 
 protected:
 	SchedulerBase(unsigned char systemFlags, SchedulerTypes type);

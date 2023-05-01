@@ -17,6 +17,7 @@ static enum class Systems : unsigned char
 };
 
 static const int SystemsCount = 8;
+static int NextAvailableSchedulerID;
 
 template <typename T>
 static bool Contains(std::vector<T> list, T value)

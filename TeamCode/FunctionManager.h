@@ -14,7 +14,6 @@ public:
 	{
 	private:
 		unsigned char availableSystems;
-
 		std::function<bool()> backingFunction;
 
 	protected:

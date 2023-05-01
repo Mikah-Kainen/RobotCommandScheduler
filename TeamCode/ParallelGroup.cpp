@@ -11,10 +11,8 @@
 ParallelGroup::ParallelGroup(std::vector<FunctionManager::Scheduleable*> scheduleablesToSchedule)
 	: SchedulerBase(GetRequirementFlags(scheduleablesToSchedule), SchedulerTypes::Parallel)
 {
-
 	for (FunctionManager::Scheduleable* scheduleable : scheduleablesToSchedule)
 	{
 		SchedulerBase::Schedule(scheduleable);
 	}
-	//Schedule the functionList here
 }

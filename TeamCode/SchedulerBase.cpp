@@ -21,7 +21,7 @@ unsigned char SchedulerBase::GetRequirementFlags(std::vector<FunctionManager::Sc
 }
 
 SchedulerBase::SchedulerBase(unsigned char systemFlags, SchedulerTypes type) //change this to be the main constructor that the other constructors call
-	:Scheduleable(std::function<bool()>([&]() {return Run(); }), systemFlags), functionManager{ FunctionManager() }
+	:Scheduleable(std::function<bool()>([&]() {return Run(); }), systemFlags), functionManager{ FunctionManager() }, schedulerID{NextAvailableSchedulerID}
 {
 	schedulerType = type;
 
@@ -35,6 +35,8 @@ SchedulerBase::SchedulerBase(unsigned char systemFlags, SchedulerTypes type) //c
 			schedule.emplace(currentSystem, std::list<int>());
 		}
 	}
+
+	NextAvailableSchedulerID++;
 }
 
 SchedulerBase::SchedulerBase(std::vector<unsigned char> systemFlags, SchedulerTypes type)
@@ -101,7 +103,9 @@ void SchedulerBase::Update()
 
 bool SchedulerBase::Run()
 {
-	unsigned char availableSystem = (unsigned char)0x1;
+	int debug = schedulerID;
+	unsigned char currentAvailableSystem = (unsigned char)0x1;
+	std::vector<int> IDsToDelete = std::vector<int>();
 	for (int i = 0; i < SystemsCount; i ++)
 	{
 		unsigned char currentMask = 1 << i;
@@ -109,35 +113,46 @@ bool SchedulerBase::Run()
 		{
 			Systems currentSystem = (Systems)(unsigned char)pow(2, i);
 			std::list<int>& currentSystemSchedule = schedule[currentSystem];
-			if (currentSystemSchedule.size() == 0) //Optimally, this check should be nested right after functions are removed from the functionManager, but I'll keep it here for now because the BaseScheduler doesn't run default functions yet, meaning schedules of size 0 exist in the BaseScheduler
+			if (currentSystemSchedule.size() != 0 && functionManager.RunIfReady(currentSystemSchedule.front(), currentAvailableSystem))
 			{
-				schedule.erase(currentSystem);
-				requirementFlags = requirementFlags & (255 - currentMask); //Test this
-				std::cout << "DeletedSystem: " << (int)currentSystem << ", Size: " << schedule.size() << std::endl;
-				//std::cout << "No functions are schedule for System-" << i << "\n";
-			}
-			else if (functionManager.RunIfReady(currentSystemSchedule.front(), availableSystem))
-			{
+				if (currentSystemSchedule.front() == 1)
+				{
+					std::cout << "Wow Again\n";
+				}
+				IDsToDelete.push_back(currentSystemSchedule.front());
 				functionManager.Remove(currentSystemSchedule.front());
-				currentSystemSchedule.pop_front();
 			}
-			availableSystem <<= 1;
 		}
-		//std::unique_ptr<ScheduledFunction>& currentFunction = functions.Get(currentSystemSchedule.front());
-		//if (currentFunction->RequirementFlags & currentlyRunningSystems == 0)
-		//{
-		//	currentFunction->AvailableSystems |= (1 << i);
-		//	if (currentFunction->AvailableSystems == currentFunction->RequirementFlags)
-		//	{
-		//		currentlyRunningSystems |= currentFunction->RequirementFlags;
-		//		if (currentFunction->Run())
-		//		{
-		//			currentSystemSchedule.pop_front();
-		//		}
-		//		//think about if I should ever reset the AvailableSystems of a function(maybe in Update?)
-		//		//(i.e. does a system which was once available for ever become unavailable for that function before that function finishes?)
-		//	}
-		//}
+		currentAvailableSystem <<= 1;
 	}
-	return schedule.size() == 0;
+
+	unsigned char finishedSystems = 0;
+	for (int i = 0; i < SystemsCount; i ++)
+	{
+		unsigned char currentMask = 1 << i;
+		if ((requirementFlags & currentMask) >> i == 1)
+		{
+			Systems currentSystem = (Systems)(unsigned char)pow(2, i);
+			std::list<int>& currentSystemSchedule = schedule[currentSystem];
+			if (currentSystemSchedule.size() == 0)
+			{
+				finishedSystems |= (unsigned char)currentSystem;
+			}
+			else
+			{
+				for (int ID : IDsToDelete)
+				{
+					if (currentSystemSchedule.front() == ID)
+					{
+						currentSystemSchedule.pop_front();
+						if (currentSystemSchedule.size() == 0)
+						{
+							finishedSystems |= (unsigned char)currentSystem;
+						}
+					}
+				}
+			}
+		}
+	}
+	return finishedSystems == requirementFlags;
 }
