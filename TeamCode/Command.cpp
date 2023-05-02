@@ -1,12 +1,9 @@
 #pragma once
 #include <functional>
 #include <exception>
+#include <iostream>
 #include "FunctionManager.h"
-
-//#include "Scheduler.h"
-//these two are included in Scheduler.h
-//#include "FunctionManager.h"
-//#include "Static.h"
+#include "Static.h"
 
 //class ScheduleableCommand : FunctionManager::Scheduleable
 //{
@@ -17,6 +14,7 @@
 
 class ScheduledCommand : public FunctionManager::Scheduleable
 {
+private:
 
 public:
 
@@ -37,13 +35,13 @@ public:
 	Command(std::function<bool(Ts...)> backingFunction, unsigned char requirementFlags)
 		:backingFunction{ backingFunction }, requirementFlags{ requirementFlags } {}
 
-	//Command(std::function<bool(Ts...)> backingFunction, std::vector<Systems> requiredSystems)
-	//	: Command(backingFunction, CreateFlag(requiredSystems)) {}
+	Command(std::function<bool(Ts...)> backingFunction, std::vector<Systems> requiredSystems)
+		: Command(backingFunction, GetRequirementFlag(requiredSystems)) {}
 
-	//Command(std::function<bool(Ts...)> backingFunction, Systems system)
-	//	: Command(backingFunction, system) {}
+	Command(std::function<bool(Ts...)> backingFunction, Systems system)
+		: Command(backingFunction, (unsigned char)system) {}
 
-
+#pragma region CommentedFunctions
 	//Use for testing purposes if needed
 	//bool Activate(Ts... params)
 	//{
@@ -55,20 +53,20 @@ public:
 	//{
 	//	requirementFlags |= requirement;
 	//}
+#pragma endregion
 
-	//Maybe more complicated commands can have things like end behavior added to them with functions
-
-
-	//Make this work
-	//Scheduleable GetScheduleable(Ts... params)
-	//{
-	//}
-
-	void Schedule(Ts... params)
+	ScheduledCommand* Schedule(Ts... params)
 	{
-		//Schedule a ScheduleableCommand from GetScheduleable
-		throw std::exception("Function incomplete. No way to access the scheduler. Fix this Mikah!");
+		return new ScheduledCommand([&]() {return backingFunction(params...); }, requirementFlags);
 	}
 
+	void SetInitializationBehavior()
+	{
 
+	}
+
+	void SetEndBehavior()
+	{
+
+	}
 };

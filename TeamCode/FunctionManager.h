@@ -36,6 +36,8 @@ public:
 		void AddRequirement(unsigned char newRequirementFlags);
 
 		bool RunIfReady(unsigned char availableSystem);
+
+		void ResetAvailability();
 	};
 
 private:
@@ -51,5 +53,7 @@ public:
 	bool RunIfReady(int scheduledID, unsigned char availableSystem); //Runs the IScheduleable with the specified ID if the system requirements are met
 
 	void Remove(int ID);
+
+	void ResetAvailability(int ID);
 };
 

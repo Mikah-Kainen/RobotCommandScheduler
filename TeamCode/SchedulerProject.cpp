@@ -75,10 +75,6 @@ public:
 	bool MultiStepMove(int numberOfSteps)
 	{
 		//int numberOfSteps = 3;
-		if (currentStep >= 4)
-		{
-			std::cout << "Wow\n";
-		}
 		std::cout << "CurrentStep: " << currentStep << " MotorID: " << (int)MotorID << std::endl;
 		currentStep++;
 		return currentStep >= numberOfSteps;
@@ -94,6 +90,36 @@ bool test()
 	return MotorA.MultiStepMove(5);
 }
 
+bool MotorAMultiStepMove(int params)
+{
+	return MotorA.MultiStepMove(params);
+}
+
+bool MotorBMultiStepMove(int params)
+{
+	return MotorB.MultiStepMove(params);
+}
+
+bool MotorCMultiStepMove(int params)
+{
+	return MotorC.MultiStepMove(params);
+}
+
+bool MotorAResetCurrentStep()
+{
+	return MotorA.ResetCurrentStep();
+}
+
+bool MotorBResetCurrentStep()
+{
+	return MotorB.ResetCurrentStep();
+}
+
+bool MotorCResetCurrentStep()
+{
+	return MotorC.ResetCurrentStep();
+}
+
 int main() //Unit tests with GoogleTest
 {
 		//**Things to do
@@ -101,31 +127,30 @@ int main() //Unit tests with GoogleTest
 	//Add Initialization and EndBehavior functions to commands
 	//give schedulers unique IDs for debugging purposes
 
+	Command<int> MotorAMultiStepMoveCommand = Command<int>(MotorAMultiStepMove, Systems::MotorA);
+	Command<int> MotorBMultiStepMoveCommand = Command<int>(MotorBMultiStepMove, Systems::MotorB);
+	Command<int> MotorCMultiStepMoveCommand = Command<int>(MotorCMultiStepMove, Systems::MotorC);
 
-	//scheduler.Schedule(MotorA.Display, (unsigned char)Systems::MotorA);
 	Scheduler scheduler = Scheduler::GetInstance();
-	//scheduler.Schedule([&]() {return MotorA.MultiStepMove(3); }, (unsigned char)Systems::MotorA);
-	//scheduler.Schedule([&]() {return MotorA.ResetCurrentStep(); }, (unsigned char)Systems::MotorA);
-	//scheduler.Schedule(test, (unsigned char)Systems::MotorA);
-	//scheduler.Schedule([&]() {return MotorB.MultiStepMove(4); }, (unsigned char)Systems::MotorB);
-	//scheduler.Schedule([&]() {return MotorC.MultiStepMove(5); }, (unsigned char)Systems::MotorC);
 
 	SequentialGroup* sequentialGroup = new SequentialGroup({
-
 		new ParallelGroup({
-			new ScheduledCommand([&]() {return MotorA.MultiStepMove(3); }, (unsigned char)Systems::MotorA),
+			MotorAMultiStepMoveCommand.Schedule(3),
+			//new ScheduledCommand([&]() {return MotorA.MultiStepMove(3); }, (unsigned char)Systems::MotorA),
 			new ScheduledCommand([&]() {return MotorA.ResetCurrentStep(); }, (unsigned char)Systems::MotorA),
 		}),
-
-		new ScheduledCommand([&]() {return MotorB.MultiStepMove(5); }, (unsigned char)Systems::MotorB),
+		MotorBMultiStepMoveCommand.Schedule(5),
+		//new ScheduledCommand([&]() {return MotorB.MultiStepMove(5); }, (unsigned char)Systems::MotorB),
 		new ScheduledCommand([&]() {return MotorB.ResetCurrentStep(); }, (unsigned char)Systems::MotorB),
-
 		new ParallelGroup({
-			new ScheduledCommand([&]() {return MotorA.MultiStepMove(5); }, (unsigned char)Systems::MotorA),
-
-			new ParallelGroup({
-				new ScheduledCommand([&]() {return MotorB.MultiStepMove(4); }, (unsigned char)Systems::MotorB), //scheduling stuff should just take in Systems and convert it to unsigned char(or maybe just make Command wrapper more convenient)
-				new ScheduledCommand([&]() {return MotorC.MultiStepMove(5); }, (unsigned char)Systems::MotorC), //Add Initialization and EndBehavior functions to commands
+			MotorAMultiStepMoveCommand.Schedule(5),
+			//new ScheduledCommand([&]() {return MotorA.MultiStepMove(5); }, (unsigned char)Systems::MotorA),
+			new ScheduledCommand([&]() {return MotorA.ResetCurrentStep(); }, (unsigned char)Systems::MotorA),
+			new SequentialGroup({
+				MotorBMultiStepMoveCommand.Schedule(4),
+				MotorCMultiStepMoveCommand.Schedule(5),
+				//new ScheduledCommand([&]() {return MotorB.MultiStepMove(4); }, (unsigned char)Systems::MotorB), //scheduling stuff should just take in Systems and convert it to unsigned char(or maybe just make Command wrapper more convenient)
+				//new ScheduledCommand([&]() {return MotorC.MultiStepMove(5); }, (unsigned char)Systems::MotorC), //Add Initialization and EndBehavior functions to commands
 			}),
 		}),
 	});
@@ -136,6 +161,12 @@ int main() //Unit tests with GoogleTest
 		std::cout << "\n";
 	}
 }
+
+//scheduler.Schedule([&]() {return MotorA.MultiStepMove(3); }, (unsigned char)Systems::MotorA);
+//scheduler.Schedule([&]() {return MotorA.ResetCurrentStep(); }, (unsigned char)Systems::MotorA);
+//scheduler.Schedule(test, (unsigned char)Systems::MotorA);
+//scheduler.Schedule([&]() {return MotorB.MultiStepMove(4); }, (unsigned char)Systems::MotorB);
+//scheduler.Schedule([&]() {return MotorC.MultiStepMove(5); }, (unsigned char)Systems::MotorC);
 
 //new ParallelGroup(std::vector<FunctionManager::Scheduleable*>({
 //	new ScheduledCommand([&]() {return MotorA.MultiStepMove(3); }, (unsigned char)Systems::MotorA),

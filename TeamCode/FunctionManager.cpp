@@ -42,6 +42,11 @@ bool FunctionManager::Scheduleable::RunIfReady(unsigned char availableSystem)
 		return false;
 	}
 }
+
+void FunctionManager::Scheduleable::ResetAvailability()
+{
+	availableSystems = 0;
+}
 #pragma endregion
 
 
@@ -71,6 +76,11 @@ bool FunctionManager::RunIfReady(int scheduledID, unsigned char availableSystem)
 void FunctionManager::Remove(int ID)
 {
 	//remove ID from database
+}
+
+void FunctionManager::ResetAvailability(int ID)
+{
+	database[ID]->ResetAvailability();
 }
 
 #pragma endregion

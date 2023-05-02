@@ -106,7 +106,7 @@ bool SchedulerBase::Run()
 	int debug = schedulerID;
 	unsigned char currentAvailableSystem = (unsigned char)0x1;
 	std::vector<int> IDsToDelete = std::vector<int>();
-	for (int i = 0; i < SystemsCount; i ++)
+	for (int i = 0; i < SystemsCount; i ++) //maybe use the requirementFlag instead of SystemsCount at some point
 	{
 		unsigned char currentMask = 1 << i;
 		if ((requirementFlags & currentMask) >> i == 1)
@@ -115,10 +115,6 @@ bool SchedulerBase::Run()
 			std::list<int>& currentSystemSchedule = schedule[currentSystem];
 			if (currentSystemSchedule.size() != 0 && functionManager.RunIfReady(currentSystemSchedule.front(), currentAvailableSystem))
 			{
-				if (currentSystemSchedule.front() == 1)
-				{
-					std::cout << "Wow Again\n";
-				}
 				IDsToDelete.push_back(currentSystemSchedule.front());
 				functionManager.Remove(currentSystemSchedule.front());
 			}
@@ -140,6 +136,7 @@ bool SchedulerBase::Run()
 			}
 			else
 			{
+				functionManager.ResetAvailability(currentSystemSchedule.front());
 				for (int ID : IDsToDelete)
 				{
 					if (currentSystemSchedule.front() == ID)
@@ -149,6 +146,7 @@ bool SchedulerBase::Run()
 						{
 							finishedSystems |= (unsigned char)currentSystem;
 						}
+						break;
 					}
 				}
 			}
