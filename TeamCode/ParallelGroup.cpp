@@ -1,5 +1,5 @@
+//#include "../../inc/SchedulerInc/ParallelGroup.h"
 #include "ParallelGroup.h"
-
 
 //Pretty sure this function is completely useless
 //ParallelGroup::ParallelGroup(std::vector<FunctionManager::Scheduleable> functionList, unsigned char requirements)

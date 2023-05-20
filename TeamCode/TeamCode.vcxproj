@@ -131,19 +131,25 @@
     <ClCompile Include="Command.cpp" />
     <ClCompile Include="FunctionManager.cpp" />
     <ClCompile Include="Manager.cpp" />
+    <ClCompile Include="Motor.cpp" />
     <ClCompile Include="ParallelGroup.cpp" />
+    <ClCompile Include="Robot.cpp" />
     <ClCompile Include="Scheduler.cpp" />
     <ClCompile Include="SchedulerBase.cpp" />
     <ClCompile Include="SchedulerProject.cpp" />
     <ClCompile Include="SequentialGroup.cpp" />
+    <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FunctionManager.h" />
+    <ClInclude Include="Motor.h" />
     <ClInclude Include="ParallelGroup.h" />
+    <ClInclude Include="Robot.h" />
     <ClInclude Include="Scheduler.h" />
     <ClInclude Include="SequentialGroup.h" />
     <ClInclude Include="Static.h" />
     <ClInclude Include="SchedulerBase.h" />
+    <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Ideas.txt" />

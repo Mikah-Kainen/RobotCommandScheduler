@@ -6,6 +6,9 @@
 #include "Static.h"
 #include "ParallelGroup.h"
 #include "SequentialGroup.h"
+#include "Robot.h"
+#include "Motor.h"
+#include "Timer.h"
 
 #pragma region CatStuff
 class Cat
@@ -16,6 +19,26 @@ public:
 
 	Cat(int age, std::string name)
 		: Age{ age }, Name{ name } {}
+
+	~Cat()
+	{
+		std::cout << "A Cat Just Died\n";
+	}
+};
+
+class OldCat : public Cat
+{
+public:
+
+	OldCat(std::string name)
+		: Cat(38, name)
+	{
+	}
+
+	~OldCat()
+	{
+
+	}
 };
 
 bool CoolFunction()
@@ -36,50 +59,6 @@ bool CoolCatFunction()
 	return CatFunction(bobCat);
 }
 #pragma endregion
-
-
-class Motor
-{
-private:
-	int speed;
-	int currentStep;
-
-public:
-	Systems MotorID;
-
-	Motor(Systems motor)
-		: MotorID{ motor }, currentStep{ 0 }, speed{0}
-	{
-
-	}
-
-	bool SetSpeed(int targetSpeed)
-	{
-		speed = targetSpeed;
-		return true;
-	}
-
-	bool Display()
-	{
-		std::cout << "Motor: " << (int)MotorID << ", Speed: " << speed << std::endl;
-		return true;
-	}
-
-	//As opposed to being initialized, functions like ResetCurrentStep and MultiStepMove are scheduled together in a command group
-	bool ResetCurrentStep()
-	{
-		currentStep = 0;
-		return true;
-	}
-
-	bool MultiStepMove(int numberOfSteps)
-	{
-		//numberOfSteps = 3;
-		std::cout << "CurrentStep: " << currentStep << " MotorID: " << (int)MotorID << std::endl;
-		currentStep++;
-		return currentStep >= numberOfSteps;
-	}
-};
 
 Motor MotorA = Motor(Systems::MotorA);
 Motor MotorB = Motor(Systems::MotorB);
@@ -124,6 +103,54 @@ bool MotorCResetCurrentStep()
 
 #pragma endregion
 
+
+Robot robot = Robot::GetInstance();
+
+SequentialGroup* sequentialGroup0 = new SequentialGroup({
+new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
+new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
+new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
+new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
+new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
+new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
+});
+
+SequentialGroup* sequentialGroup1 = new SequentialGroup({
+new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
+new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
+new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
+new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
+new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
+new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
+});
+
+SequentialGroup* sequentialGroup2 = new SequentialGroup({
+new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
+new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
+new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
+new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
+new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
+new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
+});
+
+SequentialGroup* sequentialGroup3 = new SequentialGroup({
+new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
+new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
+new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
+new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
+new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
+new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
+});
+
+SequentialGroup* sequentialGroup4 = new SequentialGroup({
+new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
+new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
+new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
+new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
+new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
+new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
+});
+
 int main() //Unit tests with GoogleTest
 {
 		//**Things to do
@@ -134,42 +161,73 @@ int main() //Unit tests with GoogleTest
 	//new ScheduledCommand([&]() {return MotorB.MultiStepMove(4); }, (unsigned char)Systems::MotorB), //scheduling stuff should just take in Systems and convert it to unsigned char(or maybe just make Command wrapper more convenient)
 	//new ScheduledCommand([&]() {return MotorC.MultiStepMove(5); }, (unsigned char)Systems::MotorC), //Add Initialization and EndBehavior functions to commands
 
+#pragma region CommandExample
+	//Command<int> MotorAMultiStepMoveCommand = Command<int>(MotorAMultiStepMove, Systems::MotorA);
+	//Command<int> MotorBMultiStepMoveCommand = Command<int>(MotorBMultiStepMove, Systems::MotorB);
+	//Command<int> MotorCMultiStepMoveCommand = Command<int>(MotorCMultiStepMove, Systems::MotorC);
 
-	Command<int> MotorAMultiStepMoveCommand = Command<int>(MotorAMultiStepMove, Systems::MotorA);
-	Command<int> MotorBMultiStepMoveCommand = Command<int>(MotorBMultiStepMove, Systems::MotorB);
-	Command<int> MotorCMultiStepMoveCommand = Command<int>(MotorCMultiStepMove, Systems::MotorC);
+	//Command<> MotorAResetCurrentStepCommand = Command<>(MotorAResetCurrentStep, Systems::MotorA);
+	//Command<> MotorBResetCurrentStepCommand = Command<>(MotorBResetCurrentStep, Systems::MotorB);
+	//Command<> MotorCResetCurrentStepCommand = Command<>(MotorCResetCurrentStep, Systems::MotorC);
 
-	Command<> MotorAResetCurrentStepCommand = Command<>(MotorAResetCurrentStep, Systems::MotorA);
-	Command<> MotorBResetCurrentStepCommand = Command<>(MotorBResetCurrentStep, Systems::MotorB);
-	Command<> MotorCResetCurrentStepCommand = Command<>(MotorCResetCurrentStep, Systems::MotorC);
-
-	int three = 3;
-	int four = 4;
-	int five = 5;
+	//int three = 3;
+	//int four = 4;
+	//int five = 5;
 
 
-	Scheduler scheduler = Scheduler::GetInstance();
+	//Scheduler scheduler = Scheduler::GetInstance();
 
-	SequentialGroup* sequentialGroup = new SequentialGroup({
-		new ParallelGroup({
-			MotorAMultiStepMoveCommand.ScheduleWith(three),
-			MotorAResetCurrentStepCommand.ScheduleWith(),
-		}),
-		MotorBMultiStepMoveCommand.ScheduleWith(five),
-		MotorBResetCurrentStepCommand.ScheduleWith(),
-		new ParallelGroup({
-			MotorAMultiStepMoveCommand.ScheduleWith(five),
-			MotorAResetCurrentStepCommand.ScheduleWith(),
-			new SequentialGroup({
-				MotorBMultiStepMoveCommand.ScheduleWith(four),
-				MotorCMultiStepMoveCommand.ScheduleWith(five),
-			}),
-		}),
-	});
+	//SequentialGroup* sequentialGroup = new SequentialGroup({
+	//	new ParallelGroup({
+	//		MotorAMultiStepMoveCommand.ScheduleWith(three),
+	//		MotorAResetCurrentStepCommand.ScheduleWith(),
+	//	}),
+	//	MotorBMultiStepMoveCommand.ScheduleWith(five),
+	//	MotorBResetCurrentStepCommand.ScheduleWith(),
+	//	new ParallelGroup({
+	//		MotorAMultiStepMoveCommand.ScheduleWith(five),
+	//		MotorAResetCurrentStepCommand.ScheduleWith(),
+	//		new SequentialGroup({
+	//			MotorBMultiStepMoveCommand.ScheduleWith(four),
+	//			MotorCMultiStepMoveCommand.ScheduleWith(five),
+	//		}),
+	//	}),
+	//});
 
-	scheduler.Schedule(sequentialGroup);
-	while (!scheduler.Run()){}
-	std::cout << "Program Finished!";
+	//scheduler.Schedule(sequentialGroup);
+	//while (!scheduler.Run()){}
+	//std::cout << "Program Finished!";
+#pragma endregion
+
+	std::cout << "Robot Made!\n";
+
+	Scheduler& scheduler = Scheduler::GetInstance();
+
+	while (true)
+	{
+		SequentialGroup* sequentialGroup = new SequentialGroup({
+		new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
+		new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
+		new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
+		new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
+		new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
+		new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
+		});
+
+		FunctionManager::Scheduleable* endFunction = new FunctionManager::Scheduleable([&]() {std::cout << "End of Functions, Current Time: " << Timer::GetInstance().ElapsedMilliseconds() << std::endl; return true; }, (unsigned char)Systems::All);
+
+		scheduler.Schedule(sequentialGroup2);
+		scheduler.Schedule(sequentialGroup);
+		scheduler.Schedule(endFunction);
+
+		//if (true)
+		//{
+		//	OldCat cat = OldCat("Bob");
+		//}
+
+		while (!scheduler.Run()) {}
+		std::cout << "EVERYTHING DONE!!!!!!!\n";
+	}
 }
 
 

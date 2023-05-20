@@ -16,7 +16,8 @@ public:
 		unsigned char availableSystems;
 		std::function<bool()> backingFunction;
 
-	protected:
+	//protected:
+	public:
 		//virtual void ThisIsAbstract() = 0;
 
 		unsigned char requirementFlags;

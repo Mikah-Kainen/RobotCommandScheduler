@@ -1,4 +1,5 @@
 #pragma once
+//#include "../../src/SchedulerSrc/Command.cpp"
 #include "Command.cpp"
 #include <deque>
 #include <vector>
@@ -17,7 +18,7 @@ class SchedulerBase : public FunctionManager::Scheduleable
 protected:
 	static unsigned char GetRequirementFlags(std::vector<FunctionManager::Scheduleable*> scheduleables);
 
-	static enum class SchedulerTypes
+	enum class SchedulerTypes
 	{
 		Base,
 		Parallel,

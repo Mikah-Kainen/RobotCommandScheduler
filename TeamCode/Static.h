@@ -2,18 +2,30 @@
 #include <vector>
 
 
-static enum class Systems : unsigned char
+enum class Systems : unsigned char
 {
 	None = 0,
+
+	ContainerIntake = 1,
 	MotorA = 1,
+
+	LeftMotor = 2,
 	MotorB = 2,
+
+	RightMotor = 4,
 	MotorC = 4,
-	Three = 8,
+
+	HoopIntake = 8,
+	MotorD = 8,
+
 	Four = 16,
 	Five = 32,
 	Six = 64,
 	Other = 128,
+
+	//Custom flags
 	All = 255,
+	Chassis = 6,
 };
 
 static const int SystemsCount = 8;
@@ -40,7 +52,8 @@ static std::vector<Systems> GetSystems(unsigned char systemFlags)
 		unsigned char currentMask = 1 << i;
 		if ((systemFlags & currentMask) >> i == 1)
 		{
-			Systems currentSystem = (Systems)(unsigned char)pow(2, i);
+			//Systems currentSystem = (Systems)((unsigned char)pow(2, i));
+			Systems currentSystem = (Systems)currentMask;
 			returnSystems.push_back(currentSystem);
 		}
 	}

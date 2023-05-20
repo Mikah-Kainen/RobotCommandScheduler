@@ -1,3 +1,5 @@
+#include <iostream>
+//#include "../../inc/SchedulerInc/FunctionManager.h"
 #include "FunctionManager.h"
 
 #pragma region IScheduleable
@@ -12,7 +14,12 @@ FunctionManager::Scheduleable::Scheduleable(std::function<bool()> backingFunctio
 
 FunctionManager::Scheduleable::~Scheduleable() 
 {
+	if (IsDead)
+	{
+		throw new std::exception("THIS IS DEAD!\n");
+	}
 	IsDead = true;
+	std::cout << "FunctionDied\n";
 };
 
 unsigned char FunctionManager::Scheduleable::GetRequirementFlags()
@@ -28,10 +35,6 @@ void FunctionManager::Scheduleable::AddRequirement(unsigned char newRequirementF
 bool FunctionManager::Scheduleable::RunIfReady(unsigned char availableSystem) 
 //An IScheduleable that doesn't require any systems will never run(unless availableSystem is 0) because RunIfReady always adds an available system before checking the requirements 
 {
-	if (IsDead)
-	{
-		throw std::exception("This is not alive");
-	}
 	availableSystems |= availableSystem;
 	if ((availableSystems & requirementFlags) == requirementFlags)
 	{
@@ -69,12 +72,14 @@ bool FunctionManager::RunIfReady(int scheduledID, unsigned char availableSystem)
 	{
 		//do end of function logic
 		//throw std::exception("not implemented"); //UNCOMMENT THIS!!
+		Remove(scheduledID);
 	}
 	return result;
 }
 
 void FunctionManager::Remove(int ID)
 {
+	database.erase(ID);
 	//remove ID from database
 }
 

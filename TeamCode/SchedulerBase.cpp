@@ -1,5 +1,5 @@
+//#include "../../inc/SchedulerInc/SchedulerBase.h"
 #include "SchedulerBase.h"
-
 
 //Scheduler::ScheduledFunction::ScheduledFunction(std::function<bool()>& backingFunction, unsigned char requirementFlags)
 //	:backingFunction{ backingFunction }, RequirementFlags{ requirementFlags } {}
@@ -31,7 +31,7 @@ SchedulerBase::SchedulerBase(unsigned char systemFlags, SchedulerTypes type) //c
 		unsigned char currentMask = 1 << i;
 		if ((systemFlags & currentMask) >> i == 1)
 		{
-			Systems currentSystem = (Systems)(unsigned char)pow(2, i);
+			Systems currentSystem = (Systems)currentMask;
 			schedule.emplace(currentSystem, std::list<int>());
 		}
 	}
@@ -79,7 +79,7 @@ void SchedulerBase::Schedule(Scheduleable* scheduleable)
 		unsigned char currentMask = 1 << i;
 		if ((requirementFlags & currentMask) >> i == 1)
 		{
-			Systems currentSystem = (Systems)(unsigned char)pow(2, i);
+			Systems currentSystem = (Systems)currentMask;
 			schedule[currentSystem].push_back(newID);
 		}
 	}
@@ -111,7 +111,7 @@ bool SchedulerBase::Run()
 		unsigned char currentMask = 1 << i;
 		if ((requirementFlags & currentMask) >> i == 1)
 		{
-			Systems currentSystem = (Systems)(unsigned char)pow(2, i);
+			Systems currentSystem = (Systems)currentMask;
 			std::list<int>& currentSystemSchedule = schedule[currentSystem];
 			if (currentSystemSchedule.size() != 0 && functionManager.RunIfReady(currentSystemSchedule.front(), currentAvailableSystem))
 			{
@@ -128,25 +128,33 @@ bool SchedulerBase::Run()
 		unsigned char currentMask = 1 << i;
 		if ((requirementFlags & currentMask) >> i == 1)
 		{
-			Systems currentSystem = (Systems)(unsigned char)pow(2, i);
+			Systems currentSystem = (Systems)currentMask;
 			std::list<int>& currentSystemSchedule = schedule[currentSystem];
 			if (currentSystemSchedule.size() == 0)
 			{
-				finishedSystems |= (unsigned char)currentSystem;
+				finishedSystems |= currentMask;
 			}
 			else
 			{
-				functionManager.ResetAvailability(currentSystemSchedule.front());
 				for (int ID : IDsToDelete)
 				{
 					if (currentSystemSchedule.front() == ID)
 					{
+						functionManager.Remove(ID);
 						currentSystemSchedule.pop_front();
 						if (currentSystemSchedule.size() == 0)
 						{
-							finishedSystems |= (unsigned char)currentSystem;
+							finishedSystems |= currentMask;
+						}
+						else
+						{
+							functionManager.ResetAvailability(currentSystemSchedule.front());
 						}
 						break;
+					}
+					else
+					{
+						functionManager.ResetAvailability(currentSystemSchedule.front());
 					}
 				}
 			}

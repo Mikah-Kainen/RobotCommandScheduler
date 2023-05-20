@@ -1,69 +1,87 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\Schedulers">
+    <Filter Include="inc">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="src\SchedulerSrc">
+      <UniqueIdentifier>{a72727be-5d9f-47ba-9a46-8b2862b67580}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="inc\SchedulerInc">
       <UniqueIdentifier>{6561061b-c09d-4517-a007-062f7f9c42b3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Schedulers">
-      <UniqueIdentifier>{ab3d3542-b2b5-4b55-8718-6567eef9b549}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="SchedulerProject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Command.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Manager.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>src\SchedulerSrc</Filter>
     </ClCompile>
     <ClCompile Include="FunctionManager.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>src\SchedulerSrc</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager.cpp">
+      <Filter>src\SchedulerSrc</Filter>
     </ClCompile>
     <ClCompile Include="ParallelGroup.cpp">
-      <Filter>Source Files\Schedulers</Filter>
+      <Filter>src\SchedulerSrc</Filter>
     </ClCompile>
     <ClCompile Include="Scheduler.cpp">
-      <Filter>Source Files\Schedulers</Filter>
+      <Filter>src\SchedulerSrc</Filter>
     </ClCompile>
     <ClCompile Include="SchedulerBase.cpp">
-      <Filter>Source Files\Schedulers</Filter>
+      <Filter>src\SchedulerSrc</Filter>
     </ClCompile>
     <ClCompile Include="SequentialGroup.cpp">
-      <Filter>Source Files\Schedulers</Filter>
+      <Filter>src\SchedulerSrc</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="SchedulerProject.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="Robot.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="Motor.cpp">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FunctionManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Static.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Scheduler.h">
-      <Filter>Header Files\Schedulers</Filter>
+      <Filter>inc\SchedulerInc</Filter>
     </ClInclude>
     <ClInclude Include="ParallelGroup.h">
-      <Filter>Header Files\Schedulers</Filter>
+      <Filter>inc\SchedulerInc</Filter>
     </ClInclude>
     <ClInclude Include="SequentialGroup.h">
-      <Filter>Header Files\Schedulers</Filter>
+      <Filter>inc\SchedulerInc</Filter>
     </ClInclude>
     <ClInclude Include="SchedulerBase.h">
-      <Filter>Header Files\Schedulers</Filter>
+      <Filter>inc\SchedulerInc</Filter>
+    </ClInclude>
+    <ClInclude Include="FunctionManager.h">
+      <Filter>inc\SchedulerInc</Filter>
+    </ClInclude>
+    <ClInclude Include="Static.h">
+      <Filter>src\SchedulerSrc</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Robot.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Motor.h">
+      <Filter>inc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
