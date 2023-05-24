@@ -131,6 +131,7 @@
     <ClCompile Include="Command.cpp" />
     <ClCompile Include="FunctionManager.cpp" />
     <ClCompile Include="Manager.cpp" />
+    <ClCompile Include="MemoryEater.cpp" />
     <ClCompile Include="Motor.cpp" />
     <ClCompile Include="ParallelGroup.cpp" />
     <ClCompile Include="Robot.cpp" />

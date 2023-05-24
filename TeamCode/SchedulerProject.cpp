@@ -9,6 +9,7 @@
 #include "Robot.h"
 #include "Motor.h"
 #include "Timer.h"
+#include "MemoryEater.cpp"
 
 #pragma region CatStuff
 class Cat
@@ -161,6 +162,10 @@ int main() //Unit tests with GoogleTest
 //Add Initialization and EndBehavior functions to commands
 //give schedulers unique IDs for debugging purposes
 
+//ScheduleWith should return a shared pointer and Schedulers should use shared pointers for Scheduleable
+//MemoryEater should return a key/provide some functionality so that memory can be uneaten at some point
+//	^also it should take in a bool for if the uneated memory can be cleaned up(always should be true in the case of values but references might want to be preserved if its from an important function)
+
 //new ScheduledCommand([&]() {return MotorB.MultiStepMove(4); }, (unsigned char)Systems::MotorB), //scheduling stuff should just take in Systems and convert it to unsigned char(or maybe just make Command wrapper more convenient)
 //new ScheduledCommand([&]() {return MotorC.MultiStepMove(5); }, (unsigned char)Systems::MotorC), //Add Initialization and EndBehavior functions to commands
 
@@ -203,15 +208,14 @@ int main() //Unit tests with GoogleTest
 #pragma endregion
 
 	Command<int> MoveLeftMotorByTime = Command<int>(std::bind(&Motor::MoveByTime, robot.GetLeftMotor(), std::placeholders::_1), (unsigned char)Systems::LeftMotor);
-	Command<std::vector<std::string>> DisplayMessage = Command<std::vector<std::string>>([=](std::vector<std::string> messages) {for (std::string message : messages) {std::cout << message; } std::cout << std::flush; 
-	return true; 
-		}, (unsigned char)Systems::None);
+	Command<std::vector<std::string>> DisplayMessage = Command<std::vector<std::string>>([=](std::vector<std::string> messages) {for (std::string message : messages) {std::cout << message; } std::cout << std::flush; return true; }, (unsigned char)Systems::None);
 	//Command<int> DisplayNumber = Command<int>([&](int number) {std::cout << number << std::flush; return true; }, (unsigned char)Systems::None);
 	Command<> UpdateLeftMotorTime = Command<>(std::bind(&Motor::UpdateTime, robot.GetLeftMotor()), (unsigned char)Systems::LeftMotor);
 
 	std::cout << "Robot Made!\n";
 
 	Scheduler& scheduler = Scheduler::GetInstance();
+	MemoryEater& eater = MemoryEater::GetInstance();
 
 	//SequentialGroup* sequentialGroup = new SequentialGroup({
 	//new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
@@ -233,18 +237,16 @@ int main() //Unit tests with GoogleTest
 	//	});r::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
 	//	});
 
-	int delays[] = {1000, 3000, 1000,};
-	std::vector<std::string> messages;
-
 	std::vector<FunctionManager::Scheduleable*> delayFunctions = std::vector<FunctionManager::Scheduleable*>();
-	for (int i = 0; i < 3; i ++)
+	if (true)
 	{
-		delayFunctions.push_back(UpdateLeftMotorTime.ScheduleWith());
-
-		messages = { "Moving ", std::to_string(delays[i]), " milliseconds\n"};
-		delayFunctions.push_back(DisplayMessage.ScheduleWith(messages));
-
-		delayFunctions.push_back(MoveLeftMotorByTime.ScheduleWith(delays[i]));
+		int delays[] = { 1000, 3000, 1000, };
+		for (int i = 0; i < 3; i++)
+		{
+			delayFunctions.push_back(UpdateLeftMotorTime.ScheduleWith());
+			delayFunctions.push_back(DisplayMessage.ScheduleWith(eater.CreateRef<std::vector<std::string>>({ "Moving ", std::to_string(delays[i]), " milliseconds\n" })));
+			delayFunctions.push_back(MoveLeftMotorByTime.ScheduleWith(delays[i]));
+		}
 	}
 	SequentialGroup* sequentialGroup = new SequentialGroup(delayFunctions);
 
