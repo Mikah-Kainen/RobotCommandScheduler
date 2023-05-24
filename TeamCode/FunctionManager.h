@@ -27,7 +27,6 @@ public:
 
 		//Scheduleable();
 
-	public:
 		bool IsDead;
 
 		~Scheduleable();

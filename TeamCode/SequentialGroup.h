@@ -10,5 +10,6 @@ protected:
 public:
 	SequentialGroup(std::vector<FunctionManager::Scheduleable*> scheduleablesToSchedule);
 
+	//SequentialGroup(FunctionManager::Scheduleable** scheduleablesToSchedule, int numberOfScheduleables);
 };
 

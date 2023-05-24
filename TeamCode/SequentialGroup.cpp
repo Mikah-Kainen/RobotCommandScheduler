@@ -12,3 +12,8 @@ SequentialGroup::SequentialGroup(std::vector<FunctionManager::Scheduleable*> sch
 		SchedulerBase::Schedule(scheduleable);
 	}
 }
+
+//SequentialGroup::SequentialGroup(FunctionManager::Scheduleable** scheduleablesToSchedule, int numberOfScheduleables)
+//	:SequentialGroup(std::vector<FunctionManager::Scheduleable*>(numberOfScheduleables, scheduleablesToSchedule[0]))
+//{
+//}
