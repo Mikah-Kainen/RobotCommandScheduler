@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <memory>
 #include <exception>
-
+#include "Static.h"
 
 
 //Interesting link: https://jguegant.github.io/blogs/tech/performing-try-emplace.html
@@ -23,7 +23,7 @@ public:
 		unsigned char requirementFlags;
 		Scheduleable(std::function<bool()> backingFunction, unsigned char requirementFlags);
 
-		//Scheduleable(std::function<bool()> backingFunction);
+		Scheduleable(std::function<bool()> backingFunction, Systems requiredSystem);
 
 		//Scheduleable();
 

@@ -155,6 +155,11 @@ new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime
 	});
 #pragma endregion
 
+void TakeConstRef(const int& constRef)
+{
+	std::cout << constRef << std::endl;
+}
+
 int main() //Unit tests with GoogleTest
 {
 	//**Things to do
@@ -165,6 +170,8 @@ int main() //Unit tests with GoogleTest
 //ScheduleWith should return a shared pointer and Schedulers should use shared pointers for Scheduleable
 //MemoryEater should return a key/provide some functionality so that memory can be uneaten at some point
 //	^also it should take in a bool for if the uneated memory can be cleaned up(always should be true in the case of values but references might want to be preserved if its from an important function)
+//look into and start using const ref
+//maybe change MemoryEater to use void* instead of TypeBase and Type
 
 //new ScheduledCommand([&]() {return MotorB.MultiStepMove(4); }, (unsigned char)Systems::MotorB), //scheduling stuff should just take in Systems and convert it to unsigned char(or maybe just make Command wrapper more convenient)
 //new ScheduledCommand([&]() {return MotorC.MultiStepMove(5); }, (unsigned char)Systems::MotorC), //Add Initialization and EndBehavior functions to commands
@@ -217,6 +224,8 @@ int main() //Unit tests with GoogleTest
 	Scheduler& scheduler = Scheduler::GetInstance();
 	MemoryEater& eater = MemoryEater::GetInstance();
 
+	TakeConstRef(5);
+
 	//SequentialGroup* sequentialGroup = new SequentialGroup({
 	//new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
 	//new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
@@ -245,7 +254,7 @@ int main() //Unit tests with GoogleTest
 		{
 			delayFunctions.push_back(UpdateLeftMotorTime.ScheduleWith());
 			delayFunctions.push_back(DisplayMessage.ScheduleWith(eater.CreateRef<std::vector<std::string>>({ "Moving ", std::to_string(delays[i]), " milliseconds\n" })));
-			delayFunctions.push_back(MoveLeftMotorByTime.ScheduleWith(delays[i]));
+			delayFunctions.push_back(MoveLeftMotorByTime.ScheduleWith(delays[i])); //delays is already dead
 		}
 	}
 	SequentialGroup* sequentialGroup = new SequentialGroup(delayFunctions);

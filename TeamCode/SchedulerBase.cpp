@@ -10,10 +10,10 @@
 //}
 
 
-unsigned char SchedulerBase::GetRequirementFlags(std::vector<FunctionManager::Scheduleable*> scheduleables)
+unsigned char SchedulerBase::GetRequirementFlags(std::vector<std::shared_ptr<FunctionManager::Scheduleable>> scheduleables)
 {
 	unsigned char requirementFlag = 0;
-	for (FunctionManager::Scheduleable* scheduleable : scheduleables)
+	for (std::shared_ptr<FunctionManager::Scheduleable> scheduleable : scheduleables)
 	{
 		requirementFlag |= scheduleable->GetRequirementFlags();
 	}
@@ -21,7 +21,7 @@ unsigned char SchedulerBase::GetRequirementFlags(std::vector<FunctionManager::Sc
 }
 
 SchedulerBase::SchedulerBase(unsigned char systemFlags, SchedulerTypes type) //change this to be the main constructor that the other constructors call
-	:Scheduleable(std::function<bool()>([&]() {return Run(); }), systemFlags), functionManager{ FunctionManager() }, schedulerID{NextAvailableSchedulerID}
+	:Scheduleable(std::function<bool()>(std::bind(&SchedulerBase::Run, this)), systemFlags), functionManager{ FunctionManager() }, schedulerID{NextAvailableSchedulerID}
 {
 	schedulerType = type;
 
@@ -52,7 +52,7 @@ SchedulerBase::SchedulerBase(std::vector<Systems> schedulerSystems, SchedulerTyp
 //also think about how conditional functions could work(maybe a placeholder function that is replaced by a Scheduler that handles whichever branch it is currently on)
 //also add functionality to remove systems from the scheduler when all the system's commands have been completed, so that the parent scheduler can start scheduling things with that system(but don't remove systems from the original scheduler!)
 //make different types of schedulers or have information in the schedulers which decides whether a system should be removed or its default functions should be run when the scheduler runs out of scheduled functions for that system
-void SchedulerBase::Schedule(Scheduleable* scheduleable)
+void SchedulerBase::Schedule(std::shared_ptr<Scheduleable> scheduleable)
 {
 #pragma region workingTheory
 	/*
@@ -73,14 +73,14 @@ void SchedulerBase::Schedule(Scheduleable* scheduleable)
 }*/
 #pragma endregion
 	unsigned char requirementFlags = scheduleable->GetRequirementFlags();
-	int newID = functionManager.AddToDatabase(scheduleable);
+	//int newID = functionManager.AddToDatabase(scheduleable);
 	for (int i = 0; i < SystemsCount; i++)
 	{
 		unsigned char currentMask = 1 << i;
 		if ((requirementFlags & currentMask) >> i == 1)
 		{
 			Systems currentSystem = (Systems)currentMask;
-			schedule[currentSystem].push_back(newID);
+			//schedule[currentSystem].push_back(newID);
 		}
 	}
 	//Definitely put stuff here
@@ -88,7 +88,7 @@ void SchedulerBase::Schedule(Scheduleable* scheduleable)
 
 void SchedulerBase::Schedule(std::function<bool()> function, unsigned char requirementFlags)
 {
-	Schedule(new ScheduledCommand(function, requirementFlags));
+	//Schedule(new ScheduledCommand(function, requirementFlags));
 }
 
 void SchedulerBase::Schedule(std::function<bool()> function, std::vector<Systems> requiredSystems)

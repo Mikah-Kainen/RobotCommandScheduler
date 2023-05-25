@@ -16,7 +16,7 @@
 class SchedulerBase : public FunctionManager::Scheduleable
 {
 protected:
-	static unsigned char GetRequirementFlags(std::vector<FunctionManager::Scheduleable*> scheduleables);
+	static unsigned char GetRequirementFlags(std::vector<std::shared_ptr<FunctionManager::Scheduleable>> scheduleables);
 
 	enum class SchedulerTypes
 	{
@@ -39,7 +39,7 @@ protected:
 
 	SchedulerBase(std::vector<Systems> schedulerSystems, SchedulerTypes type);
 
-	void Schedule(Scheduleable* scheduleable);
+	void Schedule(std::shared_ptr<Scheduleable> scheduleable);
 
 	void Schedule(std::function<bool()> function, unsigned char requirementFlags);
 

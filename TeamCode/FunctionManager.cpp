@@ -6,10 +6,10 @@
 FunctionManager::Scheduleable::Scheduleable(std::function<bool()> backingFunction, unsigned char requirementFlags)
 	:backingFunction{ backingFunction }, requirementFlags{ requirementFlags }, availableSystems{(unsigned char)0}, IsDead{ false } {}
 
-//I don't think these constructors have good use cases (maybe second one required for unordered_map?)
-//FunctionManager::Scheduleable::Scheduleable(std::function<bool()> backingFunction)
-//	:Scheduleable(backingFunction, (unsigned char)255) {}
+FunctionManager::Scheduleable::Scheduleable(std::function<bool()> backingFunction, Systems requiredSystem)
+	:Scheduleable(backingFunction, (unsigned char)requiredSystem) {}
 
+//maybe this required for unordered_map?
 //FunctionManager::Scheduleable::Scheduleable() {}
 
 FunctionManager::Scheduleable::~Scheduleable() 

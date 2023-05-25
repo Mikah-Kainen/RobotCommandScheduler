@@ -37,7 +37,7 @@ private:
         }
     };
 
-    std::vector<TypeBase*> objects;
+    std::vector<TypeBase*> objects; //maybe replace with std::vector<void*>
 
     MemoryEater()
     {

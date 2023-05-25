@@ -58,7 +58,7 @@ public:
 	//}
 #pragma endregion
 
-	ScheduledCommand* ScheduleWith(Ts&... params)
+	ScheduledCommand* ScheduleWith(const Ts&... params) //maybe this?
 	{
 		return new ScheduledCommand([&]() {return backingFunction(params...); }, requirementFlags);
 	}
