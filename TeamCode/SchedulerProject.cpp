@@ -107,54 +107,6 @@ bool MotorCResetCurrentStep()
 
 Robot& robot = Robot::GetInstance();
 
-#pragma region 
-
-SequentialGroup* sequentialGroup0 = new SequentialGroup({
-new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
-new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
-new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
-new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
-new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
-new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
-	});
-
-SequentialGroup* sequentialGroup1 = new SequentialGroup({
-new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
-new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
-new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
-new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
-new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
-new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
-	});
-
-SequentialGroup* sequentialGroup2 = new SequentialGroup({
-new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
-new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
-new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
-new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
-new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
-new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
-	});
-
-SequentialGroup* sequentialGroup3 = new SequentialGroup({
-new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
-new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
-new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
-new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
-new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
-new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
-	});
-
-SequentialGroup* sequentialGroup4 = new SequentialGroup({
-new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
-new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
-new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
-new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
-new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
-new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
-	});
-#pragma endregion
-
 void TakeConstRef(const int& constRef)
 {
 	std::cout << constRef << std::endl;
@@ -215,7 +167,7 @@ int main() //Unit tests with GoogleTest
 #pragma endregion
 
 	Command<int> MoveLeftMotorByTime = Command<int>(std::bind(&Motor::MoveByTime, robot.GetLeftMotor(), std::placeholders::_1), (unsigned char)Systems::LeftMotor);
-	Command<std::vector<std::string>> DisplayMessage = Command<std::vector<std::string>>([=](std::vector<std::string> messages) {for (std::string message : messages) {std::cout << message; } std::cout << std::flush; return true; }, (unsigned char)Systems::None);
+	Command<std::vector<std::string>> DisplayMessage = Command<std::vector<std::string>>([=](std::vector<std::string> messages) {for (std::string message : messages) { std::cout << message; } std::cout << std::flush; return true; }, (unsigned char)Systems::None);
 	//Command<int> DisplayNumber = Command<int>([&](int number) {std::cout << number << std::flush; return true; }, (unsigned char)Systems::None);
 	Command<> UpdateLeftMotorTime = Command<>(std::bind(&Motor::UpdateTime, robot.GetLeftMotor()), (unsigned char)Systems::LeftMotor);
 
@@ -233,7 +185,7 @@ int main() //Unit tests with GoogleTest
 	//new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
 	//new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
 	//new FunctionManage
-	
+
 	//int oneThousand = 1000;
 	//int fiveThousand = 5000;
 	//SequentialGroup* sequentialGroup = new SequentialGroup({
@@ -246,21 +198,20 @@ int main() //Unit tests with GoogleTest
 	//	});r::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
 	//	});
 
-	std::vector<FunctionManager::Scheduleable*> delayFunctions = std::vector<FunctionManager::Scheduleable*>();
-	if (true)
+	std::vector<std::shared_ptr<FunctionManager::Scheduleable>> delayFunctions = std::vector<std::shared_ptr<FunctionManager::Scheduleable>>();
+	int delays[] = { 1000, 3000, 1000, };
+	std::vector<std::string> message = { "Displaying Message\n" };
+	for (int i = 0; i < 3; i++)
 	{
-		int delays[] = { 1000, 3000, 1000, };
-		for (int i = 0; i < 3; i++)
-		{
-			delayFunctions.push_back(UpdateLeftMotorTime.ScheduleWith());
-			delayFunctions.push_back(DisplayMessage.ScheduleWith(eater.CreateRef<std::vector<std::string>>({ "Moving ", std::to_string(delays[i]), " milliseconds\n" })));
-			delayFunctions.push_back(MoveLeftMotorByTime.ScheduleWith(delays[i])); //delays is already dead
-		}
+		delayFunctions.push_back(UpdateLeftMotorTime.ScheduleWith());
+		delayFunctions.push_back(DisplayMessage.ScheduleWith(eater.CreateRef<std::vector<std::string>>({ "Moving ", std::to_string(delays[i]), " milliseconds\n" })));
+		delayFunctions.push_back(MoveLeftMotorByTime.ScheduleWith(delays[i]));
 	}
-	SequentialGroup* sequentialGroup = new SequentialGroup(delayFunctions);
+
+	std::shared_ptr<SequentialGroup> sequentialGroup = std::make_shared<SequentialGroup>(delayFunctions);
 
 
-	FunctionManager::Scheduleable* endFunction = new FunctionManager::Scheduleable([&]() {std::cout << "End of Functions, Current Time: " << Timer::GetInstance().ElapsedMilliseconds() << std::endl; return true; }, (unsigned char)Systems::All);
+	std::shared_ptr<FunctionManager::Scheduleable> endFunction = std::make_shared<FunctionManager::Scheduleable>([&]() {std::cout << "End of Functions, Current Time: " << Timer::GetInstance().ElapsedMilliseconds() << std::endl; return true; }, (unsigned char)Systems::All);
 
 	//scheduler.Schedule(sequentialGroup2);
 	scheduler.Schedule(sequentialGroup);
@@ -273,9 +224,9 @@ int main() //Unit tests with GoogleTest
 
 	while (!scheduler.Run()) {}
 	std::cout << "EVERYTHING DONE!!!!!!!" << std::endl;
-	while (true)
-	{
-	}
+	//while (true)
+	//{
+	//}
 }
 
 

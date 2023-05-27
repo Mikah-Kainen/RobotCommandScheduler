@@ -13,7 +13,7 @@ Scheduler& Scheduler::GetInstance()
 	return scheduler;
 }
 
-void Scheduler::Schedule(Scheduleable* scheduleable)
+void Scheduler::Schedule(std::shared_ptr<Scheduleable> scheduleable)
 {
 	SchedulerBase::Schedule(scheduleable);
 }

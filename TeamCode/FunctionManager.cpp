@@ -3,10 +3,10 @@
 #include "FunctionManager.h"
 
 #pragma region IScheduleable
-FunctionManager::Scheduleable::Scheduleable(std::function<bool()> backingFunction, unsigned char requirementFlags)
+FunctionManager::Scheduleable::Scheduleable(const std::function<bool()>& backingFunction, unsigned char requirementFlags)
 	:backingFunction{ backingFunction }, requirementFlags{ requirementFlags }, availableSystems{(unsigned char)0}, IsDead{ false } {}
 
-FunctionManager::Scheduleable::Scheduleable(std::function<bool()> backingFunction, Systems requiredSystem)
+FunctionManager::Scheduleable::Scheduleable(const std::function<bool()>& backingFunction, Systems requiredSystem)
 	:Scheduleable(backingFunction, (unsigned char)requiredSystem) {}
 
 //maybe this required for unordered_map?
@@ -16,7 +16,7 @@ FunctionManager::Scheduleable::~Scheduleable()
 {
 	if (IsDead)
 	{
-		throw new std::exception("THIS IS DEAD!\n");
+		throw new std::exception("THIS IS ALREADY DEAD!\n");
 	}
 	IsDead = true;
 	std::cout << "FunctionDied\n";
@@ -35,6 +35,10 @@ void FunctionManager::Scheduleable::AddRequirement(unsigned char newRequirementF
 bool FunctionManager::Scheduleable::RunIfReady(unsigned char availableSystem) 
 //An IScheduleable that doesn't require any systems will never run(unless availableSystem is 0) because RunIfReady always adds an available system before checking the requirements 
 {
+	if (IsDead)
+	{
+		std::cout << "THIS ALREADY DIED!! ALERT, THIS IS DEAD ALREADY!";
+	}
 	availableSystems |= availableSystem;
 	if ((availableSystems & requirementFlags) == requirementFlags)
 	{
@@ -58,7 +62,7 @@ void FunctionManager::Scheduleable::ResetAvailability()
 FunctionManager::FunctionManager()
 	:database{ std::unordered_map<int, std::shared_ptr<Scheduleable>>() }, nextAvailableID{ 0 } {}
 
-int FunctionManager::AddToDatabase(Scheduleable* scheduledItem)
+int FunctionManager::AddToDatabase(std::shared_ptr<Scheduleable> scheduledItem)
 {
 	int ID = nextAvailableID++;
 	database.emplace(ID, scheduledItem);

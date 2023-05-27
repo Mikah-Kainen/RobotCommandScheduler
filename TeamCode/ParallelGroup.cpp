@@ -8,10 +8,10 @@
 //	
 //}
 
-ParallelGroup::ParallelGroup(std::vector<FunctionManager::Scheduleable*> scheduleablesToSchedule)
+ParallelGroup::ParallelGroup(std::vector<std::shared_ptr<FunctionManager::Scheduleable>> scheduleablesToSchedule)
 	: SchedulerBase(GetRequirementFlags(scheduleablesToSchedule), SchedulerTypes::Parallel)
 {
-	for (FunctionManager::Scheduleable* scheduleable : scheduleablesToSchedule)
+	for (std::shared_ptr<FunctionManager::Scheduleable> scheduleable : scheduleablesToSchedule)
 	{
 		SchedulerBase::Schedule(scheduleable);
 	}

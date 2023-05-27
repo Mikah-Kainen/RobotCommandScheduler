@@ -8,7 +8,7 @@ private:
 protected:
 
 public:
-	SequentialGroup(std::vector<FunctionManager::Scheduleable*> scheduleablesToSchedule);
+	SequentialGroup(std::vector<std::shared_ptr<FunctionManager::Scheduleable>> scheduleablesToSchedule);
 
 	//SequentialGroup(FunctionManager::Scheduleable** scheduleablesToSchedule, int numberOfScheduleables);
 };

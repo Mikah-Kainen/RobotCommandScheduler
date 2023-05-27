@@ -14,16 +14,16 @@ public:
 	{
 	private:
 		unsigned char availableSystems;
-		std::function<bool()> backingFunction;
+		const std::function<bool()>& backingFunction;
 
 	//protected:
 	public:
 		//virtual void ThisIsAbstract() = 0;
 
 		unsigned char requirementFlags;
-		Scheduleable(std::function<bool()> backingFunction, unsigned char requirementFlags);
+		Scheduleable(const std::function<bool()>& backingFunction, unsigned char requirementFlags);
 
-		Scheduleable(std::function<bool()> backingFunction, Systems requiredSystem);
+		Scheduleable(const std::function<bool()>& backingFunction, Systems requiredSystem);
 
 		//Scheduleable();
 
@@ -48,7 +48,7 @@ public:
 
 	FunctionManager();
 
-	int AddToDatabase(Scheduleable* scheduledItem);
+	int AddToDatabase(std::shared_ptr<Scheduleable> scheduledItem);
 
 	bool RunIfReady(int scheduledID, unsigned char availableSystem); //Runs the IScheduleable with the specified ID if the system requirements are met
 
@@ -56,4 +56,3 @@ public:
 
 	void ResetAvailability(int ID);
 };
-

@@ -2,11 +2,11 @@
 #include "SequentialGroup.h"
 
 
-SequentialGroup::SequentialGroup(std::vector<FunctionManager::Scheduleable*> scheduleablesToSchedule)
+SequentialGroup::SequentialGroup(std::vector<std::shared_ptr<FunctionManager::Scheduleable>> scheduleablesToSchedule)
 	:SchedulerBase(GetRequirementFlags(scheduleablesToSchedule), SchedulerTypes::Sequential)
 {
 	unsigned char requirements = requirementFlags;
-	for (FunctionManager::Scheduleable* scheduleable : scheduleablesToSchedule)
+	for (std::shared_ptr<FunctionManager::Scheduleable> scheduleable : scheduleablesToSchedule)
 	{
 		scheduleable->AddRequirement(requirementFlags);
 		SchedulerBase::Schedule(scheduleable);

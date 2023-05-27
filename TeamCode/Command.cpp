@@ -6,7 +6,7 @@
 //#include "../../inc/SchedulerInc/Static.h"
 #include "FunctionManager.h"
 #include "Static.h"
-
+#include "MemoryEater.cpp"
 
 //class ScheduleableCommand : FunctionManager::Scheduleable
 //{
@@ -21,7 +21,7 @@ private:
 
 public:
 
-	ScheduledCommand(std::function<bool()> backingFunction, unsigned char requirementFlags)
+	ScheduledCommand(const std::function<bool()>& backingFunction, unsigned char requirementFlags)
 		: FunctionManager::Scheduleable(backingFunction, requirementFlags) {}
 };
 
@@ -30,18 +30,18 @@ template <typename... Ts>
 class Command
 {
 private:
-	std::function<bool(Ts...)> backingFunction;
 	unsigned char requirementFlags;
 
 public:
+	const std::function<bool(Ts...)>& backingFunction;//maybe make this private?
 
-	Command(std::function<bool(Ts...)> backingFunction, unsigned char requirementFlags)
+	Command(const std::function<bool(Ts...)>& backingFunction, unsigned char requirementFlags)
 		:backingFunction{ backingFunction }, requirementFlags{ requirementFlags } {}
 
-	Command(std::function<bool(Ts...)> backingFunction, std::vector<Systems> requiredSystems)
+	Command(const std::function<bool(Ts...)>& backingFunction, std::vector<Systems> requiredSystems)
 		: Command(backingFunction, GetRequirementFlag(requiredSystems)) {}
 
-	Command(std::function<bool(Ts...)> backingFunction, Systems system)
+	Command(const std::function<bool(Ts...)>& backingFunction, Systems system)
 		: Command(backingFunction, (unsigned char)system) {}
 
 #pragma region CommentedFunctions
@@ -58,9 +58,9 @@ public:
 	//}
 #pragma endregion
 
-	ScheduledCommand* ScheduleWith(const Ts&... params) //maybe this?
+	std::shared_ptr<ScheduledCommand> ScheduleWith(const Ts&... params) //maybe this?
 	{
-		return new ScheduledCommand([&]() {return backingFunction(params...); }, requirementFlags);
+		return std::make_shared<ScheduledCommand>(/*MemoryEater::GetInstance().CreateRef<ScheduledCommand>(*/[&]() {return backingFunction(params...); }, requirementFlags/*)*/);
 	}
 
 	void SetInitializationBehavior()

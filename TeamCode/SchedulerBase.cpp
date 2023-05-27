@@ -73,14 +73,14 @@ void SchedulerBase::Schedule(std::shared_ptr<Scheduleable> scheduleable)
 }*/
 #pragma endregion
 	unsigned char requirementFlags = scheduleable->GetRequirementFlags();
-	//int newID = functionManager.AddToDatabase(scheduleable);
+	int newID = functionManager.AddToDatabase(scheduleable);
 	for (int i = 0; i < SystemsCount; i++)
 	{
 		unsigned char currentMask = 1 << i;
 		if ((requirementFlags & currentMask) >> i == 1)
 		{
 			Systems currentSystem = (Systems)currentMask;
-			//schedule[currentSystem].push_back(newID);
+			schedule[currentSystem].push_back(newID);
 		}
 	}
 	//Definitely put stuff here
@@ -88,7 +88,7 @@ void SchedulerBase::Schedule(std::shared_ptr<Scheduleable> scheduleable)
 
 void SchedulerBase::Schedule(std::function<bool()> function, unsigned char requirementFlags)
 {
-	//Schedule(new ScheduledCommand(function, requirementFlags));
+	Schedule(std::make_shared<Scheduleable>(function, requirementFlags));
 }
 
 void SchedulerBase::Schedule(std::function<bool()> function, std::vector<Systems> requiredSystems)

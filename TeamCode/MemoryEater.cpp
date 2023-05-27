@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <vector>
 
@@ -27,7 +28,7 @@ private:
             IsDead = true;
         }
 
-        T& GetRef()
+        const T& GetRef()
         {
             if (IsDead)
             {
@@ -53,7 +54,7 @@ public:
     }
 
     template <typename T>
-    T& CreateRef(T value)
+    const T& CreateRef(T value)
     {
         objects.emplace_back(new Type<T>(value));
         return dynamic_cast<Type<T>*>(objects.back())->GetRef();
