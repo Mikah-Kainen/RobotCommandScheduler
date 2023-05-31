@@ -18,12 +18,12 @@ void Scheduler::Schedule(std::shared_ptr<Scheduleable> scheduleable)
 	SchedulerBase::Schedule(scheduleable);
 }
 
-void Scheduler::Schedule(std::function<bool()> function, unsigned char requirementFlags)
+void Scheduler::Schedule(const std::function<bool()>& function, unsigned char requirementFlags)
 {
 	SchedulerBase::Schedule(function, requirementFlags);
 }
 
-void Scheduler::Schedule(std::function<bool()> function, std::vector<Systems> requiredSystems)
+void Scheduler::Schedule(const std::function<bool()>& function, std::vector<Systems> requiredSystems)
 {
 	SchedulerBase::Schedule(function, requiredSystems);
 }

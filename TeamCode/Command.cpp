@@ -20,9 +20,11 @@ class ScheduledCommand : public FunctionManager::Scheduleable
 private:
 
 public:
-
 	ScheduledCommand(const std::function<bool()>& backingFunction, unsigned char requirementFlags)
 		: FunctionManager::Scheduleable(backingFunction, requirementFlags) {}
+
+	ScheduledCommand(std::function<bool()> backingFunctionCopy, unsigned char requirementFlags, bool passingByCopy)
+		: FunctionManager::Scheduleable(backingFunctionCopy, requirementFlags, passingByCopy) {}
 };
 
 //Link about Parameter Packs: https://en.cppreference.com/w/cpp/language/parameter_pack
@@ -31,10 +33,9 @@ class Command
 {
 private:
 	unsigned char requirementFlags;
+	std::function<bool(Ts...)> backingFunction;
 
 public:
-	const std::function<bool(Ts...)>& backingFunction;//maybe make this private?
-
 	Command(const std::function<bool(Ts...)>& backingFunction, unsigned char requirementFlags)
 		:backingFunction{ backingFunction }, requirementFlags{ requirementFlags } {}
 
@@ -43,6 +44,9 @@ public:
 
 	Command(const std::function<bool(Ts...)>& backingFunction, Systems system)
 		: Command(backingFunction, (unsigned char)system) {}
+
+	Command(std::function<bool(Ts...)> backingFunction, unsigned char requirementFlags, bool passByValue) //this shouldn't be necessary(remove it at some point)
+		:Command(backingFunction, requirementFlags) {}
 
 #pragma region CommentedFunctions
 	//Use for testing purposes if needed
@@ -60,8 +64,13 @@ public:
 
 	std::shared_ptr<ScheduledCommand> ScheduleWith(const Ts&... params) //maybe this?
 	{
-		return std::make_shared<ScheduledCommand>(/*MemoryEater::GetInstance().CreateRef<ScheduledCommand>(*/[&]() {return backingFunction(params...); }, requirementFlags/*)*/);
+		return std::make_shared<ScheduledCommand>([&]() {return backingFunction(params...); }, requirementFlags);
 	}
+
+	//std::shared_ptr<ScheduledCommand> ScheduleWith(bool useNothing) //function for debugging
+	//{
+	//	return std::make_shared<ScheduledCommand>([&]() {std::cout << "Yay this ran\n";  return true; }, requirementFlags, true);
+	//}
 
 	void SetInitializationBehavior()
 	{

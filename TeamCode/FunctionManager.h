@@ -14,20 +14,26 @@ public:
 	{
 	private:
 		unsigned char availableSystems;
-		const std::function<bool()>& backingFunction;
+		std::function<bool()> backingFunction;
 
 	//protected:
 	public:
 		//virtual void ThisIsAbstract() = 0;
 
+		bool IsDead;
 		unsigned char requirementFlags;
+
 		Scheduleable(const std::function<bool()>& backingFunction, unsigned char requirementFlags);
 
 		Scheduleable(const std::function<bool()>& backingFunction, Systems requiredSystem);
 
+		Scheduleable(std::function<bool()> backingFunctionCopy, unsigned char requirementFlags, bool passingByCopy);
+
+		Scheduleable(std::function<bool()> backingFunctionCopy, Systems requiredSystem, bool passingByCopy);
+
 		//Scheduleable();
 
-		bool IsDead;
+		Scheduleable(const Scheduleable& copyScheduelable);
 
 		~Scheduleable();
 
@@ -47,6 +53,8 @@ private:
 public:
 
 	FunctionManager();
+
+	~FunctionManager();
 
 	int AddToDatabase(std::shared_ptr<Scheduleable> scheduledItem);
 

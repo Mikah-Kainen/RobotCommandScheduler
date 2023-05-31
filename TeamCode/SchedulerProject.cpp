@@ -125,6 +125,8 @@ int main() //Unit tests with GoogleTest
 //look into and start using const ref
 //maybe change MemoryEater to use void* instead of TypeBase and Type
 
+//I should add proper destructors at some point
+
 //new ScheduledCommand([&]() {return MotorB.MultiStepMove(4); }, (unsigned char)Systems::MotorB), //scheduling stuff should just take in Systems and convert it to unsigned char(or maybe just make Command wrapper more convenient)
 //new ScheduledCommand([&]() {return MotorC.MultiStepMove(5); }, (unsigned char)Systems::MotorC), //Add Initialization and EndBehavior functions to commands
 
@@ -166,9 +168,12 @@ int main() //Unit tests with GoogleTest
 	//std::cout << "Program Finished!";
 #pragma endregion
 
-	Command<int> MoveLeftMotorByTime = Command<int>(std::bind(&Motor::MoveByTime, robot.GetLeftMotor(), std::placeholders::_1), (unsigned char)Systems::LeftMotor);
-	Command<std::vector<std::string>> DisplayMessage = Command<std::vector<std::string>>([=](std::vector<std::string> messages) {for (std::string message : messages) { std::cout << message; } std::cout << std::flush; return true; }, (unsigned char)Systems::None);
-	//Command<int> DisplayNumber = Command<int>([&](int number) {std::cout << number << std::flush; return true; }, (unsigned char)Systems::None);
+	Command<const int&> MoveLeftMotorByTime = Command<const int&>(std::bind(&Motor::MoveByTime, robot.GetLeftMotor(), std::placeholders::_1), (unsigned char)Systems::LeftMotor);
+	//Command<const std::vector<std::string>&> DisplayMessage = Command<const std::vector<std::string>&>([&](const std::vector<std::string>& messages) {for (std::string message : messages) { std::cout << message; } std::cout << std::flush; return true; }, (unsigned char)Systems::RightMotor);
+	std::function<bool(const std::string&)> myFunc = std::function<bool(const std::string&)>([&](const std::string& message) {std::cout << message; return true; });
+	myFunc("Hi\n\n");
+	//Command<const std::string&> DisplayString = Command<const std::string&>(std::function<bool(const std::string&)>([&](const std::string& message) {std::cout << message; return true; }), (unsigned char)Systems::RightMotor);
+	Command<const int&> DisplayNumber = Command<const int&>(std::function<bool(const int&)>([&](int number) {std::cout << number << std::endl; return true; }), (unsigned char)Systems::LeftMotor);
 	Command<> UpdateLeftMotorTime = Command<>(std::bind(&Motor::UpdateTime, robot.GetLeftMotor()), (unsigned char)Systems::LeftMotor);
 
 	std::cout << "Robot Made!\n";
@@ -176,7 +181,7 @@ int main() //Unit tests with GoogleTest
 	Scheduler& scheduler = Scheduler::GetInstance();
 	MemoryEater& eater = MemoryEater::GetInstance();
 
-	TakeConstRef(5);
+	//TakeConstRef(5);
 
 	//SequentialGroup* sequentialGroup = new SequentialGroup({
 	//new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
@@ -200,18 +205,34 @@ int main() //Unit tests with GoogleTest
 
 	std::vector<std::shared_ptr<FunctionManager::Scheduleable>> delayFunctions = std::vector<std::shared_ptr<FunctionManager::Scheduleable>>();
 	int delays[] = { 1000, 3000, 1000, };
-	std::vector<std::string> message = { "Displaying Message\n" };
+	//std::vector<std::string> message = { "Displaying Message\n" };
 	for (int i = 0; i < 3; i++)
 	{
+		//scheduler.Schedule(UpdateLeftMotorTime.ScheduleWith());
 		delayFunctions.push_back(UpdateLeftMotorTime.ScheduleWith());
-		delayFunctions.push_back(DisplayMessage.ScheduleWith(eater.CreateRef<std::vector<std::string>>({ "Moving ", std::to_string(delays[i]), " milliseconds\n" })));
+		
+		//auto result = DisplayString.ScheduleWith("Moving ");
+		//scheduler.Schedule(DisplayString.ScheduleWith("Moving "));
+		//scheduler.Schedule(DisplayNumber.ScheduleWith(6));
+		//delayFunctions.push_back(DisplayString.ScheduleWith("Moving "));
+		delayFunctions.push_back(DisplayNumber.ScheduleWith(delays[i]));
+
+		//delayFunctions.push_back(DisplayString.ScheduleWith(std::to_string(delays[i]))); //Uncomment this for a fun suprise
+		//delayFunctions.push_back(DisplayString.ScheduleWith(" milliseconds\n")); //Uncomment this for a fun suprise
+
+		//scheduler.Schedule(MoveLeftMotorByTime.ScheduleWith(delays[i]));
 		delayFunctions.push_back(MoveLeftMotorByTime.ScheduleWith(delays[i]));
 	}
+	delays[0] = 1000;
+	delays[1] = 1000;
+	delays[2] = 4000;
+	//delays = { 2000, 1000, 2000 };
 
 	std::shared_ptr<SequentialGroup> sequentialGroup = std::make_shared<SequentialGroup>(delayFunctions);
 
-
-	std::shared_ptr<FunctionManager::Scheduleable> endFunction = std::make_shared<FunctionManager::Scheduleable>([&]() {std::cout << "End of Functions, Current Time: " << Timer::GetInstance().ElapsedMilliseconds() << std::endl; return true; }, (unsigned char)Systems::All);
+	std::string otherMessage = "End of Functions, Current Time: ";
+	std::shared_ptr<FunctionManager::Scheduleable> endFunction = std::make_shared<FunctionManager::Scheduleable>([&]() {std::cout << otherMessage << Timer::GetInstance().ElapsedMilliseconds() << std::endl; return true; }, (unsigned char)Systems::All);
+	//otherMessage = "Haha I changed it ";
 
 	//scheduler.Schedule(sequentialGroup2);
 	scheduler.Schedule(sequentialGroup);

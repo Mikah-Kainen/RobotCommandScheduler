@@ -21,7 +21,8 @@ unsigned char SchedulerBase::GetRequirementFlags(std::vector<std::shared_ptr<Fun
 }
 
 SchedulerBase::SchedulerBase(unsigned char systemFlags, SchedulerTypes type) //change this to be the main constructor that the other constructors call
-	:Scheduleable(std::function<bool()>(std::bind(&SchedulerBase::Run, this)), systemFlags), functionManager{ FunctionManager() }, schedulerID{NextAvailableSchedulerID}
+	:Scheduleable(std::function<bool()>([&]() {return Run(); }/*std::function<bool()>(std::bind(&SchedulerBase::Run, this)*/), systemFlags), functionManager{ FunctionManager() }, schedulerID{ NextAvailableSchedulerID }
+	//I don't use std::bing because it causes a copy anyway when passed to the next function despite being passed as a reference(I think)
 {
 	schedulerType = type;
 
@@ -54,24 +55,6 @@ SchedulerBase::SchedulerBase(std::vector<Systems> schedulerSystems, SchedulerTyp
 //make different types of schedulers or have information in the schedulers which decides whether a system should be removed or its default functions should be run when the scheduler runs out of scheduled functions for that system
 void SchedulerBase::Schedule(std::shared_ptr<Scheduleable> scheduleable)
 {
-#pragma region workingTheory
-	/*
-	* char needs to be unsigned
-	* use masks instead of shifting
-	void SchedulerTest(unsigned char requirementFlags)
-{
-	for (int i = 0; i < 8; i++)
-	{
-		unsigned char currentMask = 1 << i;
-		if ((requirementFlags & currentMask) >> i == 1)
-		{
-			std::cout << (pow(2, i)) << std::endl;
-			//schedule[(Systems)pow(2, i)].push_back(newID);
-		}
-	}
-	//Definitely put stuff here
-}*/
-#pragma endregion
 	unsigned char requirementFlags = scheduleable->GetRequirementFlags();
 	int newID = functionManager.AddToDatabase(scheduleable);
 	for (int i = 0; i < SystemsCount; i++)
@@ -86,12 +69,12 @@ void SchedulerBase::Schedule(std::shared_ptr<Scheduleable> scheduleable)
 	//Definitely put stuff here
 }
 
-void SchedulerBase::Schedule(std::function<bool()> function, unsigned char requirementFlags)
+void SchedulerBase::Schedule(const std::function<bool()>& function, unsigned char requirementFlags)
 {
 	Schedule(std::make_shared<Scheduleable>(function, requirementFlags));
 }
 
-void SchedulerBase::Schedule(std::function<bool()> function, std::vector<Systems> requiredSystems)
+void SchedulerBase::Schedule(const std::function<bool()>& function, std::vector<Systems> requiredSystems)
 {
 	Schedule(function, GetRequirementFlag(requiredSystems));
 }
@@ -106,7 +89,7 @@ bool SchedulerBase::Run()
 	int debug = schedulerID;
 	unsigned char currentAvailableSystem = (unsigned char)0x1;
 	std::vector<int> IDsToDelete = std::vector<int>();
-	for (int i = 0; i < SystemsCount; i ++) //maybe use the requirementFlag instead of SystemsCount at some point
+	for (int i = 0; i < SystemsCount; i++) //maybe use the requirementFlag instead of SystemsCount at some point
 	{
 		unsigned char currentMask = 1 << i;
 		if ((requirementFlags & currentMask) >> i == 1)
@@ -116,14 +99,14 @@ bool SchedulerBase::Run()
 			if (currentSystemSchedule.size() != 0 && functionManager.RunIfReady(currentSystemSchedule.front(), currentAvailableSystem))
 			{
 				IDsToDelete.push_back(currentSystemSchedule.front());
-				functionManager.Remove(currentSystemSchedule.front());
+				//functionManager.Remove(currentSystemSchedule.front());
 			}
 		}
 		currentAvailableSystem <<= 1;
 	}
 
 	unsigned char finishedSystems = 0;
-	for (int i = 0; i < SystemsCount; i ++)
+	for (int i = 0; i < SystemsCount; i++)
 	{
 		unsigned char currentMask = 1 << i;
 		if ((requirementFlags & currentMask) >> i == 1)
@@ -136,12 +119,14 @@ bool SchedulerBase::Run()
 			}
 			else
 			{
+				bool wasDeleted = false;
 				for (int ID : IDsToDelete)
 				{
 					if (currentSystemSchedule.front() == ID)
 					{
 						functionManager.Remove(ID);
 						currentSystemSchedule.pop_front();
+						wasDeleted = true;
 						if (currentSystemSchedule.size() == 0)
 						{
 							finishedSystems |= currentMask;
@@ -152,10 +137,10 @@ bool SchedulerBase::Run()
 						}
 						break;
 					}
-					else
-					{
-						functionManager.ResetAvailability(currentSystemSchedule.front());
-					}
+				}
+				if (!wasDeleted)
+				{
+					functionManager.ResetAvailability(currentSystemSchedule.front());
 				}
 			}
 		}

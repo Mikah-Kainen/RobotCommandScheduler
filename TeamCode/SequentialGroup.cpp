@@ -6,7 +6,7 @@ SequentialGroup::SequentialGroup(std::vector<std::shared_ptr<FunctionManager::Sc
 	:SchedulerBase(GetRequirementFlags(scheduleablesToSchedule), SchedulerTypes::Sequential)
 {
 	unsigned char requirements = requirementFlags;
-	for (std::shared_ptr<FunctionManager::Scheduleable> scheduleable : scheduleablesToSchedule)
+	for (std::shared_ptr<FunctionManager::Scheduleable>& scheduleable : scheduleablesToSchedule)
 	{
 		scheduleable->AddRequirement(requirementFlags);
 		SchedulerBase::Schedule(scheduleable);

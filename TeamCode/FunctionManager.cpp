@@ -9,8 +9,26 @@ FunctionManager::Scheduleable::Scheduleable(const std::function<bool()>& backing
 FunctionManager::Scheduleable::Scheduleable(const std::function<bool()>& backingFunction, Systems requiredSystem)
 	:Scheduleable(backingFunction, (unsigned char)requiredSystem) {}
 
+FunctionManager::Scheduleable::Scheduleable(std::function<bool()> backingFunctionCopy, unsigned char requirementFlags, bool passingByCopy)
+	:Scheduleable{ backingFunction, requirementFlags } 
+{
+	std::cout << "Scheduleable Backing Function Made via Copy!" << std::endl;
+}
+
+FunctionManager::Scheduleable::Scheduleable(std::function<bool()> backingFunctionCopy, Systems requiredSystem, bool passingByCopy)
+	:Scheduleable(backingFunctionCopy, (unsigned char)requiredSystem) 
+{
+	std::cout << "Scheduleable Backing Function Made via Copy!" << std::endl;
+}
+
 //maybe this required for unordered_map?
 //FunctionManager::Scheduleable::Scheduleable() {}
+
+FunctionManager::Scheduleable::Scheduleable(const Scheduleable& copyScheduleable)
+	:availableSystems{ copyScheduleable.availableSystems }, backingFunction{ copyScheduleable.backingFunction }, IsDead{ copyScheduleable.IsDead }, requirementFlags{copyScheduleable.requirementFlags}
+{
+	std::cout << "Scheduleable Copied!!" << std::endl;
+}
 
 FunctionManager::Scheduleable::~Scheduleable() 
 {
@@ -19,7 +37,7 @@ FunctionManager::Scheduleable::~Scheduleable()
 		throw new std::exception("THIS IS ALREADY DEAD!\n");
 	}
 	IsDead = true;
-	std::cout << "FunctionDied\n";
+	std::cout << "Scheduleable Destructed\n";
 };
 
 unsigned char FunctionManager::Scheduleable::GetRequirementFlags()
@@ -62,6 +80,11 @@ void FunctionManager::Scheduleable::ResetAvailability()
 FunctionManager::FunctionManager()
 	:database{ std::unordered_map<int, std::shared_ptr<Scheduleable>>() }, nextAvailableID{ 0 } {}
 
+FunctionManager::~FunctionManager()
+{
+	//I should do something in the destructors
+}
+
 int FunctionManager::AddToDatabase(std::shared_ptr<Scheduleable> scheduledItem)
 {
 	int ID = nextAvailableID++;
@@ -76,7 +99,7 @@ bool FunctionManager::RunIfReady(int scheduledID, unsigned char availableSystem)
 	{
 		//do end of function logic
 		//throw std::exception("not implemented"); //UNCOMMENT THIS!!
-		Remove(scheduledID);
+		//Remove(scheduledID); //Don't delete here because I clean up in SchedulerBase(I could change Cleanup here if I want so maybe think about that)
 	}
 	return result;
 }
