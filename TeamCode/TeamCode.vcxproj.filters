@@ -27,9 +27,6 @@
     <ClCompile Include="FunctionManager.cpp">
       <Filter>src\SchedulerSrc</Filter>
     </ClCompile>
-    <ClCompile Include="Manager.cpp">
-      <Filter>src\SchedulerSrc</Filter>
-    </ClCompile>
     <ClCompile Include="ParallelGroup.cpp">
       <Filter>src\SchedulerSrc</Filter>
     </ClCompile>
@@ -74,9 +71,6 @@
     <ClInclude Include="FunctionManager.h">
       <Filter>inc\SchedulerInc</Filter>
     </ClInclude>
-    <ClInclude Include="Static.h">
-      <Filter>src\SchedulerSrc</Filter>
-    </ClInclude>
     <ClInclude Include="Timer.h">
       <Filter>inc</Filter>
     </ClInclude>
@@ -85,6 +79,9 @@
     </ClInclude>
     <ClInclude Include="Motor.h">
       <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Static.h">
+      <Filter>inc\SchedulerInc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
