@@ -1,5 +1,5 @@
 #include <iostream>
-#include "Command.cpp"
+#include "CommandBuilder.cpp"
 #include <string>
 #include <list>
 #include "Scheduler.h"
@@ -17,30 +17,55 @@ class Cat
 public:
 	int Age;
 	std::string Name;
+	bool IsDead;
 
 	Cat(int age, std::string name)
-		: Age{ age }, Name{ name } {}
+		: Age{ age }, Name{ name }, IsDead{false} {}
+
+	Cat(const Cat& copyCat)
+		: Age{ copyCat.Age }, Name{ copyCat.Name }, IsDead{copyCat.IsDead}
+	{
+		std::cout << "Cat Copied" << std::endl;
+	}
 
 	~Cat()
 	{
+		if (IsDead)
+		{
+			std::cout << "A Dead Cat is Back" << std::endl;
+		}
 		std::cout << "A Cat Just Died\n";
+		IsDead = true;
+	}
+
+	bool Display() const
+	{
+		if (IsDead)
+		{
+			std::cout << "Displaying Dead Cat!" << std::endl;
+		}
+		else
+		{
+			std::cout << "Name: " << Name << ", Age: " << Age << std::endl;
+		}
+		return true;
 	}
 };
 
-class OldCat : public Cat
-{
-public:
-
-	OldCat(std::string name)
-		: Cat(38, name)
-	{
-	}
-
-	~OldCat()
-	{
-
-	}
-};
+//class OldCat : public Cat
+//{
+//public:
+//
+//	OldCat(std::string name)
+//		: Cat(38, name)
+//	{
+//	}
+//
+//	~OldCat()
+//	{
+//
+//	}
+//};
 
 bool CoolFunction()
 {
@@ -168,13 +193,25 @@ int main() //Unit tests with GoogleTest
 	//std::cout << "Program Finished!";
 #pragma endregion
 
-	Command<const int&> MoveLeftMotorByTime = Command<const int&>(std::bind(&Motor::MoveByTime, robot.GetLeftMotor(), std::placeholders::_1), (unsigned char)Systems::LeftMotor);
+	CommandBuilder<const int&> MoveLeftMotorByTime = CommandBuilder<const int&>(std::bind(&Motor::MoveByTime, robot.GetLeftMotor(), std::placeholders::_1), (unsigned char)Systems::LeftMotor);
+	CommandBuilder<int> MoveLeftMotorByTimeVal = CommandBuilder<int>(std::bind(&Motor::MoveByTime, robot.GetLeftMotor(), std::placeholders::_1), (unsigned char)Systems::LeftMotor);
 	//Command<const std::vector<std::string>&> DisplayMessage = Command<const std::vector<std::string>&>([&](const std::vector<std::string>& messages) {for (std::string message : messages) { std::cout << message; } std::cout << std::flush; return true; }, (unsigned char)Systems::RightMotor);
 	std::function<bool(const std::string&)> myFunc = std::function<bool(const std::string&)>([&](const std::string& message) {std::cout << message; return true; });
 	myFunc("Hi\n\n");
-	//Command<const std::string&> DisplayString = Command<const std::string&>(std::function<bool(const std::string&)>([&](const std::string& message) {std::cout << message; return true; }), (unsigned char)Systems::RightMotor);
-	Command<const int&> DisplayNumber = Command<const int&>(std::function<bool(const int&)>([&](int number) {std::cout << number << std::endl; return true; }), (unsigned char)Systems::LeftMotor);
-	Command<> UpdateLeftMotorTime = Command<>(std::bind(&Motor::UpdateTime, robot.GetLeftMotor()), (unsigned char)Systems::LeftMotor);
+	CommandBuilder<std::string*> DisplayString = CommandBuilder<std::string*>(std::function<bool(std::string*)>([&](std::string* message) {std::cout << *message; return true; }), (unsigned char)Systems::RightMotor);
+
+	CommandBuilder<const int&> DisplayNumber = CommandBuilder<const int&>(std::function<bool(const int&)>([&](const int& number) {std::cout << number << std::endl; return true; }), (unsigned char)Systems::LeftMotor);
+	CommandBuilder<int> DisplayNumberVal = CommandBuilder<int>(std::function<bool(int)>([&](int number) {std::cout << number << std::endl; return true; }), (unsigned char)Systems::LeftMotor);
+	CommandBuilder<> UpdateLeftMotorTime = CommandBuilder<>(std::bind(&Motor::UpdateTime, robot.GetLeftMotor()), (unsigned char)Systems::LeftMotor);
+
+	CommandBuilder<Cat> TakesCatVal = CommandBuilder<Cat>(std::function<bool(Cat)>([&](Cat cat) {return cat.Display(); }), Systems::RightMotor);
+	CommandBuilder<const Cat&> TakesCat = CommandBuilder<const Cat&>(std::function<bool(const Cat&)>([&](const Cat& cat) {return cat.Display(); }), Systems::RightMotor);
+	CommandBuilder<Cat*> TakesCatPointer = CommandBuilder<Cat*>(std::function<bool(Cat*)>([&](Cat* cat) {return cat->Display(); }), Systems::RightMotor);
+
+	//Cat cat = Cat(600, "SuperCat");
+	//auto bindResult = std::bind(&Cat::Display, Cat(600, "SuperCat"));
+	//Command<> TakesCatBind = Command<>(std::bind(&Cat::Display, cat), Systems::RightMotor);
+	//cat.Age = 0;
 
 	std::cout << "Robot Made!\n";
 
@@ -209,23 +246,29 @@ int main() //Unit tests with GoogleTest
 	for (int i = 0; i < 3; i++)
 	{
 		//scheduler.Schedule(UpdateLeftMotorTime.ScheduleWith());
-		delayFunctions.push_back(UpdateLeftMotorTime.ScheduleWith());
+		delayFunctions.push_back(UpdateLeftMotorTime.CreateCommand());
 		
 		//auto result = DisplayString.ScheduleWith("Moving ");
 		//scheduler.Schedule(DisplayString.ScheduleWith("Moving "));
 		//scheduler.Schedule(DisplayNumber.ScheduleWith(6));
 		//delayFunctions.push_back(DisplayString.ScheduleWith("Moving "));
-		delayFunctions.push_back(DisplayNumber.ScheduleWith(delays[i]));
+		delayFunctions.push_back(DisplayNumberVal.CreateCommand(delays[i]));
 
-		//delayFunctions.push_back(DisplayString.ScheduleWith(std::to_string(delays[i]))); //Uncomment this for a fun suprise
-		//delayFunctions.push_back(DisplayString.ScheduleWith(" milliseconds\n")); //Uncomment this for a fun suprise
+		delayFunctions.push_back(DisplayString.CreateCommand(new std::string(std::to_string(delays[i])))); //Uncomment this for a fun suprise
+		delayFunctions.push_back(DisplayString.CreateCommand(new std::string(" milliseconds\n"))); //Uncomment this for a fun suprise
 
 		//scheduler.Schedule(MoveLeftMotorByTime.ScheduleWith(delays[i]));
-		delayFunctions.push_back(MoveLeftMotorByTime.ScheduleWith(delays[i]));
+		delayFunctions.push_back(MoveLeftMotorByTimeVal.CreateCommand(delays[i]));
+
 	}
-	delays[0] = 1000;
-	delays[1] = 1000;
-	delays[2] = 4000;
+	//Cat cat = Cat(10, "Tim");
+	//delayFunctions.push_back(TakesCatVal.ScheduleWith(cat));
+	//cat.Age = 100;
+	delayFunctions.push_back(TakesCatPointer.CreateCommand(new Cat(12, "John")));
+	//delayFunctions.push_back(TakesCatBind.ScheduleWith());
+	delays[0] = 500;
+	delays[1] = 500;
+	delays[2] = 500;
 	//delays = { 2000, 1000, 2000 };
 
 	std::shared_ptr<SequentialGroup> sequentialGroup = std::make_shared<SequentialGroup>(delayFunctions);

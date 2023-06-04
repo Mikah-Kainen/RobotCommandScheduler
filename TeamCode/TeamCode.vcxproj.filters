@@ -21,7 +21,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Command.cpp">
+    <ClCompile Include="CommandBuilder.cpp">
       <Filter>src\SchedulerSrc</Filter>
     </ClCompile>
     <ClCompile Include="FunctionManager.cpp">

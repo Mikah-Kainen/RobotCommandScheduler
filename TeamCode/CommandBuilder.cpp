@@ -23,30 +23,33 @@ public:
 	ScheduledCommand(const std::function<bool()>& backingFunction, unsigned char requirementFlags)
 		: FunctionManager::Scheduleable(backingFunction, requirementFlags) {}
 
-	ScheduledCommand(std::function<bool()> backingFunctionCopy, unsigned char requirementFlags, bool passingByCopy)
-		: FunctionManager::Scheduleable(backingFunctionCopy, requirementFlags, passingByCopy) {}
+	//ScheduledCommand(std::function<bool()> backingFunctionCopy, unsigned char requirementFlags, bool passingByCopy)
+	//	: FunctionManager::Scheduleable(backingFunctionCopy, requirementFlags, passingByCopy) {}
 };
 
 //Link about Parameter Packs: https://en.cppreference.com/w/cpp/language/parameter_pack
 template <typename... Ts>
-class Command
+class CommandBuilder
 {
 private:
 	unsigned char requirementFlags;
 	std::function<bool(Ts...)> backingFunction;
 
 public:
-	Command(const std::function<bool(Ts...)>& backingFunction, unsigned char requirementFlags)
+	CommandBuilder(const std::function<bool(Ts...)>& backingFunction, unsigned char requirementFlags)
 		:backingFunction{ backingFunction }, requirementFlags{ requirementFlags } {}
 
-	Command(const std::function<bool(Ts...)>& backingFunction, std::vector<Systems> requiredSystems)
-		: Command(backingFunction, GetRequirementFlag(requiredSystems)) {}
+	CommandBuilder(const std::function<bool(Ts...)>& backingFunction, std::vector<Systems> requiredSystems)
+		: CommandBuilder(backingFunction, GetRequirementFlag(requiredSystems)) {}
 
-	Command(const std::function<bool(Ts...)>& backingFunction, Systems system)
-		: Command(backingFunction, (unsigned char)system) {}
+	CommandBuilder(const std::function<bool(Ts...)>& backingFunction, Systems system)
+		: CommandBuilder(backingFunction, (unsigned char)system) {}
 
-	Command(std::function<bool(Ts...)> backingFunction, unsigned char requirementFlags, bool passByValue) //this shouldn't be necessary(remove it at some point)
-		:Command(backingFunction, requirementFlags) {}
+	//Command(std::function<bool(Ts...)> backingFunction, unsigned char requirementFlags, bool passByValue) //this shouldn't be necessary(remove it at some point)
+	//	:Command(backingFunction, requirementFlags) 
+	//{
+	//	std::cout << "Command Made by Value" << std::endl;
+	//}
 
 #pragma region CommentedFunctions
 	//Use for testing purposes if needed
@@ -62,7 +65,7 @@ public:
 	//}
 #pragma endregion
 
-	std::shared_ptr<ScheduledCommand> ScheduleWith(const Ts&... params) //maybe this?
+	std::shared_ptr<ScheduledCommand> CreateCommand(const Ts&... params) //maybe this?
 	{
 		return std::make_shared<ScheduledCommand>([&]() {return backingFunction(params...); }, requirementFlags);
 	}

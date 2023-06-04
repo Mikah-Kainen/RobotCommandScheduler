@@ -27,9 +27,9 @@ public:
 
 		Scheduleable(const std::function<bool()>& backingFunction, Systems requiredSystem);
 
-		Scheduleable(std::function<bool()> backingFunctionCopy, unsigned char requirementFlags, bool passingByCopy);
+		//Scheduleable(std::function<bool()> backingFunctionCopy, unsigned char requirementFlags, bool passingByCopy);
 
-		Scheduleable(std::function<bool()> backingFunctionCopy, Systems requiredSystem, bool passingByCopy);
+		//Scheduleable(std::function<bool()> backingFunctionCopy, Systems requiredSystem, bool passingByCopy);
 
 		//Scheduleable();
 

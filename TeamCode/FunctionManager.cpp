@@ -9,17 +9,17 @@ FunctionManager::Scheduleable::Scheduleable(const std::function<bool()>& backing
 FunctionManager::Scheduleable::Scheduleable(const std::function<bool()>& backingFunction, Systems requiredSystem)
 	:Scheduleable(backingFunction, (unsigned char)requiredSystem) {}
 
-FunctionManager::Scheduleable::Scheduleable(std::function<bool()> backingFunctionCopy, unsigned char requirementFlags, bool passingByCopy)
-	:Scheduleable{ backingFunction, requirementFlags } 
-{
-	std::cout << "Scheduleable Backing Function Made via Copy!" << std::endl;
-}
-
-FunctionManager::Scheduleable::Scheduleable(std::function<bool()> backingFunctionCopy, Systems requiredSystem, bool passingByCopy)
-	:Scheduleable(backingFunctionCopy, (unsigned char)requiredSystem) 
-{
-	std::cout << "Scheduleable Backing Function Made via Copy!" << std::endl;
-}
+//FunctionManager::Scheduleable::Scheduleable(std::function<bool()> backingFunctionCopy, unsigned char requirementFlags, bool passingByCopy)
+//	:Scheduleable{ backingFunction, requirementFlags } 
+//{
+//	std::cout << "Scheduleable Backing Function Made via Copy!" << std::endl;
+//}
+//
+//FunctionManager::Scheduleable::Scheduleable(std::function<bool()> backingFunctionCopy, Systems requiredSystem, bool passingByCopy)
+//	:Scheduleable(backingFunctionCopy, (unsigned char)requiredSystem) 
+//{
+//	std::cout << "Scheduleable Backing Function Made via Copy!" << std::endl;
+//}
 
 //maybe this required for unordered_map?
 //FunctionManager::Scheduleable::Scheduleable() {}

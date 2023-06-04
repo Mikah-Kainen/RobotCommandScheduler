@@ -1,13 +1,10 @@
 #pragma once
-//#include "../../src/SchedulerSrc/Command.cpp"
-#include "Command.cpp"
 #include <deque>
 #include <vector>
 #include <list>
 #include <iostream>
 #include "FunctionManager.h"
 #include "Static.h"
-//#include "Manager.cpp"
 
 //int
 //Schedulers should not be made in the main project; rather, a static scheduler(the only Base) can be part of another class and shared with the user via that

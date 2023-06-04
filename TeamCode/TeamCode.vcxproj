@@ -128,7 +128,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Command.cpp" />
+    <ClCompile Include="CommandBuilder.cpp" />
     <ClCompile Include="FunctionManager.cpp" />
     <ClCompile Include="Manager.cpp" />
     <ClCompile Include="MemoryEater.cpp" />
