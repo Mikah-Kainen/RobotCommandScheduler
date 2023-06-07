@@ -80,6 +80,16 @@ void FunctionManager::Scheduleable::ResetAvailability()
 FunctionManager::FunctionManager()
 	:database{ std::unordered_map<int, std::shared_ptr<Scheduleable>>() }, nextAvailableID{ 0 } {}
 
+FunctionManager::FunctionManager(const FunctionManager& copyFunctionManager)
+	: nextAvailableID{copyFunctionManager.nextAvailableID} 
+{
+	database = std::unordered_map<int, std::shared_ptr<FunctionManager::Scheduleable>>();
+	for (std::pair<int, std::shared_ptr<FunctionManager::Scheduleable>> kvp : copyFunctionManager.database)
+	{
+		database.emplace(kvp.first, kvp.second);
+	}
+}
+
 FunctionManager::~FunctionManager()
 {
 	//I should do something in the destructors

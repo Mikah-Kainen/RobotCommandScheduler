@@ -16,7 +16,6 @@ public:
 		unsigned char availableSystems;
 		std::function<bool()> backingFunction;
 
-	//protected:
 	public:
 		//virtual void ThisIsAbstract() = 0;
 
@@ -53,6 +52,8 @@ private:
 public:
 
 	FunctionManager();
+
+	FunctionManager(const FunctionManager& copyFunctionManager);
 
 	~FunctionManager();
 

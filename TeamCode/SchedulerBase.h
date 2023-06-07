@@ -36,6 +36,7 @@ protected:
 
 	SchedulerBase(std::vector<Systems> schedulerSystems, SchedulerTypes type);
 
+
 	void Schedule(std::shared_ptr<Scheduleable> scheduleable);
 
 	void Schedule(const std::function<bool()>& function, unsigned char requirementFlags);
@@ -43,7 +44,8 @@ protected:
 	void Schedule(const std::function<bool()>& function, std::vector<Systems> requiredSystems);
 
 public:
-
+	SchedulerBase(const SchedulerBase& copySchedulerBase);
+	
 	void Update();
 
 	bool Run();

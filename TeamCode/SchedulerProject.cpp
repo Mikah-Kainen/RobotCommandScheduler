@@ -198,7 +198,13 @@ int main() //Unit tests with GoogleTest
 	//Command<const std::vector<std::string>&> DisplayMessage = Command<const std::vector<std::string>&>([&](const std::vector<std::string>& messages) {for (std::string message : messages) { std::cout << message; } std::cout << std::flush; return true; }, (unsigned char)Systems::RightMotor);
 	std::function<bool(const std::string&)> myFunc = std::function<bool(const std::string&)>([&](const std::string& message) {std::cout << message; return true; });
 	myFunc("Hi\n\n");
-	CommandBuilder<std::string*> DisplayString = CommandBuilder<std::string*>(std::function<bool(std::string*)>([&](std::string* message) {std::cout << *message; return true; }), (unsigned char)Systems::RightMotor);
+	CommandBuilder<std::string*> DisplayStringPointer = CommandBuilder<std::string*>(std::function<bool(std::string*)>([&](std::string* message) {std::cout << *message; return true; }), Systems::RightMotor);
+	CommandBuilder<const std::string&> DisplayStringReference = CommandBuilder<const std::string&>([&](const std::string& message){std::cout << message; return true; }, Systems::RightMotor);
+	CommandBuilder<std::string> DisplayStringValue = CommandBuilder<std::string>([&](std::string message) {std::cout << message; return true; }, Systems::RightMotor);
+
+	CommandBuilder<Cat*> DisplayCatPointer = CommandBuilder<Cat*>([&](Cat* cat) {return cat->Display(); }, Systems::RightMotor);
+	CommandBuilder<const Cat&> DisplayCatReference = CommandBuilder<const Cat&>([&](const Cat& cat) {return cat.Display(); }, Systems::RightMotor);
+	CommandBuilder<Cat> DisplayCatValue = CommandBuilder<Cat>([&](Cat cat) {return cat.Display(); }, Systems::RightMotor);
 
 	CommandBuilder<const int&> DisplayNumber = CommandBuilder<const int&>(std::function<bool(const int&)>([&](const int& number) {std::cout << number << std::endl; return true; }), (unsigned char)Systems::LeftMotor);
 	CommandBuilder<int> DisplayNumberVal = CommandBuilder<int>(std::function<bool(int)>([&](int number) {std::cout << number << std::endl; return true; }), (unsigned char)Systems::LeftMotor);
@@ -254,8 +260,8 @@ int main() //Unit tests with GoogleTest
 		//delayFunctions.push_back(DisplayString.ScheduleWith("Moving "));
 		delayFunctions.push_back(DisplayNumberVal.CreateCommand(delays[i]));
 
-		delayFunctions.push_back(DisplayString.CreateCommand(new std::string(std::to_string(delays[i])))); //Uncomment this for a fun suprise
-		delayFunctions.push_back(DisplayString.CreateCommand(new std::string(" milliseconds\n"))); //Uncomment this for a fun suprise
+		delayFunctions.push_back(DisplayStringPointer.CreateCommand(new std::string(std::to_string(delays[i])))); //Uncomment this for a fun suprise
+		delayFunctions.push_back(DisplayStringPointer.CreateCommand(new std::string(" milliseconds\n"))); //Uncomment this for a fun suprise
 
 		//scheduler.Schedule(MoveLeftMotorByTime.ScheduleWith(delays[i]));
 		delayFunctions.push_back(MoveLeftMotorByTimeVal.CreateCommand(delays[i]));
@@ -271,14 +277,24 @@ int main() //Unit tests with GoogleTest
 	delays[2] = 500;
 	//delays = { 2000, 1000, 2000 };
 
-	std::shared_ptr<SequentialGroup> sequentialGroup = std::make_shared<SequentialGroup>(delayFunctions);
+	//std::shared_ptr<SequentialGroup> sequentialGroup = std::make_shared<SequentialGroup>(delayFunctions);
+	std::string* message = new std::string("This is running\n");
+	Cat* cat = new Cat(50, "PLEASE WORK");
+	std::shared_ptr<SequentialGroup> otherSequentialGroup = std::make_shared<SequentialGroup>(SequentialGroup({
+		//DisplayStringPointer.CreateCommand(message),
+		//DisplayStringReference.CreateCommand(*message),
+		//DisplayStringValue.CreateCommand(*message),
+		DisplayCatPointer.CreateCommand(cat),
+		DisplayCatReference.CreateCommand(*cat),
+		DisplayCatValue.CreateCommand(*cat),
+	}));
 
 	std::string otherMessage = "End of Functions, Current Time: ";
 	std::shared_ptr<FunctionManager::Scheduleable> endFunction = std::make_shared<FunctionManager::Scheduleable>([&]() {std::cout << otherMessage << Timer::GetInstance().ElapsedMilliseconds() << std::endl; return true; }, (unsigned char)Systems::All);
 	//otherMessage = "Haha I changed it ";
 
 	//scheduler.Schedule(sequentialGroup2);
-	scheduler.Schedule(sequentialGroup);
+	scheduler.Schedule(otherSequentialGroup);
 	scheduler.Schedule(endFunction);
 
 	//if (true)

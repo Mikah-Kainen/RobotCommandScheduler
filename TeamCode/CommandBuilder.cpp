@@ -65,9 +65,9 @@ public:
 	//}
 #pragma endregion
 
-	std::shared_ptr<ScheduledCommand> CreateCommand(const Ts&... params) //maybe this?
+	std::shared_ptr<FunctionManager::Scheduleable> CreateCommand(const Ts&... params) //maybe this?
 	{
-		return std::make_shared<ScheduledCommand>([&]() {return backingFunction(params...); }, requirementFlags);
+		return std::make_shared<FunctionManager::Scheduleable>([&]() {return backingFunction(params...); }, requirementFlags);
 	}
 
 	//std::shared_ptr<ScheduledCommand> ScheduleWith(bool useNothing) //function for debugging

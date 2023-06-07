@@ -22,7 +22,7 @@ unsigned char SchedulerBase::GetRequirementFlags(std::vector<std::shared_ptr<Fun
 
 SchedulerBase::SchedulerBase(unsigned char systemFlags, SchedulerTypes type) //change this to be the main constructor that the other constructors call
 	:Scheduleable(std::function<bool()>([&]() {return Run(); }/*std::function<bool()>(std::bind(&SchedulerBase::Run, this)*/), systemFlags), functionManager{ FunctionManager() }, schedulerID{ NextAvailableSchedulerID }
-	//I don't use std::bing because it causes a copy anyway when passed to the next function despite being passed as a reference(I think)
+	//I don't use std::bind because it causes a copy anyway when passed to the next function despite being passed as a reference(I think)
 {
 	schedulerType = type;
 
@@ -79,6 +79,22 @@ void SchedulerBase::Schedule(const std::function<bool()>& function, std::vector<
 	Schedule(function, GetRequirementFlag(requiredSystems));
 }
 
+SchedulerBase::SchedulerBase(const SchedulerBase& copySchedulerBase) //maybe just call SchedulerBase constructor
+	: Scheduleable([&]() {return Run(); }, copySchedulerBase.requirementFlags), functionManager{ copySchedulerBase.functionManager }, schedulerType{ copySchedulerBase.schedulerType },
+	currentlyRunningSystems{ copySchedulerBase.currentlyRunningSystems }, schedulerID{ copySchedulerBase.schedulerID }
+{
+	schedule = std::unordered_map<Systems, std::list<int>>();
+	for (std::pair<Systems, std::list<int>> kvp : copySchedulerBase.schedule)
+	{
+		std::list<int> copyList = std::list<int>();
+		for (int number : kvp.second)
+		{
+			copyList.push_back(number);
+		}
+		schedule.emplace(kvp.first, copyList);
+	}
+}
+
 void SchedulerBase::Update()
 {
 	//This is probably unnecessary
@@ -86,6 +102,7 @@ void SchedulerBase::Update()
 
 bool SchedulerBase::Run()
 {
+	std::cout << "Run Ran\n";
 	int debug = schedulerID;
 	unsigned char currentAvailableSystem = (unsigned char)0x1;
 	std::vector<int> IDsToDelete = std::vector<int>();
