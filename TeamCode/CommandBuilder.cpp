@@ -2,6 +2,8 @@
 #include <functional>
 #include <exception>
 #include <iostream>
+#include <tuple>
+#include <utility>
 //#include "../../inc/SchedulerInc/FunctionManager.h"
 //#include "../../inc/SchedulerInc/Static.h"
 #include "FunctionManager.h"
@@ -15,13 +17,30 @@
 //		:FunctionManager::Scheduleable(backingFunction, requirementFlags) {}
 //};
 
+//https://stackoverflow.com/questions/15537817/c-how-to-store-a-parameter-pack-as-a-variable //Look at this link for some interesting ideas
+//https://en.cppreference.com/w/cpp/utility/apply
+template <typename... Ts>
 class ScheduledCommand : public FunctionManager::Scheduleable
 {
 private:
+	std::function<bool(Ts...)> backingFunction;
+	std::tuple<Ts...> params;
+
+	void ReturnRef(Ts... parameters, bool& returnVal)
+	{
+		returnVal = backingFunction(parameters...);
+	}
+
+	bool RunBackingFunction()
+	{
+		bool returnVal;
+		std::apply([&](Ts... parameters) {return ReturnRef(parameters..., returnVal); }, params);
+		return returnVal;
+	}
 
 public:
-	ScheduledCommand(const std::function<bool()>& backingFunction, unsigned char requirementFlags)
-		: FunctionManager::Scheduleable(backingFunction, requirementFlags) {}
+	ScheduledCommand(const std::function<bool(Ts...)>& backingFunction, Ts... params, unsigned char requirementFlags)
+		: FunctionManager::Scheduleable([&]() {return RunBackingFunction(); }, requirementFlags), backingFunction{ backingFunction }, params{ std::tuple<Ts...>(params...) } {}
 
 	//ScheduledCommand(std::function<bool()> backingFunctionCopy, unsigned char requirementFlags, bool passingByCopy)
 	//	: FunctionManager::Scheduleable(backingFunctionCopy, requirementFlags, passingByCopy) {}
@@ -65,9 +84,9 @@ public:
 	//}
 #pragma endregion
 
-	std::shared_ptr<FunctionManager::Scheduleable> CreateCommand(const Ts&... params) //maybe this?
+	std::shared_ptr<ScheduledCommand<Ts...>> CreateCommand(Ts... params) //maybe this?
 	{
-		return std::make_shared<FunctionManager::Scheduleable>([&]() {return backingFunction(params...); }, requirementFlags);
+		return std::make_shared<ScheduledCommand<Ts...>>(backingFunction, params..., requirementFlags);
 	}
 
 	//std::shared_ptr<ScheduledCommand> ScheduleWith(bool useNothing) //function for debugging

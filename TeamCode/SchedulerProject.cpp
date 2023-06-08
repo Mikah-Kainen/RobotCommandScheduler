@@ -284,9 +284,13 @@ int main() //Unit tests with GoogleTest
 		//DisplayStringPointer.CreateCommand(message),
 		//DisplayStringReference.CreateCommand(*message),
 		//DisplayStringValue.CreateCommand(*message),
+
+
 		DisplayCatPointer.CreateCommand(cat),
-		DisplayCatReference.CreateCommand(*cat),
-		DisplayCatValue.CreateCommand(*cat),
+		//DisplayCatReference.CreateCommand(*cat),
+		//DisplayCatValue.CreateCommand(*cat),
+
+		//DisplayCatValue.CreateCommand(Cat(100, "Old Cat")),
 	}));
 
 	std::string otherMessage = "End of Functions, Current Time: ";
