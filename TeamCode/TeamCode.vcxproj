@@ -136,7 +136,7 @@
     <ClCompile Include="ParallelGroup.cpp" />
     <ClCompile Include="Robot.cpp" />
     <ClCompile Include="Scheduler.cpp" />
-    <ClCompile Include="SchedulerBase.cpp" />
+    <ClCompile Include="GroupBase.cpp" />
     <ClCompile Include="SchedulerProject.cpp" />
     <ClCompile Include="SequentialGroup.cpp" />
     <ClCompile Include="Timer.cpp" />
@@ -149,7 +149,7 @@
     <ClInclude Include="Scheduler.h" />
     <ClInclude Include="SequentialGroup.h" />
     <ClInclude Include="Static.h" />
-    <ClInclude Include="SchedulerBase.h" />
+    <ClInclude Include="GroupBase.h" />
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>

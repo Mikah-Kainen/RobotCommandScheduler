@@ -33,7 +33,7 @@
     <ClCompile Include="Scheduler.cpp">
       <Filter>src\SchedulerSrc</Filter>
     </ClCompile>
-    <ClCompile Include="SchedulerBase.cpp">
+    <ClCompile Include="GroupBase.cpp">
       <Filter>src\SchedulerSrc</Filter>
     </ClCompile>
     <ClCompile Include="SequentialGroup.cpp">
@@ -65,7 +65,7 @@
     <ClInclude Include="SequentialGroup.h">
       <Filter>inc\SchedulerInc</Filter>
     </ClInclude>
-    <ClInclude Include="SchedulerBase.h">
+    <ClInclude Include="GroupBase.h">
       <Filter>inc\SchedulerInc</Filter>
     </ClInclude>
     <ClInclude Include="FunctionManager.h">

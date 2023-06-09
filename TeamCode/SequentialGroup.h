@@ -1,7 +1,7 @@
 #pragma once
-#include "SchedulerBase.h"
+#include "GroupBase.h"
 
-class SequentialGroup : public SchedulerBase
+class SequentialGroup : public GroupBase
 {
 private:
 

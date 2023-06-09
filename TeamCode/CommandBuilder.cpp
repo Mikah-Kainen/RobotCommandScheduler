@@ -26,27 +26,29 @@ private:
 	std::function<bool(Ts...)> backingFunction;
 	std::tuple<Ts...> params;
 
-	void ReturnRef(Ts... parameters, bool& returnVal)
-	{
-		returnVal = backingFunction(parameters...);
-	}
+	//void ReturnRef(Ts... parameters, bool& returnVal)
+	//{
+	//	returnVal = backingFunction(parameters...);
+	//}
 
-	bool RunBackingFunction()
+	bool Run() override
 	{
-		bool returnVal;
-		std::apply([&](Ts... parameters) {return ReturnRef(parameters..., returnVal); }, params);
-		return returnVal;
+		return std::apply(backingFunction, params);
+		//bool returnVal;
+		//std::apply([&](Ts... parameters) {return ReturnRef(parameters..., returnVal); }, params);
+		//return returnVal;
 	}
 
 public:
 	ScheduledCommand(const std::function<bool(Ts...)>& backingFunction, Ts... params, unsigned char requirementFlags)
-		: FunctionManager::Scheduleable([&]() {return RunBackingFunction(); }, requirementFlags), backingFunction{ backingFunction }, params{ std::tuple<Ts...>(params...) } {}
+		: FunctionManager::Scheduleable(/*[&]() {return ThrowError();*//*return RunBackingFunction();*/ requirementFlags), backingFunction{ backingFunction }, params{ std::tuple<Ts...>(params...) } {}
 
 	//ScheduledCommand(std::function<bool()> backingFunctionCopy, unsigned char requirementFlags, bool passingByCopy)
 	//	: FunctionManager::Scheduleable(backingFunctionCopy, requirementFlags, passingByCopy) {}
 };
 
 //Link about Parameter Packs: https://en.cppreference.com/w/cpp/language/parameter_pack
+//Make builder a base class
 template <typename... Ts>
 class CommandBuilder
 {

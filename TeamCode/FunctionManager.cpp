@@ -3,10 +3,19 @@
 #include "FunctionManager.h"
 
 #pragma region IScheduleable
-FunctionManager::Scheduleable::Scheduleable(const std::function<bool()>& backingFunction, unsigned char requirementFlags)
+
+bool FunctionManager::Scheduleable::Run()
+{
+	return backingFunction();
+}
+
+FunctionManager::Scheduleable::Scheduleable(unsigned char requirementFlags)
+	:Scheduleable(NoFunctionProvided, requirementFlags) {}
+
+FunctionManager::Scheduleable::Scheduleable(std::function<bool()> backingFunction, unsigned char requirementFlags)
 	:backingFunction{ backingFunction }, requirementFlags{ requirementFlags }, availableSystems{(unsigned char)0}, IsDead{ false } {}
 
-FunctionManager::Scheduleable::Scheduleable(const std::function<bool()>& backingFunction, Systems requiredSystem)
+FunctionManager::Scheduleable::Scheduleable(std::function<bool()> backingFunction, Systems requiredSystem)
 	:Scheduleable(backingFunction, (unsigned char)requiredSystem) {}
 
 //FunctionManager::Scheduleable::Scheduleable(std::function<bool()> backingFunctionCopy, unsigned char requirementFlags, bool passingByCopy)
@@ -60,7 +69,7 @@ bool FunctionManager::Scheduleable::RunIfReady(unsigned char availableSystem)
 	availableSystems |= availableSystem;
 	if ((availableSystems & requirementFlags) == requirementFlags)
 	{
-		return backingFunction();
+		return Run();
 	}
 	else
 	{
@@ -109,7 +118,7 @@ bool FunctionManager::RunIfReady(int scheduledID, unsigned char availableSystem)
 	{
 		//do end of function logic
 		//throw std::exception("not implemented"); //UNCOMMENT THIS!!
-		//Remove(scheduledID); //Don't delete here because I clean up in SchedulerBase(I could change Cleanup here if I want so maybe think about that)
+		//Remove(scheduledID); //Don't delete here because I clean up in GroupBase(I could change Cleanup here if I want so maybe think about that)
 	}
 	return result;
 }

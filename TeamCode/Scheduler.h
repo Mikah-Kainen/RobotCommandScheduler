@@ -1,7 +1,7 @@
 #pragma once
-#include "SchedulerBase.h"
+#include "GroupBase.h"
 
-class Scheduler : public SchedulerBase
+class Scheduler : public GroupBase
 {
 private:
 	Scheduler();
@@ -11,7 +11,7 @@ public:
 
 	void Schedule(std::shared_ptr<Scheduleable> scheduleable);
 
-	void Schedule(const std::function<bool()>& function, unsigned char requirementFlags); //look here
+	void Schedule(std::function<bool()> function, unsigned char requirementFlags); //look here
 
-	void Schedule(const std::function<bool()>& function, std::vector<Systems> requiredSystems);
+	void Schedule(std::function<bool()> function, std::vector<Systems> requiredSystems);
 };

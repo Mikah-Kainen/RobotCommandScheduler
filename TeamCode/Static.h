@@ -1,5 +1,8 @@
 #pragma once
 #include <vector>
+#include <iostream>
+#include <exception>
+#include <functional>
 
 
 enum class Systems : unsigned char
@@ -30,6 +33,24 @@ enum class Systems : unsigned char
 
 static const int SystemsCount = 8;
 static int NextAvailableSchedulerID;
+
+static std::function<bool()> ReturnTrue = std::function<bool()>([&]() {return true; });
+
+static std::function<bool()> ThrowError = std::function<bool()>([&]()
+{
+	throw std::exception("Saving User from Wierd Error Exception");
+	std::cout << "~~~!ERROR!~~~!ERROR!~~~!ERROR!~~~" << std::endl;
+	while (true);
+	return false;
+});
+
+static std::function<bool()> NoFunctionProvided = std::function<bool()>([&]()
+{
+	throw std::exception("No Function Provided");
+	std::cout << "NOFUNCTIONPROVIDED" << std::endl;
+	while (true);
+	return false;
+});
 
 template <typename T>
 static bool Contains(std::vector<T> list, T value)

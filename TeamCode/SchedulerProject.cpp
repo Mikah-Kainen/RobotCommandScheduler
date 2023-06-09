@@ -20,7 +20,10 @@ public:
 	bool IsDead;
 
 	Cat(int age, std::string name)
-		: Age{ age }, Name{ name }, IsDead{false} {}
+		: Age{ age }, Name{ name }, IsDead{false} 
+	{
+		std::cout << "Cat Made" << std::endl;
+	}
 
 	Cat(const Cat& copyCat)
 		: Age{ copyCat.Age }, Name{ copyCat.Name }, IsDead{copyCat.IsDead}
@@ -270,7 +273,10 @@ int main() //Unit tests with GoogleTest
 	//Cat cat = Cat(10, "Tim");
 	//delayFunctions.push_back(TakesCatVal.ScheduleWith(cat));
 	//cat.Age = 100;
-	delayFunctions.push_back(TakesCatPointer.CreateCommand(new Cat(12, "John")));
+	// 
+	//std::shared_ptr<FunctionManager::Scheduleable> command = TakesCatPointer.CreateCommand(new Cat(12, "John"));
+	//delayFunctions.push_back(command);
+	// 
 	//delayFunctions.push_back(TakesCatBind.ScheduleWith());
 	delays[0] = 500;
 	delays[1] = 500;
@@ -279,18 +285,18 @@ int main() //Unit tests with GoogleTest
 
 	//std::shared_ptr<SequentialGroup> sequentialGroup = std::make_shared<SequentialGroup>(delayFunctions);
 	std::string* message = new std::string("This is running\n");
-	Cat* cat = new Cat(50, "PLEASE WORK");
+	//Cat* cat = new Cat(50, "PLEASE WORK");
 	std::shared_ptr<SequentialGroup> otherSequentialGroup = std::make_shared<SequentialGroup>(SequentialGroup({
 		//DisplayStringPointer.CreateCommand(message),
 		//DisplayStringReference.CreateCommand(*message),
 		//DisplayStringValue.CreateCommand(*message),
 
 
-		DisplayCatPointer.CreateCommand(cat),
+		//DisplayCatPointer.CreateCommand(cat),
 		//DisplayCatReference.CreateCommand(*cat),
 		//DisplayCatValue.CreateCommand(*cat),
 
-		//DisplayCatValue.CreateCommand(Cat(100, "Old Cat")),
+		DisplayCatValue.CreateCommand(Cat(100, "Old Cat")),
 	}));
 
 	std::string otherMessage = "End of Functions, Current Time: ";

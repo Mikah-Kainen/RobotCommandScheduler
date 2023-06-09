@@ -14,7 +14,12 @@ public:
 	{
 	private:
 		unsigned char availableSystems;
-		std::function<bool()> backingFunction;
+		std::function<bool()> backingFunction; //Change to virtual function
+
+		virtual bool Run();
+
+	protected:
+		Scheduleable(unsigned char requirementFlags);
 
 	public:
 		//virtual void ThisIsAbstract() = 0;
@@ -22,9 +27,9 @@ public:
 		bool IsDead;
 		unsigned char requirementFlags;
 
-		Scheduleable(const std::function<bool()>& backingFunction, unsigned char requirementFlags);
+		Scheduleable(std::function<bool()> backingFunction, unsigned char requirementFlags);
 
-		Scheduleable(const std::function<bool()>& backingFunction, Systems requiredSystem);
+		Scheduleable(std::function<bool()> backingFunction, Systems requiredSystem);
 
 		//Scheduleable(std::function<bool()> backingFunctionCopy, unsigned char requirementFlags, bool passingByCopy);
 

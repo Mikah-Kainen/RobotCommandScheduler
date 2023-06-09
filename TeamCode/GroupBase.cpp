@@ -1,5 +1,5 @@
-//#include "../../inc/SchedulerInc/SchedulerBase.h"
-#include "SchedulerBase.h"
+//#include "../../inc/SchedulerInc/GroupBase.h"
+#include "GroupBase.h"
 
 //Scheduler::ScheduledFunction::ScheduledFunction(std::function<bool()>& backingFunction, unsigned char requirementFlags)
 //	:backingFunction{ backingFunction }, RequirementFlags{ requirementFlags } {}
@@ -10,7 +10,7 @@
 //}
 
 
-unsigned char SchedulerBase::GetRequirementFlags(std::vector<std::shared_ptr<FunctionManager::Scheduleable>> scheduleables)
+unsigned char GroupBase::GetRequirementFlags(std::vector<std::shared_ptr<FunctionManager::Scheduleable>> scheduleables)
 {
 	unsigned char requirementFlag = 0;
 	for (std::shared_ptr<FunctionManager::Scheduleable> scheduleable : scheduleables)
@@ -20,13 +20,12 @@ unsigned char SchedulerBase::GetRequirementFlags(std::vector<std::shared_ptr<Fun
 	return requirementFlag;
 }
 
-SchedulerBase::SchedulerBase(unsigned char systemFlags, SchedulerTypes type) //change this to be the main constructor that the other constructors call
-	:Scheduleable(std::function<bool()>([&]() {return Run(); }/*std::function<bool()>(std::bind(&SchedulerBase::Run, this)*/), systemFlags), functionManager{ FunctionManager() }, schedulerID{ NextAvailableSchedulerID }
+GroupBase::GroupBase(std::vector<std::shared_ptr<FunctionManager::Scheduleable>> scheduleablesToStore, bool shouldStoreScheduleables, unsigned char systemFlags, SchedulerTypes type)
+	:Scheduleable(/*std::function<bool()>([&]() {return Run(); }*//*std::function<bool()>(std::bind(&GroupBase::Run, this)*/ systemFlags), functionManager{ FunctionManager() }, currentlyRunningSystems{0},
+	schedulerID{ NextAvailableSchedulerID }, storedScheduleables{ scheduleablesToStore }, shouldStoreScheduleables{ shouldStoreScheduleables }, schedulerType{ type }, schedule{ std::unordered_map<Systems, std::list<int>>() }
 	//I don't use std::bind because it causes a copy anyway when passed to the next function despite being passed as a reference(I think)
 {
-	schedulerType = type;
-
-	schedule = std::unordered_map<Systems, std::list<int>>();
+	//schedule = std::unordered_map<Systems, std::list<int>>();
 	for (int i = 0; i < SystemsCount; i++)
 	{
 		unsigned char currentMask = 1 << i;
@@ -40,11 +39,26 @@ SchedulerBase::SchedulerBase(unsigned char systemFlags, SchedulerTypes type) //c
 	NextAvailableSchedulerID++;
 }
 
-SchedulerBase::SchedulerBase(std::vector<unsigned char> systemFlags, SchedulerTypes type)
-	:SchedulerBase(GetRequirementFlag(systemFlags), type) {}
 
-SchedulerBase::SchedulerBase(std::vector<Systems> schedulerSystems, SchedulerTypes type)
-	:SchedulerBase(GetRequirementFlag(schedulerSystems), type) {}
+GroupBase::GroupBase(std::vector<std::shared_ptr<FunctionManager::Scheduleable>> scheduleablesToStore, unsigned char systemFlags, SchedulerTypes type)
+	:GroupBase(scheduleablesToStore, true, systemFlags, type) {}
+
+GroupBase::GroupBase(std::vector<std::shared_ptr<FunctionManager::Scheduleable>> scheduleablesToStore, std::vector<unsigned char> systemFlags, SchedulerTypes type)
+	:GroupBase(scheduleablesToStore, GetRequirementFlag(systemFlags), type) {}
+
+GroupBase::GroupBase(std::vector<std::shared_ptr<FunctionManager::Scheduleable>> scheduleablesToStore, std::vector<Systems> schedulerSystems, SchedulerTypes type)
+	:GroupBase(scheduleablesToStore, GetRequirementFlag(schedulerSystems), type) {}
+
+
+
+GroupBase::GroupBase(unsigned char systemFlags, SchedulerTypes type)
+	:GroupBase(std::vector<std::shared_ptr<FunctionManager::Scheduleable>>(), false, systemFlags, type) {}
+
+GroupBase::GroupBase(std::vector<unsigned char> systemFlags, SchedulerTypes type)
+	:GroupBase(GetRequirementFlag(systemFlags), type) {}
+
+GroupBase::GroupBase(std::vector<Systems> schedulerSystems, SchedulerTypes type)
+	:GroupBase(GetRequirementFlag(schedulerSystems), type) {}
 
 
 //make it so commands can be scheduled with their parameters passed in(and the FunctionManager properly owns everything)
@@ -53,7 +67,7 @@ SchedulerBase::SchedulerBase(std::vector<Systems> schedulerSystems, SchedulerTyp
 //also think about how conditional functions could work(maybe a placeholder function that is replaced by a Scheduler that handles whichever branch it is currently on)
 //also add functionality to remove systems from the scheduler when all the system's commands have been completed, so that the parent scheduler can start scheduling things with that system(but don't remove systems from the original scheduler!)
 //make different types of schedulers or have information in the schedulers which decides whether a system should be removed or its default functions should be run when the scheduler runs out of scheduled functions for that system
-void SchedulerBase::Schedule(std::shared_ptr<Scheduleable> scheduleable)
+void GroupBase::Schedule(std::shared_ptr<Scheduleable> scheduleable)
 {
 	unsigned char requirementFlags = scheduleable->GetRequirementFlags();
 	int newID = functionManager.AddToDatabase(scheduleable);
@@ -69,22 +83,22 @@ void SchedulerBase::Schedule(std::shared_ptr<Scheduleable> scheduleable)
 	//Definitely put stuff here
 }
 
-void SchedulerBase::Schedule(const std::function<bool()>& function, unsigned char requirementFlags)
+void GroupBase::Schedule(std::function<bool()> function, unsigned char requirementFlags)
 {
 	Schedule(std::make_shared<Scheduleable>(function, requirementFlags));
 }
 
-void SchedulerBase::Schedule(const std::function<bool()>& function, std::vector<Systems> requiredSystems)
+void GroupBase::Schedule(std::function<bool()> function, std::vector<Systems> requiredSystems)
 {
 	Schedule(function, GetRequirementFlag(requiredSystems));
 }
 
-SchedulerBase::SchedulerBase(const SchedulerBase& copySchedulerBase) //maybe just call SchedulerBase constructor
-	: Scheduleable([&]() {return Run(); }, copySchedulerBase.requirementFlags), functionManager{ copySchedulerBase.functionManager }, schedulerType{ copySchedulerBase.schedulerType },
-	currentlyRunningSystems{ copySchedulerBase.currentlyRunningSystems }, schedulerID{ copySchedulerBase.schedulerID }
+GroupBase::GroupBase(const GroupBase& copyGroupBase)
+	: Scheduleable(copyGroupBase.requirementFlags), functionManager{ copyGroupBase.functionManager }, schedulerType{ copyGroupBase.schedulerType },
+	currentlyRunningSystems{ copyGroupBase.currentlyRunningSystems }, schedulerID{ copyGroupBase.schedulerID }, shouldStoreScheduleables{ copyGroupBase.shouldStoreScheduleables }
 {
 	schedule = std::unordered_map<Systems, std::list<int>>();
-	for (std::pair<Systems, std::list<int>> kvp : copySchedulerBase.schedule)
+	for (std::pair<Systems, std::list<int>> kvp : copyGroupBase.schedule)
 	{
 		std::list<int> copyList = std::list<int>();
 		for (int number : kvp.second)
@@ -93,14 +107,20 @@ SchedulerBase::SchedulerBase(const SchedulerBase& copySchedulerBase) //maybe jus
 		}
 		schedule.emplace(kvp.first, copyList);
 	}
+
+	storedScheduleables = std::vector<std::shared_ptr<FunctionManager::Scheduleable>>();
+	for (std::shared_ptr<FunctionManager::Scheduleable> scheduleable : copyGroupBase.storedScheduleables)
+	{
+		storedScheduleables.push_back(scheduleable);
+	}
 }
 
-void SchedulerBase::Update()
+void GroupBase::Update()
 {
 	//This is probably unnecessary
 }
 
-bool SchedulerBase::Run()
+bool GroupBase::Run()
 {
 	std::cout << "Run Ran\n";
 	int debug = schedulerID;
