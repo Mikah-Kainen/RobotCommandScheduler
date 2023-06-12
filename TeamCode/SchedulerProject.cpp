@@ -9,7 +9,6 @@
 #include "Robot.h"
 #include "Motor.h"
 #include "Timer.h"
-#include "MemoryEater.cpp"
 
 #pragma region CatStuff
 class Cat
@@ -225,7 +224,7 @@ int main() //Unit tests with GoogleTest
 	std::cout << "Robot Made!\n";
 
 	Scheduler& scheduler = Scheduler::GetInstance();
-	MemoryEater& eater = MemoryEater::GetInstance();
+	///MemoryEater& eater = MemoryEater::GetInstance();
 
 	//TakeConstRef(5);
 

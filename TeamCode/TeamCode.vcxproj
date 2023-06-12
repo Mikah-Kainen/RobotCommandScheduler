@@ -105,7 +105,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -145,6 +145,7 @@
     <ClInclude Include="FunctionManager.h" />
     <ClInclude Include="Motor.h" />
     <ClInclude Include="ParallelGroup.h" />
+    <ClInclude Include="Polyfills.h" />
     <ClInclude Include="Robot.h" />
     <ClInclude Include="Scheduler.h" />
     <ClInclude Include="SequentialGroup.h" />

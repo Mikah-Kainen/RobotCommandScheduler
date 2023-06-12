@@ -6,9 +6,10 @@
 #include <utility>
 //#include "../../inc/SchedulerInc/FunctionManager.h"
 //#include "../../inc/SchedulerInc/Static.h"
+//#include "../../inc/SchedulerInc/Polyfills.h"
 #include "FunctionManager.h"
 #include "Static.h"
-#include "MemoryEater.cpp"
+#include "Polyfills.h"
 
 //class ScheduleableCommand : FunctionManager::Scheduleable
 //{
@@ -24,7 +25,9 @@ class ScheduledCommand : public FunctionManager::Scheduleable
 {
 private:
 	std::function<bool(Ts...)> backingFunction;
-	std::tuple<Ts...> params;
+	//std::tuple<Ts...> params;
+
+	std::function<bool()> callbackFunction;
 
 	//void ReturnRef(Ts... parameters, bool& returnVal)
 	//{
@@ -33,15 +36,18 @@ private:
 
 	bool Run() override
 	{
-		return std::apply(backingFunction, params);
+		return callbackFunction();
+
+		//return std::apply(backingFunction, params);
+		 
 		//bool returnVal;
 		//std::apply([&](Ts... parameters) {return ReturnRef(parameters..., returnVal); }, params);
 		//return returnVal;
 	}
 
 public:
-	ScheduledCommand(const std::function<bool(Ts...)>& backingFunction, Ts... params, unsigned char requirementFlags)
-		: FunctionManager::Scheduleable(/*[&]() {return ThrowError();*//*return RunBackingFunction();*/ requirementFlags), backingFunction{ backingFunction }, params{ std::tuple<Ts...>(params...) } {}
+	ScheduledCommand(std::function<bool(Ts...)> backingFunction, Ts&... params, unsigned char requirementFlags)
+		: FunctionManager::Scheduleable(requirementFlags), backingFunction{ backingFunction }, callbackFunction{ [=]() {return backingFunction(params...); } }/*, params{std::tuple<Ts...>(params...)}*/ {}
 
 	//ScheduledCommand(std::function<bool()> backingFunctionCopy, unsigned char requirementFlags, bool passingByCopy)
 	//	: FunctionManager::Scheduleable(backingFunctionCopy, requirementFlags, passingByCopy) {}
@@ -57,13 +63,13 @@ private:
 	std::function<bool(Ts...)> backingFunction;
 
 public:
-	CommandBuilder(const std::function<bool(Ts...)>& backingFunction, unsigned char requirementFlags)
+	CommandBuilder(std::function<bool(Ts...)> backingFunction, unsigned char requirementFlags)
 		:backingFunction{ backingFunction }, requirementFlags{ requirementFlags } {}
 
-	CommandBuilder(const std::function<bool(Ts...)>& backingFunction, std::vector<Systems> requiredSystems)
+	CommandBuilder(std::function<bool(Ts...)> backingFunction, std::vector<Systems> requiredSystems)
 		: CommandBuilder(backingFunction, GetRequirementFlag(requiredSystems)) {}
 
-	CommandBuilder(const std::function<bool(Ts...)>& backingFunction, Systems system)
+	CommandBuilder(std::function<bool(Ts...)> backingFunction, Systems system)
 		: CommandBuilder(backingFunction, (unsigned char)system) {}
 
 	//Command(std::function<bool(Ts...)> backingFunction, unsigned char requirementFlags, bool passByValue) //this shouldn't be necessary(remove it at some point)
