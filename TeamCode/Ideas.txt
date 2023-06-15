@@ -26,6 +26,11 @@ Other possible solution: By giving functions the right requirements, I should be
 							^so I can just schedule commands after logic blocks for branching
 
 
+The schedules of Commands and Groups shouldn't change when they run
+Deconstructors of Commands and Groups have to remove all their scheduled Scheduleables(i.e. clear their schedules)
+Make Schedule an array that uses i
+Interstingly enough, using an array to back GroupBase takes more space but runs quicker when compared to an unorder_map. I think that running quicker is better so I changed it to an array but this is something to continue thinking about in the future
+
 
 SequentialCommandGroup should rely on the FunctionManager notification system rather than adding extra requirements.
 CommandGroups should not remove their System requirements until the whole CommandGroup is done, instead they can use the "run next function" return behavior described a few lines down.

@@ -25,7 +25,7 @@ class ScheduledCommand : public FunctionManager::Scheduleable
 {
 private:
 	std::function<bool(Ts...)> backingFunction;
-	//std::tuple<Ts...> params;
+	std::tuple<Ts...> params;
 
 	std::function<bool()> callbackFunction;
 
@@ -36,9 +36,9 @@ private:
 
 	bool Run() override
 	{
-		return callbackFunction();
+		//return callbackFunction();
 
-		//return std::apply(backingFunction, params);
+		return std::apply(backingFunction, params);
 		 
 		//bool returnVal;
 		//std::apply([&](Ts... parameters) {return ReturnRef(parameters..., returnVal); }, params);
@@ -46,8 +46,8 @@ private:
 	}
 
 public:
-	ScheduledCommand(std::function<bool(Ts...)> backingFunction, Ts&... params, unsigned char requirementFlags)
-		: FunctionManager::Scheduleable(requirementFlags), backingFunction{ backingFunction }, callbackFunction{ [=]() {return backingFunction(params...); } }/*, params{std::tuple<Ts...>(params...)}*/ {}
+	ScheduledCommand(std::function<bool(Ts...)> backingFunction, Ts... params, unsigned char requirementFlags)
+		: FunctionManager::Scheduleable(/*callbackFunction,*/ requirementFlags), backingFunction{ backingFunction }/*, callbackFunction{ [&, params = std::forward<Ts...>(params...)]() {return backingFunction(params); }}*/, params{std::tuple<Ts...>(params...)} {}
 
 	//ScheduledCommand(std::function<bool()> backingFunctionCopy, unsigned char requirementFlags, bool passingByCopy)
 	//	: FunctionManager::Scheduleable(backingFunctionCopy, requirementFlags, passingByCopy) {}

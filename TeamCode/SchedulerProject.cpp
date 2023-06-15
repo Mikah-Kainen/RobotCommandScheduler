@@ -21,13 +21,13 @@ public:
 	Cat(int age, std::string name)
 		: Age{ age }, Name{ name }, IsDead{false} 
 	{
-		std::cout << "Cat Made" << std::endl;
+		//std::cout << "Cat Made" << std::endl;
 	}
 
 	Cat(const Cat& copyCat)
 		: Age{ copyCat.Age }, Name{ copyCat.Name }, IsDead{copyCat.IsDead}
 	{
-		std::cout << "Cat Copied" << std::endl;
+		//std::cout << "Cat Copied" << std::endl;
 	}
 
 	~Cat()
@@ -36,11 +36,11 @@ public:
 		{
 			std::cout << "A Dead Cat is Back" << std::endl;
 		}
-		std::cout << "A Cat Just Died\n";
+		//std::cout << "A Cat Just Died\n";
 		IsDead = true;
 	}
 
-	bool Display() const
+	bool Display()
 	{
 		if (IsDead)
 		{
@@ -139,24 +139,24 @@ void TakeConstRef(const int& constRef)
 	std::cout << constRef << std::endl;
 }
 
+
+/* To do list:
+	Change setting flags to have two functions, change int and set int
+	Add dictionary of list of functions that run when a scheduleable is over to FunctionManager
+	Stop removing from FunctionManager when scheduleables are done
+	Add state enum to scheduleable to transition between Initialize, Run, and Cleanup
+	Add Systems::Other
+	Change Schedule to keep track of current index for each system instead of just removing
+	Change deconstructor of GroupBase to clean up Scheduleables
+	Maybe make ProgramScheduler remove scheduleables from the schedule when they are finished (virtual bool cleanup that can be overriden by Scheduler)
+	Polyfill std::apply
+	Add interruptable flag
+	Add while groups
+	Add GroupBuilder
+	Make FunctionManager and GroupBase have templates that take in unsigned types for their ID tracking
+*/
 int main() //Unit tests with GoogleTest
 {
-	//**Things to do
-//scheduling stuff should just take in Systems and convert it to unsigned char(or maybe just make Command wrapper more convenient)
-//Add Initialization and EndBehavior functions to commands
-//give schedulers unique IDs for debugging purposes
-
-//ScheduleWith should return a shared pointer and Schedulers should use shared pointers for Scheduleable
-//MemoryEater should return a key/provide some functionality so that memory can be uneaten at some point
-//	^also it should take in a bool for if the uneated memory can be cleaned up(always should be true in the case of values but references might want to be preserved if its from an important function)
-//look into and start using const ref
-//maybe change MemoryEater to use void* instead of TypeBase and Type
-
-//I should add proper destructors at some point
-
-//new ScheduledCommand([&]() {return MotorB.MultiStepMove(4); }, (unsigned char)Systems::MotorB), //scheduling stuff should just take in Systems and convert it to unsigned char(or maybe just make Command wrapper more convenient)
-//new ScheduledCommand([&]() {return MotorC.MultiStepMove(5); }, (unsigned char)Systems::MotorC), //Add Initialization and EndBehavior functions to commands
-
 #pragma region CommandExample
 	//Command<int> MotorAMultiStepMoveCommand = Command<int>(MotorAMultiStepMove, Systems::MotorA);
 	//Command<int> MotorBMultiStepMoveCommand = Command<int>(MotorBMultiStepMove, Systems::MotorB);
@@ -204,17 +204,22 @@ int main() //Unit tests with GoogleTest
 	CommandBuilder<const std::string&> DisplayStringReference = CommandBuilder<const std::string&>([&](const std::string& message){std::cout << message; return true; }, Systems::RightMotor);
 	CommandBuilder<std::string> DisplayStringValue = CommandBuilder<std::string>([&](std::string message) {std::cout << message; return true; }, Systems::RightMotor);
 
-	CommandBuilder<Cat*> DisplayCatPointer = CommandBuilder<Cat*>([&](Cat* cat) {return cat->Display(); }, Systems::RightMotor);
-	CommandBuilder<const Cat&> DisplayCatReference = CommandBuilder<const Cat&>([&](const Cat& cat) {return cat.Display(); }, Systems::RightMotor);
-	CommandBuilder<Cat> DisplayCatValue = CommandBuilder<Cat>([&](Cat cat) {return cat.Display(); }, Systems::RightMotor);
+	CommandBuilder<Cat*> DisplayCatPointerFive = CommandBuilder<Cat*>([&](Cat* cat) {return cat->Display(); }, Systems::Five);
+	CommandBuilder<Cat&> DisplayCatReferenceFive = CommandBuilder<Cat&>([&](Cat& cat) {return cat.Display(); }, Systems::Five);
+	CommandBuilder<Cat> DisplayCatValueFive = CommandBuilder<Cat>([&](Cat cat) {return cat.Display(); }, Systems::Five);
 
-	CommandBuilder<const int&> DisplayNumber = CommandBuilder<const int&>(std::function<bool(const int&)>([&](const int& number) {std::cout << number << std::endl; return true; }), (unsigned char)Systems::LeftMotor);
+	CommandBuilder<Cat*> DisplayCatPointerFour = CommandBuilder<Cat*>([&](Cat* cat) {return cat->Display(); }, Systems::Four);
+	CommandBuilder<Cat&> DisplayCatReferenceFour = CommandBuilder<Cat&>([&](Cat& cat) {return cat.Display(); }, Systems::Four);
+	CommandBuilder<Cat> DisplayCatValueFour = CommandBuilder<Cat>([&](Cat cat) {return cat.Display(); }, Systems::Four);
+
+	CommandBuilder<Cat*> DisplayCatPointerSix = CommandBuilder<Cat*>([&](Cat* cat) {return cat->Display(); }, Systems::Six);
+	CommandBuilder<Cat&> DisplayCatReferenceSix = CommandBuilder<Cat&>([&](Cat& cat) {return cat.Display(); }, Systems::Six);
+	CommandBuilder<Cat> DisplayCatValueSix = CommandBuilder<Cat>([&](Cat cat) {return cat.Display(); }, Systems::Six);
+	CommandBuilder<Cat&> IncrimentCatAgeSix = CommandBuilder<Cat&>([&](Cat& cat) {cat.Age++; std::cout << "System Six being used" << std::endl; return true; }, Systems::Six);
+
+	CommandBuilder<int&> DisplayNumber = CommandBuilder<int&>(std::function<bool(int&)>([&](int& number) {std::cout << number << std::endl; return true; }), (unsigned char)Systems::LeftMotor);
 	CommandBuilder<int> DisplayNumberVal = CommandBuilder<int>(std::function<bool(int)>([&](int number) {std::cout << number << std::endl; return true; }), (unsigned char)Systems::LeftMotor);
 	CommandBuilder<> UpdateLeftMotorTime = CommandBuilder<>(std::bind(&Motor::UpdateTime, robot.GetLeftMotor()), (unsigned char)Systems::LeftMotor);
-
-	CommandBuilder<Cat> TakesCatVal = CommandBuilder<Cat>(std::function<bool(Cat)>([&](Cat cat) {return cat.Display(); }), Systems::RightMotor);
-	CommandBuilder<const Cat&> TakesCat = CommandBuilder<const Cat&>(std::function<bool(const Cat&)>([&](const Cat& cat) {return cat.Display(); }), Systems::RightMotor);
-	CommandBuilder<Cat*> TakesCatPointer = CommandBuilder<Cat*>(std::function<bool(Cat*)>([&](Cat* cat) {return cat->Display(); }), Systems::RightMotor);
 
 	//Cat cat = Cat(600, "SuperCat");
 	//auto bindResult = std::bind(&Cat::Display, Cat(600, "SuperCat"));
@@ -253,22 +258,22 @@ int main() //Unit tests with GoogleTest
 	//std::vector<std::string> message = { "Displaying Message\n" };
 	for (int i = 0; i < 3; i++)
 	{
-		//scheduler.Schedule(UpdateLeftMotorTime.ScheduleWith());
-		delayFunctions.push_back(UpdateLeftMotorTime.CreateCommand());
-		
-		//auto result = DisplayString.ScheduleWith("Moving ");
-		//scheduler.Schedule(DisplayString.ScheduleWith("Moving "));
-		//scheduler.Schedule(DisplayNumber.ScheduleWith(6));
-		//delayFunctions.push_back(DisplayString.ScheduleWith("Moving "));
-		delayFunctions.push_back(DisplayNumberVal.CreateCommand(delays[i]));
+		////scheduler.Schedule(UpdateLeftMotorTime.ScheduleWith());
+		//delayFunctions.push_back(UpdateLeftMotorTime.CreateCommand());
+		//
+		////auto result = DisplayString.ScheduleWith("Moving ");
+		////scheduler.Schedule(DisplayString.ScheduleWith("Moving "));
+		////scheduler.Schedule(DisplayNumber.ScheduleWith(6));
+		////delayFunctions.push_back(DisplayString.ScheduleWith("Moving "));
+		//delayFunctions.push_back(DisplayNumberVal.CreateCommand(delays[i]));
 
-		delayFunctions.push_back(DisplayStringPointer.CreateCommand(new std::string(std::to_string(delays[i])))); //Uncomment this for a fun suprise
-		delayFunctions.push_back(DisplayStringPointer.CreateCommand(new std::string(" milliseconds\n"))); //Uncomment this for a fun suprise
+		//delayFunctions.push_back(DisplayStringPointer.CreateCommand(new std::string(std::to_string(delays[i])))); //Uncomment this for a fun suprise
+		//delayFunctions.push_back(DisplayStringPointer.CreateCommand(new std::string(" milliseconds\n"))); //Uncomment this for a fun suprise
 
-		//scheduler.Schedule(MoveLeftMotorByTime.ScheduleWith(delays[i]));
-		delayFunctions.push_back(MoveLeftMotorByTimeVal.CreateCommand(delays[i]));
-
+		////scheduler.Schedule(MoveLeftMotorByTime.ScheduleWith(delays[i]));
+		//delayFunctions.push_back(MoveLeftMotorByTimeVal.CreateCommand(delays[i]));
 	}
+
 	//Cat cat = Cat(10, "Tim");
 	//delayFunctions.push_back(TakesCatVal.ScheduleWith(cat));
 	//cat.Age = 100;
@@ -285,25 +290,99 @@ int main() //Unit tests with GoogleTest
 	//std::shared_ptr<SequentialGroup> sequentialGroup = std::make_shared<SequentialGroup>(delayFunctions);
 	std::string* message = new std::string("This is running\n");
 	//Cat* cat = new Cat(50, "PLEASE WORK");
-	std::shared_ptr<SequentialGroup> otherSequentialGroup = std::make_shared<SequentialGroup>(SequentialGroup({
-		//DisplayStringPointer.CreateCommand(message),
-		//DisplayStringReference.CreateCommand(*message),
-		//DisplayStringValue.CreateCommand(*message),
 
 
-		//DisplayCatPointer.CreateCommand(cat),
-		//DisplayCatReference.CreateCommand(*cat),
-		//DisplayCatValue.CreateCommand(*cat),
+	std::shared_ptr<FunctionManager::Scheduleable> newLineFunction = std::make_shared<FunctionManager::Scheduleable>([&]() {std::cout << std::endl; return true; }, Systems::Five);
+	//Don't forget to add Systems::None to the tests once that is supported
 
-		DisplayCatValue.CreateCommand(Cat(100, "Old Cat")),
+#pragma region SequentialGroupTest
+	Cat  sequentialGroupTestCat3 = Cat(3, "Systems 5");
+	Cat* sequentialGroupTestCat5 = new Cat(5, "Systems 4");
+	Cat  sequentialGroupTestCat6 = Cat(-1, "Systems 4");
+	Cat  sequentialGroupTestCat8and9 = Cat(8, "Systems 6");
+	std::shared_ptr<SequentialGroup> sequentialGroupTest = std::make_shared<SequentialGroup>(SequentialGroup({
+		DisplayCatValueFive.CreateCommand(Cat(1, "Systems 5")),
+		DisplayCatValueFour.CreateCommand(Cat(2, "Systems 4")),
+		DisplayCatReferenceFive.CreateCommand(sequentialGroupTestCat3),
+		DisplayCatPointerFour.CreateCommand(new Cat(4, "Systems 4")),
+		DisplayCatPointerFour.CreateCommand(sequentialGroupTestCat5),
+		DisplayCatReferenceFour.CreateCommand(sequentialGroupTestCat6),
+		DisplayCatValueFive.CreateCommand(Cat(sequentialGroupTestCat3.Age + 4, sequentialGroupTestCat3.Name)),
+		DisplayCatValueSix.CreateCommand(sequentialGroupTestCat8and9),
+		DisplayCatReferenceSix.CreateCommand(sequentialGroupTestCat8and9),
 	}));
+	sequentialGroupTestCat6.Age = 6;
+	sequentialGroupTestCat8and9.Age = 9;
+#pragma endregion
+
+#pragma region ParallelGroupTest
+	Cat  parallelGroupTestCat2 = Cat(2, "Systems 5");
+	Cat* parallelGroupTestCat3 = new Cat(3, "Systems 4");
+	Cat  parallelGroupTestCat4 = Cat(-1, "Systems 4");
+	Cat  parallelGroupTestCat1and2 = Cat(1, "Systems 6");
+	std::shared_ptr<ParallelGroup> parallelGroupTest = std::make_shared<ParallelGroup>(ParallelGroup({
+		DisplayCatValueFive.CreateCommand(Cat(1, "Systems 5")),
+		DisplayCatValueFour.CreateCommand(Cat(1, "Systems 4")),
+		DisplayCatReferenceFive.CreateCommand(parallelGroupTestCat2),
+		DisplayCatPointerFour.CreateCommand(new Cat(2, "Systems 4")),
+		DisplayCatPointerFour.CreateCommand(  parallelGroupTestCat3),
+		DisplayCatReferenceFour.CreateCommand(parallelGroupTestCat4),
+		DisplayCatValueFive.CreateCommand(Cat(parallelGroupTestCat3->Age, parallelGroupTestCat2.Name)),
+		DisplayCatValueSix.CreateCommand(     parallelGroupTestCat1and2),
+		DisplayCatReferenceSix.CreateCommand( parallelGroupTestCat1and2),
+		}));
+	parallelGroupTestCat4.Age = 4;
+	parallelGroupTestCat1and2.Age = 2;
+#pragma endregion
+
+#pragma region ParallelGroupCombinationTests
+
+	Cat* parallelGroup4and5TestCat1Pointer = new Cat(1, "Systems 4");
+	Cat  parallelGroup4and5TestCat1 = Cat(-1, "ERROR");
+	Cat  parallelGroup4and5TestCat2 = Cat(2, "Systems 5");
+	Cat  parallelGroup4and5TestCat3and4 = Cat(3, "Systems 5");
+	std::shared_ptr<ParallelGroup> parallelGroup4and5 = std::make_shared<ParallelGroup>(ParallelGroup({
+		DisplayCatReferenceFive.CreateCommand(parallelGroup4and5TestCat1),
+		DisplayCatValueFive.CreateCommand(parallelGroup4and5TestCat2),
+		DisplayCatPointerFour.CreateCommand(parallelGroup4and5TestCat1Pointer),
+		DisplayCatValueFive.CreateCommand(parallelGroup4and5TestCat3and4),
+		DisplayCatReferenceFive.CreateCommand(parallelGroup4and5TestCat3and4),
+	}));
+	parallelGroup4and5TestCat1 = Cat(1, "Systems 5");
+	parallelGroup4and5TestCat3and4.Age = 4;
+
+	Cat parallelGroup6TestCat1and2and3 = Cat(1, "Systems 6");
+	Cat parallelGroup6TestCat4and5 = Cat(4, "Systems 6");
+	std::shared_ptr<ParallelGroup> parallelGroup6 = std::make_shared<ParallelGroup>(ParallelGroup({
+		DisplayCatValueSix.CreateCommand(parallelGroup6TestCat1and2and3),
+		DisplayCatReferenceSix.CreateCommand(parallelGroup6TestCat1and2and3),
+		IncrimentCatAgeSix.CreateCommand(parallelGroup6TestCat1and2and3),
+		DisplayCatReferenceSix.CreateCommand(parallelGroup6TestCat1and2and3),
+		IncrimentCatAgeSix.CreateCommand(parallelGroup6TestCat4and5),
+		DisplayCatValueSix.CreateCommand(parallelGroup6TestCat4and5),
+		DisplayCatReferenceSix.CreateCommand(parallelGroup6TestCat4and5),
+	}));
+	parallelGroup6TestCat1and2and3.Age++;
+
+	std::shared_ptr<ParallelGroup> parallelGroupCombinationTest = std::make_shared<ParallelGroup>(ParallelGroup({
+		parallelGroup4and5,
+		parallelGroup6,
+	}));
+
+	std::shared_ptr<SequentialGroup> tempSequentialGroupCombinationTest = std::make_shared<SequentialGroup>(SequentialGroup({
+		parallelGroup6,
+		parallelGroup4and5,
+	}));
+#pragma endregion
+
 
 	std::string otherMessage = "End of Functions, Current Time: ";
 	std::shared_ptr<FunctionManager::Scheduleable> endFunction = std::make_shared<FunctionManager::Scheduleable>([&]() {std::cout << otherMessage << Timer::GetInstance().ElapsedMilliseconds() << std::endl; return true; }, (unsigned char)Systems::All);
 	//otherMessage = "Haha I changed it ";
 
-	//scheduler.Schedule(sequentialGroup2);
-	scheduler.Schedule(otherSequentialGroup);
+	scheduler.Schedule(tempSequentialGroupCombinationTest);
+	//scheduler.Schedule([&]() {std::cout << std::endl; return true; }, (unsigned char)Systems::Six);
+	//scheduler.Schedule(tempSequentialGroupCombinationTest);
 	scheduler.Schedule(endFunction);
 
 	//if (true)

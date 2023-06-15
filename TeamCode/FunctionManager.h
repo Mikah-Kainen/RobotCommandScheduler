@@ -51,8 +51,9 @@ public:
 	};
 
 private:
-	std::unordered_map<int, std::shared_ptr<Scheduleable>> database;
-	int nextAvailableID;
+	std::unordered_map<unsigned int, std::shared_ptr<Scheduleable>> database;
+	//std::shared_ptr<Scheduleable>* database;
+	unsigned int nextAvailableID;
 
 public:
 
@@ -62,11 +63,11 @@ public:
 
 	~FunctionManager();
 
-	int AddToDatabase(std::shared_ptr<Scheduleable> scheduledItem);
+	unsigned int AddToDatabase(std::shared_ptr<Scheduleable> scheduledItem);
 
-	bool RunIfReady(int scheduledID, unsigned char availableSystem); //Runs the IScheduleable with the specified ID if the system requirements are met
+	bool RunIfReady(unsigned int scheduledID, unsigned char availableSystem); //Runs the IScheduleable with the specified ID if the system requirements are met
 
-	void Remove(int ID);
+	void Remove(unsigned int ID);
 
-	void ResetAvailability(int ID);
+	void ResetAvailability(unsigned int ID);
 };

@@ -6,11 +6,7 @@
 #include "FunctionManager.h"
 #include "Static.h"
 
-//int
-//Schedulers should not be made in the main project; rather, a static scheduler(the only Base) can be part of another class and shared with the user via that
-//Have a different scheduler class for each SchedulerType. The base is what I have now. BaseScheduler is a singleton and can just be called Scheduler. Parallel and Sequential Schedulers take in a list of Scheduleables and create a scheduler.
-//P.S. Make Scheduleable a unique_pointer instead of a raw pointer in FunctionManager
-//Change name from GroupBase to GroupBase
+
 class GroupBase : public FunctionManager::Scheduleable
 {
 protected:
@@ -23,27 +19,36 @@ protected:
 		Sequential,
 	};
 
+	//These flags use one bit per value i.e. 3 bits = 3 values as opposed to 3 bits = 8 values. This is for readability so that anything with a bar set will be an odd number
+	//Bar flags are the least significant bits in a number and EndEarly flags are the most significant bits. This way telling if these flags are simple: if a number is big, EndEarly flag is set; if a number is odd, Bar flag is set
+	static const int BarBitCount = 3; //Represents the number of Bar flags
+	static const int EndEarlyBitCount = 1; //Represents the number of EndEarly flags(not sure why you'd want more than 1)
+
+	//BarBits: 00I for 1 bar, 0II for two bars, III for three bars. To check for bar just check first bit, to add bar shift left, to remove bar shift right
+	static const unsigned int BarMask = UINT32_MAX >> (32 - BarBitCount);
+	static const unsigned int BarMin = 1;
+	static const unsigned int EndEarlyMask = UINT32_MAX << (32 - EndEarlyBitCount);
+	static const unsigned int EndEarlyMin = 1 << (32 - EndEarlyBitCount);
+	static const unsigned int UnpackMask = ~(BarMask | EndEarlyMask);
+
+	static inline unsigned int Unpack(unsigned int packedID);
+
+	static inline unsigned int Pack(unsigned int  unpackedID);
+
+	static inline bool IsBarSet(unsigned int packedID);
+
+	static inline bool IsEndEarlySet(unsigned int packedID);
+
 private:
-	bool shouldStoreScheduleables;
-	std::vector<std::shared_ptr<FunctionManager::Scheduleable>> storedScheduleables; //stores scheduleables so they aren't deleted after running(not necessary for main Scheduler)
-	
-	std::unordered_map<Systems, std::list<int>> schedule;
+
+	//std::unordered_map<Systems, std::list<unsigned int>> schedule;
+	std::vector<unsigned int>* schedule;
 	FunctionManager functionManager;
 	SchedulerTypes schedulerType;
 	unsigned char currentlyRunningSystems;
-	int schedulerID;
-
-
-	GroupBase(std::vector<std::shared_ptr<FunctionManager::Scheduleable>> scheduleablesToStore, bool shouldStoreScheduleables, unsigned char systemFlags, SchedulerTypes type);
+	unsigned int schedulerID;
 
 protected:
-
-	GroupBase(std::vector<std::shared_ptr<FunctionManager::Scheduleable>> scheduleablesToStore, unsigned char systemFlags, SchedulerTypes type);
-
-	GroupBase(std::vector<std::shared_ptr<FunctionManager::Scheduleable>> scheduleablesToStore, std::vector<unsigned char> systemFlags, SchedulerTypes type);
-
-	GroupBase(std::vector<std::shared_ptr<FunctionManager::Scheduleable>> scheduleablesToStore, std::vector<Systems> schedulerSystems, SchedulerTypes type);
-
 
 	GroupBase(unsigned char systemFlags, SchedulerTypes type);
 
@@ -52,11 +57,18 @@ protected:
 	GroupBase(std::vector<Systems> schedulerSystems, SchedulerTypes type);
 
 
-	void Schedule(std::shared_ptr<Scheduleable> scheduleable);
+	int Schedule(std::shared_ptr<Scheduleable> scheduleable);
 
-	void Schedule(std::function<bool()> function, unsigned char requirementFlags);
+	int Schedule(std::function<bool()> function, unsigned char requirementFlags);
 
-	void Schedule(std::function<bool()> function, std::vector<Systems> requiredSystems);
+	int Schedule(std::function<bool()> function, std::vector<Systems> requiredSystems);
+
+	//If I ever need these I can have a special group that exposes their functionality; however, it is probably unnecessary to make them public in every group
+	void SetBar(unsigned int packedID); //multiple bars can be set
+
+	void RemoveBar(unsigned int packedID);
+
+	void SetEndEarly(unsigned int packedID);
 
 public:
 	GroupBase(const GroupBase& copyGroupBase);

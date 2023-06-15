@@ -2,7 +2,7 @@
 //#include "../../inc/SchedulerInc/FunctionManager.h"
 #include "FunctionManager.h"
 
-#pragma region IScheduleable
+#pragma region Scheduleable
 
 bool FunctionManager::Scheduleable::Run()
 {
@@ -36,7 +36,7 @@ FunctionManager::Scheduleable::Scheduleable(std::function<bool()> backingFunctio
 FunctionManager::Scheduleable::Scheduleable(const Scheduleable& copyScheduleable)
 	:availableSystems{ copyScheduleable.availableSystems }, backingFunction{ copyScheduleable.backingFunction }, IsDead{ copyScheduleable.IsDead }, requirementFlags{copyScheduleable.requirementFlags}
 {
-	std::cout << "Scheduleable Copied!!" << std::endl;
+	//std::cout << "Scheduleable Copied!!" << std::endl;
 }
 
 FunctionManager::Scheduleable::~Scheduleable() 
@@ -46,7 +46,7 @@ FunctionManager::Scheduleable::~Scheduleable()
 		throw new std::exception("THIS IS ALREADY DEAD!\n");
 	}
 	IsDead = true;
-	std::cout << "Scheduleable Destructed\n";
+	//std::cout << "Scheduleable Destructed\n";
 };
 
 unsigned char FunctionManager::Scheduleable::GetRequirementFlags()
@@ -87,13 +87,12 @@ void FunctionManager::Scheduleable::ResetAvailability()
 #pragma region FunctionManager
 
 FunctionManager::FunctionManager()
-	:database{ std::unordered_map<int, std::shared_ptr<Scheduleable>>() }, nextAvailableID{ 0 } {}
+	:database{ std::unordered_map<unsigned int, std::shared_ptr<Scheduleable>>() }, nextAvailableID{ 0 } {}
 
 FunctionManager::FunctionManager(const FunctionManager& copyFunctionManager)
-	: nextAvailableID{copyFunctionManager.nextAvailableID} 
+	: nextAvailableID{ copyFunctionManager.nextAvailableID }, database{std::unordered_map<unsigned int, std::shared_ptr<Scheduleable>>()}
 {
-	database = std::unordered_map<int, std::shared_ptr<FunctionManager::Scheduleable>>();
-	for (std::pair<int, std::shared_ptr<FunctionManager::Scheduleable>> kvp : copyFunctionManager.database)
+	for (std::pair<unsigned int, std::shared_ptr<Scheduleable>> kvp : copyFunctionManager.database)
 	{
 		database.emplace(kvp.first, kvp.second);
 	}
@@ -104,14 +103,14 @@ FunctionManager::~FunctionManager()
 	//I should do something in the destructors
 }
 
-int FunctionManager::AddToDatabase(std::shared_ptr<Scheduleable> scheduledItem)
+unsigned int FunctionManager::AddToDatabase(std::shared_ptr<Scheduleable> scheduledItem)
 {
-	int ID = nextAvailableID++;
+	unsigned int ID = nextAvailableID++;
 	database.emplace(ID, scheduledItem);
 	return ID;
 }
 
-bool FunctionManager::RunIfReady(int scheduledID, unsigned char availableSystem)
+bool FunctionManager::RunIfReady(unsigned int scheduledID, unsigned char availableSystem)
 {
 	bool result = database[scheduledID]->RunIfReady(availableSystem);
 	if (result)
@@ -123,13 +122,13 @@ bool FunctionManager::RunIfReady(int scheduledID, unsigned char availableSystem)
 	return result;
 }
 
-void FunctionManager::Remove(int ID)
+void FunctionManager::Remove(unsigned int ID)
 {
 	database.erase(ID);
 	//remove ID from database
 }
 
-void FunctionManager::ResetAvailability(int ID)
+void FunctionManager::ResetAvailability(unsigned int ID)
 {
 	database[ID]->ResetAvailability();
 }

@@ -31,16 +31,16 @@ enum class Systems : unsigned char
 	Chassis = 6,
 };
 
-static const int SystemsCount = 8;
-static int NextAvailableSchedulerID;
+static const unsigned int SystemsCount = 8;
+static unsigned int NextAvailableSchedulerID;
 
 static std::function<bool()> ReturnTrue = std::function<bool()>([&]() {return true; });
 
 static std::function<bool()> ThrowError = std::function<bool()>([&]()
 {
-	throw std::exception("Saving User from Wierd Error Exception");
+	throw std::exception("Saving User from Wierd Error Message");
 	std::cout << "~~~!ERROR!~~~!ERROR!~~~!ERROR!~~~" << std::endl;
-	while (true);
+	while (true) {};
 	return false;
 });
 
@@ -65,10 +65,21 @@ static bool Contains(std::vector<T> list, T value)
 	return false;
 }
 
+template <typename T>
+static void Pop_Front(std::vector<T>& list)
+{
+	std::vector<T> newList = std::vector<T>();
+	for (int i = 1; i < list.size(); i ++)
+	{
+		newList.push_back(list[i]);
+	}
+	list = newList;
+}
+
 static std::vector<Systems> GetSystems(unsigned char systemFlags)
 {
 	std::vector<Systems> returnSystems;
-	for (int i = 0; i < SystemsCount; i++)
+	for (unsigned int i = 0; i < SystemsCount; i++)
 	{
 		unsigned char currentMask = 1 << i;
 		if ((systemFlags & currentMask) >> i == 1)
