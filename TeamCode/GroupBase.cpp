@@ -161,6 +161,11 @@ void GroupBase::SetEndEarly(unsigned int packedID)
 	}
 }
 
+void GroupBase::Subscribe(unsigned int targetID, std::function<void()> endBehavior)
+{
+	functionManager.Subscribe(targetID, endBehavior);
+}
+
 
 GroupBase::GroupBase(const GroupBase& copyGroupBase)
 	: Scheduleable(copyGroupBase.requirementFlags), functionManager{ copyGroupBase.functionManager }, schedulerType{ copyGroupBase.schedulerType },

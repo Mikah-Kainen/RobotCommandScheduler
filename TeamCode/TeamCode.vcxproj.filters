@@ -54,6 +54,9 @@
     <ClCompile Include="MemoryEater.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="PolyFills.cpp">
+      <Filter>src\SchedulerSrc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scheduler.h">
@@ -81,9 +84,6 @@
       <Filter>inc</Filter>
     </ClInclude>
     <ClInclude Include="Static.h">
-      <Filter>inc\SchedulerInc</Filter>
-    </ClInclude>
-    <ClInclude Include="Polyfills.h">
       <Filter>inc\SchedulerInc</Filter>
     </ClInclude>
   </ItemGroup>

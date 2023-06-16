@@ -134,6 +134,7 @@
     <ClCompile Include="MemoryEater.cpp" />
     <ClCompile Include="Motor.cpp" />
     <ClCompile Include="ParallelGroup.cpp" />
+    <ClCompile Include="PolyFills.cpp" />
     <ClCompile Include="Robot.cpp" />
     <ClCompile Include="Scheduler.cpp" />
     <ClCompile Include="GroupBase.cpp" />
@@ -145,7 +146,6 @@
     <ClInclude Include="FunctionManager.h" />
     <ClInclude Include="Motor.h" />
     <ClInclude Include="ParallelGroup.h" />
-    <ClInclude Include="Polyfills.h" />
     <ClInclude Include="Robot.h" />
     <ClInclude Include="Scheduler.h" />
     <ClInclude Include="SequentialGroup.h" />

@@ -87,14 +87,24 @@ void FunctionManager::Scheduleable::ResetAvailability()
 #pragma region FunctionManager
 
 FunctionManager::FunctionManager()
-	:database{ std::unordered_map<unsigned int, std::shared_ptr<Scheduleable>>() }, nextAvailableID{ 0 } {}
+	:database{ std::unordered_map<unsigned int, std::shared_ptr<Scheduleable>>() }, endBehaviors{std::unordered_map<unsigned int, std::vector<std::function<void()>>>()}, nextAvailableID{0} {}
 
 FunctionManager::FunctionManager(const FunctionManager& copyFunctionManager)
-	: nextAvailableID{ copyFunctionManager.nextAvailableID }, database{std::unordered_map<unsigned int, std::shared_ptr<Scheduleable>>()}
+	: nextAvailableID{ copyFunctionManager.nextAvailableID }, database{ std::unordered_map<unsigned int, std::shared_ptr<Scheduleable>>() }, endBehaviors{ std::unordered_map<unsigned int, std::vector<std::function<void()>>>() }
 {
 	for (std::pair<unsigned int, std::shared_ptr<Scheduleable>> kvp : copyFunctionManager.database)
 	{
 		database.emplace(kvp.first, kvp.second);
+	}
+
+	for (std::pair<unsigned int, std::vector<std::function<void()>>> kvp : copyFunctionManager.endBehaviors)
+	{
+		std::vector<std::function<void()>> targetBehaviors = std::vector<std::function<void()>>();
+		for (std::function<void()> behavior : kvp.second)
+		{
+			targetBehaviors.push_back(behavior);
+		}
+		endBehaviors.emplace(kvp.first, targetBehaviors);
 	}
 }
 
@@ -107,6 +117,7 @@ unsigned int FunctionManager::AddToDatabase(std::shared_ptr<Scheduleable> schedu
 {
 	unsigned int ID = nextAvailableID++;
 	database.emplace(ID, scheduledItem);
+	endBehaviors.emplace(ID, std::vector<std::function<void()>>());
 	return ID;
 }
 
@@ -115,6 +126,10 @@ bool FunctionManager::RunIfReady(unsigned int scheduledID, unsigned char availab
 	bool result = database[scheduledID]->RunIfReady(availableSystem);
 	if (result)
 	{
+		for (std::function<void()> endBehavior : endBehaviors[scheduledID])
+		{
+			endBehavior();
+		}
 		//do end of function logic
 		//throw std::exception("not implemented"); //UNCOMMENT THIS!!
 		//Remove(scheduledID); //Don't delete here because I clean up in GroupBase(I could change Cleanup here if I want so maybe think about that)
@@ -125,12 +140,18 @@ bool FunctionManager::RunIfReady(unsigned int scheduledID, unsigned char availab
 void FunctionManager::Remove(unsigned int ID)
 {
 	database.erase(ID);
+	endBehaviors.erase(ID);
 	//remove ID from database
 }
 
 void FunctionManager::ResetAvailability(unsigned int ID)
 {
 	database[ID]->ResetAvailability();
+}
+
+void FunctionManager::Subscribe(unsigned int targetID, std::function<void()> endBehavior)
+{
+	endBehaviors[targetID].push_back(endBehavior);
 }
 
 #pragma endregion

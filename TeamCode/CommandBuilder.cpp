@@ -9,7 +9,7 @@
 //#include "../../inc/SchedulerInc/Polyfills.h"
 #include "FunctionManager.h"
 #include "Static.h"
-#include "Polyfills.h"
+#include "Polyfills.cpp"
 
 //class ScheduleableCommand : FunctionManager::Scheduleable
 //{
@@ -27,27 +27,15 @@ private:
 	std::function<bool(Ts...)> backingFunction;
 	std::tuple<Ts...> params;
 
-	std::function<bool()> callbackFunction;
-
-	//void ReturnRef(Ts... parameters, bool& returnVal)
-	//{
-	//	returnVal = backingFunction(parameters...);
-	//}
-
 	bool Run() override
 	{
-		//return callbackFunction();
-
 		return std::apply(backingFunction, params);
-		 
-		//bool returnVal;
-		//std::apply([&](Ts... parameters) {return ReturnRef(parameters..., returnVal); }, params);
-		//return returnVal;
+		//return PolyFills::GetInstance().Apply(backingFunction, params);
 	}
 
 public:
 	ScheduledCommand(std::function<bool(Ts...)> backingFunction, Ts... params, unsigned char requirementFlags)
-		: FunctionManager::Scheduleable(/*callbackFunction,*/ requirementFlags), backingFunction{ backingFunction }/*, callbackFunction{ [&, params = std::forward<Ts...>(params...)]() {return backingFunction(params); }}*/, params{std::tuple<Ts...>(params...)} {}
+		: FunctionManager::Scheduleable(requirementFlags), backingFunction{ backingFunction }, params{std::tuple<Ts...>(params...)} {}
 
 	//ScheduledCommand(std::function<bool()> backingFunctionCopy, unsigned char requirementFlags, bool passingByCopy)
 	//	: FunctionManager::Scheduleable(backingFunctionCopy, requirementFlags, passingByCopy) {}

@@ -52,7 +52,7 @@ public:
 
 private:
 	std::unordered_map<unsigned int, std::shared_ptr<Scheduleable>> database;
-	//std::shared_ptr<Scheduleable>* database;
+	std::unordered_map<unsigned int, std::vector<std::function<void()>>> endBehaviors;
 	unsigned int nextAvailableID;
 
 public:
@@ -70,4 +70,6 @@ public:
 	void Remove(unsigned int ID);
 
 	void ResetAvailability(unsigned int ID);
+
+	void Subscribe(unsigned int targetID, std::function<void()> endBehavior);
 };

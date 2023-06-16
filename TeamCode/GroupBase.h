@@ -31,13 +31,13 @@ protected:
 	static const unsigned int EndEarlyMin = 1 << (32 - EndEarlyBitCount);
 	static const unsigned int UnpackMask = ~(BarMask | EndEarlyMask);
 
-	static inline unsigned int Unpack(unsigned int packedID);
+	static unsigned int Unpack(unsigned int packedID);
 
-	static inline unsigned int Pack(unsigned int  unpackedID);
+	static unsigned int Pack(unsigned int  unpackedID);
 
-	static inline bool IsBarSet(unsigned int packedID);
+	static bool IsBarSet(unsigned int packedID);
 
-	static inline bool IsEndEarlySet(unsigned int packedID);
+	static bool IsEndEarlySet(unsigned int packedID);
 
 private:
 
@@ -69,6 +69,8 @@ protected:
 	void RemoveBar(unsigned int packedID);
 
 	void SetEndEarly(unsigned int packedID);
+
+	void Subscribe(unsigned int targetID, std::function<void()> endBehavior);
 
 public:
 	GroupBase(const GroupBase& copyGroupBase);
