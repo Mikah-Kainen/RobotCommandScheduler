@@ -4,24 +4,24 @@
 #include <iostream>
 #include <tuple>
 #include <utility>
-//#include "../../inc/SchedulerInc/FunctionManager.h"
+//#include "../../inc/SchedulerInc/Scheduleable.h"
 //#include "../../inc/SchedulerInc/Static.h"
 //#include "../../inc/SchedulerInc/Polyfills.h"
-#include "FunctionManager.h"
+#include "Scheduleable.h"
 #include "Static.h"
 #include "Polyfills.cpp"
 
-//class ScheduleableCommand : FunctionManager::Scheduleable
+//class ScheduleableCommand : Scheduleable
 //{
 //public:
 //	ScheduleableCommand(std::function<bool()> backingFunction, unsigned char requirementFlags)
-//		:FunctionManager::Scheduleable(backingFunction, requirementFlags) {}
+//		:Scheduleable(backingFunction, requirementFlags) {}
 //};
 
 //https://stackoverflow.com/questions/15537817/c-how-to-store-a-parameter-pack-as-a-variable //Look at this link for some interesting ideas
 //https://en.cppreference.com/w/cpp/utility/apply
 template <typename... Ts>
-class ScheduledCommand : public FunctionManager::Scheduleable
+class ScheduledCommand : public Scheduleable
 {
 private:
 	std::function<bool(Ts...)> backingFunction;
@@ -35,10 +35,10 @@ private:
 
 public:
 	ScheduledCommand(std::function<bool(Ts...)> backingFunction, Ts... params, unsigned char requirementFlags)
-		: FunctionManager::Scheduleable(requirementFlags), backingFunction{ backingFunction }, params{std::tuple<Ts...>(params...)} {}
+		: Scheduleable(requirementFlags), backingFunction{ backingFunction }, params{std::tuple<Ts...>(params...)} {}
 
 	//ScheduledCommand(std::function<bool()> backingFunctionCopy, unsigned char requirementFlags, bool passingByCopy)
-	//	: FunctionManager::Scheduleable(backingFunctionCopy, requirementFlags, passingByCopy) {}
+	//	: Scheduleable(backingFunctionCopy, requirementFlags, passingByCopy) {}
 };
 
 //Link about Parameter Packs: https://en.cppreference.com/w/cpp/language/parameter_pack

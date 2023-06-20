@@ -2,7 +2,7 @@
 #include "SequentialGroup.h"
 #include "Scheduler.h"
 
-SequentialGroup::SequentialGroup(std::vector<std::shared_ptr<FunctionManager::Scheduleable>> scheduleablesToSchedule)
+SequentialGroup::SequentialGroup(std::vector<std::shared_ptr<Scheduleable>> scheduleablesToSchedule)
 	:GroupBase(GetRequirementFlags(scheduleablesToSchedule), SchedulerTypes::Sequential)
 {
 	unsigned int previousID = GroupBase::Schedule(scheduleablesToSchedule[0]);
@@ -16,7 +16,7 @@ SequentialGroup::SequentialGroup(std::vector<std::shared_ptr<FunctionManager::Sc
 		//GroupBase::SubscribeToEnd(previousID, std::function<void()>([&, currentID]() {group.RemoveBar(currentID);}));
 		previousID = currentID;
 	}
-	//for (std::shared_ptr<FunctionManager::Scheduleable> scheduleable : scheduleablesToSchedule)
+	//for (std::shared_ptr<Scheduleable> scheduleable : scheduleablesToSchedule)
 	//{
 		//scheduleable->AddRequirement(requirementFlags); //this system is a bit broken
 		
@@ -35,7 +35,7 @@ SequentialGroup::SequentialGroup(std::vector<std::shared_ptr<FunctionManager::Sc
 	//}
 }
 
-//SequentialGroup::SequentialGroup(FunctionManager::Scheduleable** scheduleablesToSchedule, int numberOfScheduleables)
-//	:SequentialGroup(std::vector<FunctionManager::Scheduleable*>(numberOfScheduleables, scheduleablesToSchedule[0]))
+//SequentialGroup::SequentialGroup(Scheduleable** scheduleablesToSchedule, int numberOfScheduleables)
+//	:SequentialGroup(std::vector<Scheduleable*>(numberOfScheduleables, scheduleablesToSchedule[0]))
 //{
 //}

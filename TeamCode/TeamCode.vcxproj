@@ -136,6 +136,7 @@
     <ClCompile Include="ParallelGroup.cpp" />
     <ClCompile Include="PolyFills.cpp" />
     <ClCompile Include="Robot.cpp" />
+    <ClCompile Include="Scheduleable.cpp" />
     <ClCompile Include="Scheduler.cpp" />
     <ClCompile Include="GroupBase.cpp" />
     <ClCompile Include="SchedulerProject.cpp" />
@@ -147,6 +148,7 @@
     <ClInclude Include="Motor.h" />
     <ClInclude Include="ParallelGroup.h" />
     <ClInclude Include="Robot.h" />
+    <ClInclude Include="Scheduleable.h" />
     <ClInclude Include="Scheduler.h" />
     <ClInclude Include="SequentialGroup.h" />
     <ClInclude Include="Static.h" />

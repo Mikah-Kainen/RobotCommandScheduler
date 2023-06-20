@@ -10,10 +10,10 @@
 //}
 
 
-unsigned char GroupBase::GetRequirementFlags(std::vector<std::shared_ptr<FunctionManager::Scheduleable>> scheduleables)
+unsigned char GroupBase::GetRequirementFlags(std::vector<std::shared_ptr<Scheduleable>> scheduleables)
 {
 	unsigned char requirementFlag = 0;
-	for (std::shared_ptr<FunctionManager::Scheduleable> scheduleable : scheduleables)
+	for (std::shared_ptr<Scheduleable> scheduleable : scheduleables)
 	{
 		requirementFlag |= scheduleable->GetRequirementFlags();
 	}
@@ -40,8 +40,80 @@ bool GroupBase::IsFlagSet(unsigned int packedID, unsigned int mask)
 	return (packedID & mask) != 0;
 }
 
+#pragma region Database
+GroupBase::Database::Database()
+	:scheduleableMap{ std::unordered_map<unsigned int, std::shared_ptr<Scheduleable>>() }, endBehaviors{std::unordered_map<unsigned int, std::vector<std::function<void()>>>()}, nextAvailableID{0} {}
+
+GroupBase::Database::Database(const Database& copyDatabase)
+	: nextAvailableID{ copyDatabase.nextAvailableID }, scheduleableMap{ std::unordered_map<unsigned int, std::shared_ptr<Scheduleable>>() }, endBehaviors{ std::unordered_map<unsigned int, std::vector<std::function<void()>>>() }
+{
+	for (std::pair<unsigned int, std::shared_ptr<Scheduleable>> kvp : copyDatabase.scheduleableMap)
+	{
+		scheduleableMap.emplace(kvp.first, kvp.second);
+	}
+
+	for (std::pair<unsigned int, std::vector<std::function<void()>>> kvp : copyDatabase.endBehaviors)
+	{
+		std::vector<std::function<void()>> targetBehaviors = std::vector<std::function<void()>>();
+		for (std::function<void()> behavior : kvp.second)
+		{
+			targetBehaviors.push_back(behavior);
+		}
+		endBehaviors.emplace(kvp.first, targetBehaviors);
+	}
+}
+
+GroupBase::Database::~Database()
+{
+	//I should do something in the destructors
+}
+
+unsigned int GroupBase::Database::Add(std::shared_ptr<Scheduleable> scheduledItem)
+{
+	unsigned int ID = nextAvailableID++;
+	scheduleableMap.emplace(ID, scheduledItem);
+	endBehaviors.emplace(ID, std::vector<std::function<void()>>());
+	return ID;
+}
+
+bool GroupBase::Database::RunIfReady(unsigned int scheduledID, unsigned char availableSystem)
+{
+	bool result = scheduleableMap[scheduledID]->RunIfReady(availableSystem);
+	if (result)
+	{
+		for (std::function<void()>& behavior : endBehaviors[scheduledID])
+		{
+			behavior();
+		}
+		//do end of function logic
+		//throw std::exception("not implemented"); //UNCOMMENT THIS!!
+		//Remove(scheduledID); //Don't delete here because I clean up in GroupBase(I could change Cleanup here if I want so maybe think about that)
+	}
+	return result;
+}
+
+void GroupBase::Database::Remove(unsigned int ID)
+{
+	scheduleableMap.erase(ID);
+	endBehaviors.erase(ID);
+	//remove ID from Database
+}
+
+void GroupBase::Database::ResetAvailability(unsigned int ID)
+{
+	scheduleableMap[ID]->ResetAvailability();
+}
+
+void GroupBase::Database::SubscribeToEnd(unsigned int targetID, std::function<void()> endBehavior)
+{
+	endBehaviors[targetID].push_back(endBehavior);
+}
+
+#pragma endregion
+
+#pragma region GroupBase
 GroupBase::GroupBase(unsigned char systemFlags, SchedulerTypes type)
-	:Scheduleable(systemFlags), initializeFunctions{std::vector<std::function<void(GroupBase&)>>()}, functionManager {FunctionManager()}, 
+	:Scheduleable(systemFlags), initializeFunctions{std::vector<std::function<void(GroupBase&)>>()}, database {Database()}, 
 	 schedulerID{ NextAvailableSchedulerID++ }, schedulerType{ type }, schedule{ new std::vector<unsigned int>[SystemsCount] }, 
 	 currentIndices{ new unsigned int[SystemsCount] }
 {
@@ -81,7 +153,7 @@ GroupBase::GroupBase(std::vector<Systems> schedulerSystems, SchedulerTypes type)
 unsigned int GroupBase::Schedule(std::shared_ptr<Scheduleable> scheduleable)
 {
 	unsigned char scheduleableRequirementFlags = scheduleable->GetRequirementFlags();
-	unsigned int unpackedID = functionManager.AddToDatabase(scheduleable);
+	unsigned int unpackedID = database.Add(scheduleable);
 	unsigned int packedID = Pack(unpackedID) /*| ShouldInitializeMask*/;
 	for (unsigned int i = 0; i < SystemsCount; i++)
 	{
@@ -163,7 +235,7 @@ void GroupBase::ReplaceIDUnpacked(unsigned int unpackedID, unsigned int newPacke
 
 GroupBase::GroupBase(const GroupBase& copyGroupBase)
 	: Scheduleable(copyGroupBase.requirementFlags), initializeFunctions{std::vector<std::function<void(GroupBase&)>>()}, 
-	functionManager{copyGroupBase.functionManager},schedulerType{ copyGroupBase.schedulerType }, schedulerID{ copyGroupBase.schedulerID }, 
+	database{copyGroupBase.database},schedulerType{ copyGroupBase.schedulerType }, schedulerID{ copyGroupBase.schedulerID }, 
 	schedule{ new std::vector<unsigned int>[SystemsCount] }, currentIndices{ new unsigned int[SystemsCount] }, shouldInitializeOrHasRestarted{copyGroupBase.shouldInitializeOrHasRestarted}
 {
 	for (int i = 0; i < copyGroupBase.initializeFunctions.size(); i ++)
@@ -214,7 +286,7 @@ void GroupBase::ReplaceID(unsigned int oldPackedID, unsigned int newPackedID)
 
 void GroupBase::SubscribeToEnd(unsigned int targetPackedID, std::function<void()> endBehavior)
 {
-	functionManager.SubscribeToEnd(Unpack(targetPackedID), endBehavior);
+	database.SubscribeToEnd(Unpack(targetPackedID), endBehavior);
 }
 
 void GroupBase::Update()
@@ -275,13 +347,13 @@ bool GroupBase::Run()
 				}
 				else if (!IsFlagSet(currentID, BarMask)) //I should change this check after I add in the current node array for the schedule lists
 				{
-					if (functionManager.RunIfReady(Unpack(currentID), currentAvailableSystem))
+					if (database.RunIfReady(Unpack(currentID), currentAvailableSystem))
 					{
 						IDsToDelete.push_back(currentID);
-						for (int x = 0; x < functionManager.endBehaviors[Unpack(currentID)].size(); x ++)
+						for (int x = 0; x < database.endBehaviors[Unpack(currentID)].size(); x ++)
 						{
-							functionManager.endBehaviors[Unpack(currentID)][x]();
-							functionManager.endBehaviors[Unpack(currentID)].erase(functionManager.endBehaviors[Unpack(currentID)].begin() + x);
+							database.endBehaviors[Unpack(currentID)][x]();
+							database.endBehaviors[Unpack(currentID)].erase(database.endBehaviors[Unpack(currentID)].begin() + x);
 						}
 						//functionManager.Remove(currentSystemSchedule.front());
 					}
@@ -320,7 +392,7 @@ bool GroupBase::Run()
 				{
 					if (Unpack(currentSystemSchedule[currentIndices[i]]) == Unpack(packedID))
 					{
-						//functionManager.Remove(Unpack(packedID));
+						//database.Remove(Unpack(packedID));
 						//Pop_Front<unsigned int>(currentSystemSchedule);
 						currentIndices[i]++;
 						if (currentIndices[i] >= currentSystemSchedule.size())
@@ -333,7 +405,7 @@ bool GroupBase::Run()
 				}
 				if (shouldReset)
 				{
-					functionManager.ResetAvailability(Unpack(currentSystemSchedule[currentIndices[i]]));
+					database.ResetAvailability(Unpack(currentSystemSchedule[currentIndices[i]]));
 				}
 			}
 		}
@@ -341,3 +413,4 @@ bool GroupBase::Run()
 	shouldInitializeOrHasRestarted = finishedSystems == requirementFlags;
 	return shouldInitializeOrHasRestarted;
 }
+#pragma endregion

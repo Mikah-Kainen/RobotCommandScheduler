@@ -238,26 +238,26 @@ int main() //Unit tests with GoogleTest
 	//TakeConstRef(5);
 
 	//SequentialGroup* sequentialGroup = new SequentialGroup({
-	//new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
-	//new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
-	//new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
-	//new FunctionManager::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
-	//new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
+	//new Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
+	//new Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
+	//new Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
+	//new Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
+	//new Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
 	//new FunctionManage
 
 	//int oneThousand = 1000;
 	//int fiveThousand = 5000;
 	//SequentialGroup* sequentialGroup = new SequentialGroup({
-	//	new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
+	//	new Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
 	//	MoveLeftMotorByTime.ScheduleWith(oneThousand),
-	//	new FunctionManager::Scheduleable([&]() {std::cout << "Moving 5000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
+	//	new Scheduleable([&]() {std::cout << "Moving 5000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
 	//	MoveLeftMotorByTime.ScheduleWith(fiveThousand),
-	//	new FunctionManager::Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
+	//	new Scheduleable([&]() {std::cout << "Moving 1000 milliseconds\n"; return robot.GetLeftMotor()->UpdateTime(); }, (unsigned char)Systems::LeftMotor),
 	//	MoveLeftMotorByTime.ScheduleWith(oneThousand),
 	//	});r::Scheduleable([&]() {return robot.GetLeftMotor()->MoveByTime(1000); }, (unsigned char)Systems::LeftMotor),
 	//	});
 
-	std::vector<std::shared_ptr<FunctionManager::Scheduleable>> delayFunctions = std::vector<std::shared_ptr<FunctionManager::Scheduleable>>();
+	std::vector<std::shared_ptr<Scheduleable>> delayFunctions = std::vector<std::shared_ptr<Scheduleable>>();
 	int delays[] = { 1000, 3000, 1000, };
 	//std::vector<std::string> message = { "Displaying Message\n" };
 	for (int i = 0; i < 3; i++)
@@ -282,7 +282,7 @@ int main() //Unit tests with GoogleTest
 	//delayFunctions.push_back(TakesCatVal.ScheduleWith(cat));
 	//cat.Age = 100;
 	// 
-	//std::shared_ptr<FunctionManager::Scheduleable> command = TakesCatPointer.CreateCommand(new Cat(12, "John"));
+	//std::shared_ptr<Scheduleable> command = TakesCatPointer.CreateCommand(new Cat(12, "John"));
 	//delayFunctions.push_back(command);
 	// 
 	//delayFunctions.push_back(TakesCatBind.ScheduleWith());
@@ -296,7 +296,7 @@ int main() //Unit tests with GoogleTest
 	//Cat* cat = new Cat(50, "PLEASE WORK");
 
 
-	std::shared_ptr<FunctionManager::Scheduleable> newLineFunction = std::make_shared<FunctionManager::Scheduleable>([&]() {std::cout << std::endl; return true; }, Systems::Five);
+	std::shared_ptr<Scheduleable> newLineFunction = std::make_shared<Scheduleable>([&]() {std::cout << std::endl; return true; }, Systems::Five);
 	//Don't forget to add Systems::None to the tests once that is supported
 
 #pragma region SequentialGroupTest
@@ -345,12 +345,14 @@ int main() //Unit tests with GoogleTest
 	Cat  parallelGroup4and5TestCat1 = Cat(-1, "ERROR");
 	Cat  parallelGroup4and5TestCat2 = Cat(2, "Systems 5");
 	Cat  parallelGroup4and5TestCat3and4 = Cat(3, "Systems 5");
+	Cat  parallelGroup4and5TestCat2Systems4 = Cat(2, "Systems 4");
 	std::shared_ptr<ParallelGroup> parallelGroup4and5 = std::make_shared<ParallelGroup>(ParallelGroup({
 		DisplayCatReferenceFive.CreateCommand(parallelGroup4and5TestCat1),
 		DisplayCatValueFive.CreateCommand(parallelGroup4and5TestCat2),
 		DisplayCatPointerFour.CreateCommand(parallelGroup4and5TestCat1Pointer),
 		DisplayCatValueFive.CreateCommand(parallelGroup4and5TestCat3and4),
 		DisplayCatReferenceFive.CreateCommand(parallelGroup4and5TestCat3and4),
+		DisplayCatValueFour.CreateCommand(parallelGroup4and5TestCat2Systems4),
 	}));
 	parallelGroup4and5TestCat1 = Cat(1, "Systems 5");
 	parallelGroup4and5TestCat3and4.Age = 4;
@@ -381,9 +383,16 @@ int main() //Unit tests with GoogleTest
 
 
 	std::string otherMessage = "End of Functions, Current Time: ";
-	std::shared_ptr<FunctionManager::Scheduleable> endFunction = std::make_shared<FunctionManager::Scheduleable>([&]() {std::cout << otherMessage << Timer::GetInstance().ElapsedMilliseconds() << std::endl; return true; }, (unsigned char)Systems::All);
+	std::shared_ptr<Scheduleable> endFunction = std::make_shared<Scheduleable>([&]() {std::cout << otherMessage << Timer::GetInstance().ElapsedMilliseconds() << std::endl; return true; }, (unsigned char)Systems::All);
 	//otherMessage = "Haha I changed it ";
 
+	//ERROR! ERROR! FOUND ERROR! ApparentCase: In a sequential group that uses 2 groups, if you schedule the same 2 groups after in a parallel group the first one will be skipped one time(Maybe because of left over bar flag?)!
+	/* Error program
+	scheduler.Schedule(std::make_shared<SequentialGroup>(SequentialGroup({ parallelGroupCombinationTest, tempSequentialGroupCombinationTest })));
+	scheduler.Schedule(parallelGroupCombinationTest);
+	scheduler.Schedule(tempSequentialGroupCombinationTest);
+	*/
+	
 	scheduler.Schedule(std::make_shared<SequentialGroup>(SequentialGroup({ parallelGroupCombinationTest, tempSequentialGroupCombinationTest })));
 	//Make sure scheduleables are destructed properly in the main Scheduler
 	scheduler.Schedule(parallelGroupCombinationTest);
@@ -442,7 +451,7 @@ int main() //Unit tests with GoogleTest
 //scheduler.Schedule([&]() {return MotorB.MultiStepMove(4); }, (unsigned char)Systems::MotorB);
 //scheduler.Schedule([&]() {return MotorC.MultiStepMove(5); }, (unsigned char)Systems::MotorC);
 
-//new ParallelGroup(std::vector<FunctionManager::Scheduleable*>({
+//new ParallelGroup(std::vector<Scheduleable*>({
 //	new ScheduledCommand([&]() {return MotorA.MultiStepMove(3); }, (unsigned char)Systems::MotorA),
 //	new ScheduledCommand([&]() {return MotorA.ResetCurrentStep(); }, (unsigned char)Systems::MotorA),
 //	})),

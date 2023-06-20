@@ -57,6 +57,9 @@
     <ClCompile Include="PolyFills.cpp">
       <Filter>src\SchedulerSrc</Filter>
     </ClCompile>
+    <ClCompile Include="Scheduleable.cpp">
+      <Filter>src\SchedulerSrc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scheduler.h">
@@ -84,6 +87,9 @@
       <Filter>inc</Filter>
     </ClInclude>
     <ClInclude Include="Static.h">
+      <Filter>inc\SchedulerInc</Filter>
+    </ClInclude>
+    <ClInclude Include="Scheduleable.h">
       <Filter>inc\SchedulerInc</Filter>
     </ClInclude>
   </ItemGroup>

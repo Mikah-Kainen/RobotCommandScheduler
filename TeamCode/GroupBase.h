@@ -3,14 +3,15 @@
 #include <vector>
 #include <list>
 #include <iostream>
-#include "FunctionManager.h"
+#include "Scheduleable.h"
 #include "Static.h"
 
 
-class GroupBase : public FunctionManager::Scheduleable
+//GroupBase uses PackedIDs to keep track of important flags, Database uses UnpackedIDs to abstract the flags away and for ease of debugging
+class GroupBase : public Scheduleable
 {
 protected:
-	static unsigned char GetRequirementFlags(std::vector<std::shared_ptr<FunctionManager::Scheduleable>> scheduleables);
+	static unsigned char GetRequirementFlags(std::vector<std::shared_ptr<Scheduleable>> scheduleables);
 
 	enum class SchedulerTypes
 	{
@@ -49,10 +50,38 @@ protected:
 
 	//static bool IsEndEarlySet(unsigned int packedID);
 
+protected:
+	//Interesting link: https://jguegant.github.io/blogs/tech/performing-try-emplace.html
+	class Database
+	{
+	private:
+		unsigned int nextAvailableID;
+
+	public:
+		std::unordered_map<unsigned int, std::shared_ptr<Scheduleable>> scheduleableMap;
+		std::unordered_map<unsigned int, std::vector<std::function<void()>>> endBehaviors;
+
+		Database();
+
+		Database(const Database& copyDatabase);
+
+		~Database();
+
+		unsigned int Add(std::shared_ptr<Scheduleable> scheduledItem);
+
+		bool RunIfReady(unsigned int scheduledID, unsigned char availableSystem); //Runs the IScheduleable with the specified ID if the system requirements are met
+
+		void Remove(unsigned int ID);
+
+		void ResetAvailability(unsigned int ID);
+
+		void SubscribeToEnd(unsigned int targetID, std::function<void()> endBehavior);
+	};
+
 private:
 	std::vector<unsigned int>* schedule;
 	unsigned int* currentIndices;
-	FunctionManager functionManager;
+	Database database;
 	SchedulerTypes schedulerType;
 	unsigned int schedulerID; //for debugging
 	bool shouldInitializeOrHasRestarted = true;
@@ -80,6 +109,8 @@ protected:
 	//void SetEndEarly(unsigned int packedID);
 
 	void ReplaceIDUnpacked(unsigned int unpackedID, unsigned int newPackedID);
+
+	//virtual void Cleanup(int packedID) = 0; //ADD THIS! Then add derived class NonConsumingGroup and ConsumingGroup
 
 	//void AddToInitialize(std::function<void(GroupBase&)> initializeFunction);
 

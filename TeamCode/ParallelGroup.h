@@ -11,7 +11,7 @@ protected:
 
 public:
 
-	//ParallelGroup(std::vector<FunctionManager::Scheduleable> scheduleableList, unsigned char requirements);
+	//ParallelGroup(std::vector<Scheduleable> scheduleableList, unsigned char requirements);
 
-	ParallelGroup(std::vector<std::shared_ptr<FunctionManager::Scheduleable>> scheduleablesToSchedule);
+	ParallelGroup(std::vector<std::shared_ptr<Scheduleable>> scheduleablesToSchedule);
 };
