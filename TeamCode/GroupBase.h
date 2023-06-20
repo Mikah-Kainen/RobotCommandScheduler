@@ -19,36 +19,46 @@ protected:
 		Sequential,
 	};
 
-	//These flags use one bit per value i.e. 3 bits = 3 values as opposed to 3 bits = 8 values. This is for readability so that anything with a bar set will be an odd number
-	//Bar flags are the least significant bits in a number and EndEarly flags are the most significant bits. This way telling if these flags are simple: if a number is big, EndEarly flag is set; if a number is odd, Bar flag is set
-	static const int BarBitCount = 3; //Represents the number of Bar flags
-	static const int EndEarlyBitCount = 1; //Represents the number of EndEarly flags(not sure why you'd want more than 1)
-
+	//Bar flags use one bit per value i.e. 3 bits = 3 values as opposed to 3 bits = 8 values. This is for readability so that anything with a bar set will be an odd number
 	//BarBits: 00I for 1 bar, 0II for two bars, III for three bars. To check for bar just check first bit, to add bar shift left, to remove bar shift right
+	static const int BarBitCount = 3; //Represents the number of Bar flags
 	static const unsigned int BarMask = UINT32_MAX >> (32 - BarBitCount);
 	static const unsigned int BarMin = 1;
-	static const unsigned int EndEarlyMask = UINT32_MAX << (32 - EndEarlyBitCount);
-	static const unsigned int EndEarlyMin = 1 << (32 - EndEarlyBitCount);
-	static const unsigned int UnpackMask = ~(BarMask | EndEarlyMask);
+
+	//The digits that represent the various flags (0-31)
+	static const unsigned int EndEarlyDigit = 31; //IF Val ~ 4mil
+	static const unsigned int ShouldInitializeDigit = 30; //IF Val ~ 2mil
+	//static const unsigned int InterruptableDigit = 29;  //IF Val ~ 1mil
+
+	static const unsigned int EndEarlyMask = 1 << EndEarlyDigit;
+	//static const unsigned int ShouldInitializeMask = 1 << ShouldInitializeDigit;
+	//static const unsigned int InterruptableMask = 1 << InterruptableDigit;
+
+	static const unsigned int UnpackMask = ~(BarMask | /*ShouldInitializeMask |*/ EndEarlyMask);
+	//Cool Flags: EndEarly, Bar, Interruptable, Initialized, RunDefault?, Branching???
 
 	static unsigned int Unpack(unsigned int packedID);
 
 	static unsigned int Pack(unsigned int  unpackedID);
 
-	static bool IsBarSet(unsigned int packedID);
+	//static bool IsBarSet(unsigned int packedID);
 
-	static bool IsEndEarlySet(unsigned int packedID);
+	static bool IsFlagSet(unsigned int packedID, unsigned int mask);
+
+	//static bool IsShouldInitializeSet(unsigned int packedID);
+
+	//static bool IsEndEarlySet(unsigned int packedID);
 
 private:
-
-	//std::unordered_map<Systems, std::list<unsigned int>> schedule;
 	std::vector<unsigned int>* schedule;
+	unsigned int* currentIndices;
 	FunctionManager functionManager;
 	SchedulerTypes schedulerType;
-	unsigned char currentlyRunningSystems;
-	unsigned int schedulerID;
+	unsigned int schedulerID; //for debugging
+	bool shouldInitializeOrHasRestarted = true;
 
 protected:
+	std::vector<std::function<void(GroupBase&)>> initializeFunctions; //used to set CleanupFunctions in the CopyConstructor
 
 	GroupBase(unsigned char systemFlags, SchedulerTypes type);
 
@@ -57,23 +67,32 @@ protected:
 	GroupBase(std::vector<Systems> schedulerSystems, SchedulerTypes type);
 
 
-	int Schedule(std::shared_ptr<Scheduleable> scheduleable);
+	unsigned int Schedule(std::shared_ptr<Scheduleable> scheduleable);
 
-	int Schedule(std::function<bool()> function, unsigned char requirementFlags);
+	unsigned int Schedule(std::function<bool()> function, unsigned char requirementFlags);
 
-	int Schedule(std::function<bool()> function, std::vector<Systems> requiredSystems);
+	unsigned int Schedule(std::function<bool()> function, std::vector<Systems> requiredSystems);
 
 	//If I ever need these I can have a special group that exposes their functionality; however, it is probably unnecessary to make them public in every group
+
+	//void SetShouldInitialize(unsigned int packedID);
+
+	//void SetEndEarly(unsigned int packedID);
+
+	void ReplaceIDUnpacked(unsigned int unpackedID, unsigned int newPackedID);
+
+	//void AddToInitialize(std::function<void(GroupBase&)> initializeFunction);
+
+public:
+	GroupBase(const GroupBase& copyGroupBase);
+
 	void SetBar(unsigned int packedID); //multiple bars can be set
 
 	void RemoveBar(unsigned int packedID);
 
-	void SetEndEarly(unsigned int packedID);
+	void ReplaceID(unsigned int oldPackedID, unsigned int newPackedID);
 
-	void Subscribe(unsigned int targetID, std::function<void()> endBehavior);
-
-public:
-	GroupBase(const GroupBase& copyGroupBase);
+	void SubscribeToEnd(unsigned int targetID, std::function<void()> endBehavior);
 	
 	void Update();
 

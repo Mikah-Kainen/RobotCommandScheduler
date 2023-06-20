@@ -139,11 +139,15 @@ void TakeConstRef(const int& constRef)
 	std::cout << constRef << std::endl;
 }
 
-
 /* To do list:
+	Remove FunctionManager
+	Add its dictionaries to GroupBase(scheduleables and endBehavior)
+	Give GroupBase initialize functions that take in a GroupBase&(don't forget to get rid of the part where I remove cleanup functions once they have been run)
 	Change setting flags to have two functions, change int and set int
 	Add dictionary of list of functions that run when a scheduleable is over to FunctionManager
+	Add initialized flag to GroupBase IDs
 	Stop removing from FunctionManager when scheduleables are done
+	Add reset functions to initialize of scheduleables and reset initialize flag after things are run and figure out general initialize stuff
 	Add state enum to scheduleable to transition between Initialize, Run, and Cleanup
 	Add Systems::Other
 	Change Schedule to keep track of current index for each system instead of just removing
@@ -215,7 +219,7 @@ int main() //Unit tests with GoogleTest
 	CommandBuilder<Cat*> DisplayCatPointerSix = CommandBuilder<Cat*>([&](Cat* cat) {return cat->Display(); }, Systems::Six);
 	CommandBuilder<Cat&> DisplayCatReferenceSix = CommandBuilder<Cat&>([&](Cat& cat) {return cat.Display(); }, Systems::Six);
 	CommandBuilder<Cat> DisplayCatValueSix = CommandBuilder<Cat>([&](Cat cat) {return cat.Display(); }, Systems::Six);
-	CommandBuilder<Cat&> IncrimentCatAgeSix = CommandBuilder<Cat&>([&](Cat& cat) {cat.Age++; std::cout << "System Six being used" << std::endl; return true; }, Systems::Six);
+	CommandBuilder<Cat&, int> IncrimentCatAgeSix = CommandBuilder<Cat&, int>([&](Cat& cat, int age) {cat.Age += age; std::cout << "System Six being used" << std::endl; return true; }, Systems::Six);
 
 	CommandBuilder<int&> DisplayNumber = CommandBuilder<int&>(std::function<bool(int&)>([&](int& number) {std::cout << number << std::endl; return true; }), (unsigned char)Systems::LeftMotor);
 	CommandBuilder<int> DisplayNumberVal = CommandBuilder<int>(std::function<bool(int)>([&](int number) {std::cout << number << std::endl; return true; }), (unsigned char)Systems::LeftMotor);
@@ -351,18 +355,18 @@ int main() //Unit tests with GoogleTest
 	parallelGroup4and5TestCat1 = Cat(1, "Systems 5");
 	parallelGroup4and5TestCat3and4.Age = 4;
 
-	Cat parallelGroup6TestCat1and2and3 = Cat(1, "Systems 6");
-	Cat parallelGroup6TestCat4and5 = Cat(4, "Systems 6");
+	Cat parallelGroup6TestCat1and2and4 = Cat(1, "Systems 6");
+	Cat parallelGroup6TestCat6and7 = Cat(6, "Systems 6");
 	std::shared_ptr<ParallelGroup> parallelGroup6 = std::make_shared<ParallelGroup>(ParallelGroup({
-		DisplayCatValueSix.CreateCommand(parallelGroup6TestCat1and2and3),
-		DisplayCatReferenceSix.CreateCommand(parallelGroup6TestCat1and2and3),
-		IncrimentCatAgeSix.CreateCommand(parallelGroup6TestCat1and2and3),
-		DisplayCatReferenceSix.CreateCommand(parallelGroup6TestCat1and2and3),
-		IncrimentCatAgeSix.CreateCommand(parallelGroup6TestCat4and5),
-		DisplayCatValueSix.CreateCommand(parallelGroup6TestCat4and5),
-		DisplayCatReferenceSix.CreateCommand(parallelGroup6TestCat4and5),
+		DisplayCatValueSix.CreateCommand(parallelGroup6TestCat1and2and4),
+		DisplayCatReferenceSix.CreateCommand(parallelGroup6TestCat1and2and4),
+		IncrimentCatAgeSix.CreateCommand(parallelGroup6TestCat1and2and4, 2),
+		DisplayCatReferenceSix.CreateCommand(parallelGroup6TestCat1and2and4),
+		IncrimentCatAgeSix.CreateCommand(parallelGroup6TestCat6and7, 1),
+		DisplayCatValueSix.CreateCommand(parallelGroup6TestCat6and7),
+		DisplayCatReferenceSix.CreateCommand(parallelGroup6TestCat6and7),
 	}));
-	parallelGroup6TestCat1and2and3.Age++;
+	parallelGroup6TestCat1and2and4.Age++;
 
 	std::shared_ptr<ParallelGroup> parallelGroupCombinationTest = std::make_shared<ParallelGroup>(ParallelGroup({
 		parallelGroup4and5,
@@ -380,9 +384,11 @@ int main() //Unit tests with GoogleTest
 	std::shared_ptr<FunctionManager::Scheduleable> endFunction = std::make_shared<FunctionManager::Scheduleable>([&]() {std::cout << otherMessage << Timer::GetInstance().ElapsedMilliseconds() << std::endl; return true; }, (unsigned char)Systems::All);
 	//otherMessage = "Haha I changed it ";
 
+	scheduler.Schedule(std::make_shared<SequentialGroup>(SequentialGroup({ parallelGroupCombinationTest, tempSequentialGroupCombinationTest })));
+	//Make sure scheduleables are destructed properly in the main Scheduler
+	scheduler.Schedule(parallelGroupCombinationTest);
 	scheduler.Schedule(tempSequentialGroupCombinationTest);
 	//scheduler.Schedule([&]() {std::cout << std::endl; return true; }, (unsigned char)Systems::Six);
-	//scheduler.Schedule(tempSequentialGroupCombinationTest);
 	scheduler.Schedule(endFunction);
 
 	//if (true)

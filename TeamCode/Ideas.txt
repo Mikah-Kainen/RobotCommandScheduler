@@ -15,6 +15,15 @@ Upside: We don't have to store the same function multiple times if it requires m
 Critical upside: It is much easier to replace functions or branch
 
 
+I should get rid of FunctionManager
+Groups shouldn't subscribe end behavior functions every time at initialization, but should subscribe them in constructors and copy constructors. The initialization list is just for copyConstructors
+Two different derived types of GroupBase: ConsumingGroup and NonConsumingGroup
+ConsumingGroup adds endBehavior functions that Remove the scheduleables that just ran from the FunctionManager and the schedule
+NonConsumingGroup adds endBehavior functions that increment the currentInstruction for the systems that ran with the finished scheduleable\
+If a GroupBase's Run is about to return true, it should reset itself to prepare for the next run, if it is a NonConsumingGroup
+Reset function should be a virtual function that ConsumingGroup and NonConsumingGroup override
+
+
 Scheduling Command Groups Directly Instead of Unwrapping Them:
 
 Instead of unwrapping command groups (i.e. a sequential command group is just all the invidual commands with the requirements of the whole group)

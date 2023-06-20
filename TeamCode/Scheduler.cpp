@@ -15,15 +15,16 @@ Scheduler& Scheduler::GetInstance()
 
 void Scheduler::Schedule(std::shared_ptr<Scheduleable> scheduleable)
 {
-	GroupBase::Schedule(scheduleable);
+	unsigned int ID = GroupBase::Schedule(scheduleable);
+	//AddToInitialize([&, ID](GroupBase& group) {group.SubscribeToEnd(ID, [&]() {functionMan})});
 }
 
 void Scheduler::Schedule(std::function<bool()> function, unsigned char requirementFlags)
 {
-	GroupBase::Schedule(function, requirementFlags);
+	unsigned int ID = GroupBase::Schedule(function, requirementFlags);
 }
 
 void Scheduler::Schedule(std::function<bool()> function, std::vector<Systems> requiredSystems)
 {
-	GroupBase::Schedule(function, requiredSystems);
+	unsigned int ID = GroupBase::Schedule(function, requiredSystems);
 }

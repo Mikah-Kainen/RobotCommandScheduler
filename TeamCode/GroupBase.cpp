@@ -30,22 +30,25 @@ unsigned int GroupBase::Pack(unsigned int unpackedID)
 	return (unpackedID << BarBitCount) & UnpackMask;
 }
 
-bool GroupBase::IsBarSet(unsigned int packedID)
-{
-	return (packedID & BarMask) >= BarMin;
-}
+//bool GroupBase::IsBarSet(unsigned int packedID)
+//{
+//	return (packedID & BarMask) >= BarMin;
+//}
 
-bool GroupBase::IsEndEarlySet(unsigned int packedID)
+bool GroupBase::IsFlagSet(unsigned int packedID, unsigned int mask)
 {
-	return packedID > EndEarlyMin; //this works becaue EndEarly bits are the last bits in the ID and IDs start at BarMin not 0
+	return (packedID & mask) != 0;
 }
 
 GroupBase::GroupBase(unsigned char systemFlags, SchedulerTypes type)
-	:Scheduleable(/*std::function<bool()>([&]() {return Run(); }),*//*std::function<bool()>(std::bind(&GroupBase::Run, this)*/ systemFlags), functionManager{ FunctionManager() }, currentlyRunningSystems{ 0 },
-	schedulerID{ NextAvailableSchedulerID++ }, schedulerType{ type }, schedule{ new std::vector<unsigned int>[SystemsCount] }
-	//I don't use std::bind because it causes a copy anyway when passed to the next function despite being passed as a reference(I think)
+	:Scheduleable(systemFlags), initializeFunctions{std::vector<std::function<void(GroupBase&)>>()}, functionManager {FunctionManager()}, 
+	 schedulerID{ NextAvailableSchedulerID++ }, schedulerType{ type }, schedule{ new std::vector<unsigned int>[SystemsCount] }, 
+	 currentIndices{ new unsigned int[SystemsCount] }
 {
-
+	for (int i = 0; i < SystemsCount; i ++)
+	{
+		currentIndices[i] = 0;
+	}
 	//List should be automatically initialized
 	//schedule = std::unordered_map<Systems, std::list<int>>();
 	//for (int i = 0; i < SystemsCount; i++)
@@ -75,11 +78,11 @@ GroupBase::GroupBase(std::vector<Systems> schedulerSystems, SchedulerTypes type)
 //also think about how conditional functions could work(maybe a placeholder function that is replaced by a Scheduler that handles whichever branch it is currently on)
 //also add functionality to remove systems from the scheduler when all the system's commands have been completed, so that the parent scheduler can start scheduling things with that system(but don't remove systems from the original scheduler!)
 //make different types of schedulers or have information in the schedulers which decides whether a system should be removed or its default functions should be run when the scheduler runs out of scheduled functions for that system
-int GroupBase::Schedule(std::shared_ptr<Scheduleable> scheduleable)
+unsigned int GroupBase::Schedule(std::shared_ptr<Scheduleable> scheduleable)
 {
 	unsigned char scheduleableRequirementFlags = scheduleable->GetRequirementFlags();
 	unsigned int unpackedID = functionManager.AddToDatabase(scheduleable);
-	unsigned int packedID = Pack(unpackedID);
+	unsigned int packedID = Pack(unpackedID) /*| ShouldInitializeMask*/;
 	for (unsigned int i = 0; i < SystemsCount; i++)
 	{
 		unsigned char currentMask = 1 << i;
@@ -94,22 +97,18 @@ int GroupBase::Schedule(std::shared_ptr<Scheduleable> scheduleable)
 	return packedID;
 }
 
-int GroupBase::Schedule(std::function<bool()> function, unsigned char requirementFlags)
+unsigned int GroupBase::Schedule(std::function<bool()> function, unsigned char requirementFlags)
 {
 	return Schedule(std::make_shared<Scheduleable>(function, requirementFlags));
 }
 
-int GroupBase::Schedule(std::function<bool()> function, std::vector<Systems> requiredSystems)
+unsigned int GroupBase::Schedule(std::function<bool()> function, std::vector<Systems> requiredSystems)
 {
 	return Schedule(function, GetRequirementFlag(requiredSystems));
 }
 
-
-void GroupBase::SetBar(unsigned int packedID)
+void GroupBase::ReplaceIDUnpacked(unsigned int unpackedID, unsigned int newPackedID)
 {
-	int unpackedID = Unpack(packedID);
-	int BarBits = ((packedID << 1) + BarMin) & BarMask;
-	int newID = packedID | BarBits;
 	for (int i = 0; i < SystemsCount; i++)
 	{
 		std::vector<unsigned int>& currentSystemSchedule = schedule[i];
@@ -117,67 +116,70 @@ void GroupBase::SetBar(unsigned int packedID)
 		{
 			if (Unpack(currentSystemSchedule[x]) == unpackedID)
 			{
-				currentSystemSchedule[x] = newID;
+				//currentSystemSchedule[x] = newID;
+				currentSystemSchedule[x] = newPackedID;
 				break;
 			}
 		}
 	}
 }
 
-void GroupBase::RemoveBar(unsigned int packedID)
-{
-	int unpackedID = Unpack(packedID);
-	int BarBits = (packedID & BarMask) >> 1;
-	int newID = packedID & (~BarMask + BarBits);
-	for (int i = 0; i < SystemsCount; i++)
-	{
-		std::vector<unsigned int>& currentSystemSchedule = schedule[i];
-		for (int x = 0; x < currentSystemSchedule.size(); x++)
-		{
-			if (Unpack(currentSystemSchedule[x]) == unpackedID)
-			{
-				currentSystemSchedule[x] = newID;
-				break;
-			}
-		}
-	}
-}
-
-void GroupBase::SetEndEarly(unsigned int packedID)
-{
-	int unpackedID = Unpack(packedID);
-	int newID = packedID | EndEarlyMin;
-	for (int i = 0; i < SystemsCount; i++)
-	{
-		std::vector<unsigned int>& currentSystemSchedule = schedule[i];
-		for (int x = 0; x < currentSystemSchedule.size(); x++)
-		{
-			if (Unpack(currentSystemSchedule[x]) == packedID)
-			{
-				currentSystemSchedule[x] = newID;
-				break;
-			}
-		}
-	}
-}
-
-void GroupBase::Subscribe(unsigned int targetID, std::function<void()> endBehavior)
-{
-	functionManager.Subscribe(targetID, endBehavior);
-}
+//void GroupBase::SetShouldInitialize(unsigned int packedID)
+//{
+//	int unpackedID = Unpack(packedID);
+//	int newID = packedID | ShouldInitializeMask;
+//	for (int i = 0; i < SystemsCount; i++)
+//	{
+//		std::vector<unsigned int>& currentSystemSchedule = schedule[i];
+//		for (int x = 0; x < currentSystemSchedule.size(); x++)
+//		{
+//			if (Unpack(currentSystemSchedule[x]) == packedID)
+//			{
+//				currentSystemSchedule[x] = newID;
+//				break;
+//			}
+//		}
+//	}
+//}
+//
+//void GroupBase::SetEndEarly(unsigned int packedID)
+//{
+//	int unpackedID = Unpack(packedID);
+//	int newID = packedID | EndEarlyMask;
+//	for (int i = 0; i < SystemsCount; i++)
+//	{
+//		std::vector<unsigned int>& currentSystemSchedule = schedule[i];
+//		for (int x = 0; x < currentSystemSchedule.size(); x++)
+//		{
+//			if (Unpack(currentSystemSchedule[x]) == packedID)
+//			{
+//				currentSystemSchedule[x] = newID;
+//				break;
+//			}
+//		}
+//	}
+//}
 
 
 GroupBase::GroupBase(const GroupBase& copyGroupBase)
-	: Scheduleable(copyGroupBase.requirementFlags), functionManager{ copyGroupBase.functionManager }, schedulerType{ copyGroupBase.schedulerType },
-	currentlyRunningSystems{ copyGroupBase.currentlyRunningSystems }, schedulerID{ copyGroupBase.schedulerID }, schedule{ new std::vector<unsigned int>[SystemsCount] }
+	: Scheduleable(copyGroupBase.requirementFlags), initializeFunctions{std::vector<std::function<void(GroupBase&)>>()}, 
+	functionManager{copyGroupBase.functionManager},schedulerType{ copyGroupBase.schedulerType }, schedulerID{ copyGroupBase.schedulerID }, 
+	schedule{ new std::vector<unsigned int>[SystemsCount] }, currentIndices{ new unsigned int[SystemsCount] }, shouldInitializeOrHasRestarted{copyGroupBase.shouldInitializeOrHasRestarted}
 {
-	for (unsigned int i = 0; i < SystemsCount; i++)
+	for (int i = 0; i < copyGroupBase.initializeFunctions.size(); i ++)
+	{
+		initializeFunctions.push_back(copyGroupBase.initializeFunctions[i]);
+	}
+
+	for (int i = 0; i < SystemsCount; i++)
 	{
 		std::vector<unsigned int>& currentSystemSchedule = copyGroupBase.schedule[i];
 		for (unsigned int packedID : currentSystemSchedule)
 		{
 			schedule[i].push_back(packedID);
 		}
+
+		currentIndices[i] = copyGroupBase.currentIndices[i];
 	}
 	//schedule = std::unordered_map<Systems, std::list<int>>();
 	//for (std::pair<Systems, std::list<int>> kvp : copyGroupBase.schedule)
@@ -191,6 +193,30 @@ GroupBase::GroupBase(const GroupBase& copyGroupBase)
 	//}
 }
 
+void GroupBase::SetBar(unsigned int packedID)
+{
+	unsigned int BarBits = ((packedID << 1) + BarMin) & BarMask;
+	unsigned int newPackedID = packedID | BarBits;
+	ReplaceID(packedID, newPackedID);
+}
+
+void GroupBase::RemoveBar(unsigned int packedID)
+{
+	unsigned int BarBits = (packedID & BarMask) >> 1;
+	unsigned int newPackedID = packedID & (~BarMask + BarBits);
+	ReplaceID(packedID, newPackedID);
+}
+
+void GroupBase::ReplaceID(unsigned int oldPackedID, unsigned int newPackedID)
+{
+	ReplaceIDUnpacked(Unpack(oldPackedID), newPackedID);
+}
+
+void GroupBase::SubscribeToEnd(unsigned int targetPackedID, std::function<void()> endBehavior)
+{
+	functionManager.SubscribeToEnd(Unpack(targetPackedID), endBehavior);
+}
+
 void GroupBase::Update()
 {
 	//This is probably unnecessary
@@ -201,30 +227,68 @@ bool GroupBase::Run()
 	//std::cout << "Run Ran\n";
 	unsigned char currentAvailableSystem = (unsigned char)0x1;
 	std::vector<unsigned int> IDsToDelete = std::vector<unsigned int>();
-	for (unsigned int i = 0; i < SystemsCount; i++) //maybe use the requirementFlag instead of SystemsCount at some point
+	//for (int i = 0; i < SystemsCount; i ++) //Loop for initializing scheduleables
+	//{
+	//	unsigned char currentMask = 1 << i;
+	//	if ((requirementFlags & currentMask) >> i == 1) //I should keep checking if a system is part of the Group's requirements because it will save unnecessary function calls when I start calling default functions
+	//	{
+	//		Systems currentSystem = (Systems)currentMask;
+	//		std::vector<unsigned int>& currentSystemSchedule = schedule[i];
+	//		if (currentIndices[i] < currentSystemSchedule.size())
+	//		{
+	//			unsigned int currentID = currentSystemSchedule[currentIndices[i]];
+	//			if (IsFlagSet(currentID, ShouldInitializeMask))
+	//			{
+	//				Initialize();
+	//				ReplaceID(currentID, currentID & ~ShouldInitializeMask);
+	//			}
+	//		}
+	//	}
+	//}
+	if (shouldInitializeOrHasRestarted)
+	{
+		for (int i = 0; i < SystemsCount; i++)
+		{
+			currentIndices[i] = 0;
+		}
+		for (std::function<void(GroupBase&)> func : initializeFunctions)
+		{
+			func(*this);
+		}
+		shouldInitializeOrHasRestarted = false;
+	}
+
+	for (int i = 0; i < SystemsCount; i++) //maybe use the requirementFlag instead of SystemsCount at some point
 	{
 		unsigned char currentMask = 1 << i;
 		if ((requirementFlags & currentMask) >> i == 1) //I should keep checking if a system is part of the Group's requirements because it will save unnecessary function calls when I start calling default functions
 		{
 			Systems currentSystem = (Systems)currentMask;
 			std::vector<unsigned int>& currentSystemSchedule = schedule[i];
-			if (currentSystemSchedule.size() != 0)
+			if (currentIndices[i] < currentSystemSchedule.size())
 			{
-				if (IsEndEarlySet(currentSystemSchedule[0]))
+				unsigned int currentID = currentSystemSchedule[currentIndices[i]];
+				if (IsFlagSet(currentID, EndEarlyMask))
 				{
 					//functionManager.EndEarly(Unpack(currentSystemSchedule[0])); //Add EndEarly to function Manager
 					throw std::exception("Add EndEarly function to FunctionManger!!");
 				}
-				else if (!IsBarSet(currentSystemSchedule[0])) //I should change this check after I add in the current node array for the schedule lists
+				else if (!IsFlagSet(currentID, BarMask)) //I should change this check after I add in the current node array for the schedule lists
 				{
-					if (functionManager.RunIfReady(Unpack(currentSystemSchedule[0]), currentAvailableSystem))
+					if (functionManager.RunIfReady(Unpack(currentID), currentAvailableSystem))
 					{
-						IDsToDelete.push_back(currentSystemSchedule[0]);
+						IDsToDelete.push_back(currentID);
+						for (int x = 0; x < functionManager.endBehaviors[Unpack(currentID)].size(); x ++)
+						{
+							functionManager.endBehaviors[Unpack(currentID)][x]();
+							functionManager.endBehaviors[Unpack(currentID)].erase(functionManager.endBehaviors[Unpack(currentID)].begin() + x);
+						}
 						//functionManager.Remove(currentSystemSchedule.front());
 					}
 				}
 				else
 				{
+					//currentSystem = Systems::None;
 					//run default function for system
 				}
 			}
@@ -245,37 +309,35 @@ bool GroupBase::Run()
 		{
 			Systems currentSystem = (Systems)currentMask;
 			std::vector<unsigned int>& currentSystemSchedule = schedule[i];
-			if (currentSystemSchedule.size() == 0)
+			if (currentIndices[i] >= currentSystemSchedule.size())
 			{
 				finishedSystems |= currentMask;
 			}
 			else
 			{
-				bool wasDeleted = false;
+				bool shouldReset = true;
 				for (unsigned int packedID : IDsToDelete)
 				{
-					if (currentSystemSchedule[0] == packedID)
+					if (Unpack(currentSystemSchedule[currentIndices[i]]) == Unpack(packedID))
 					{
-						functionManager.Remove(Unpack(packedID));
-						Pop_Front<unsigned int>(currentSystemSchedule);
-						wasDeleted = true;
-						if (currentSystemSchedule.size() == 0)
+						//functionManager.Remove(Unpack(packedID));
+						//Pop_Front<unsigned int>(currentSystemSchedule);
+						currentIndices[i]++;
+						if (currentIndices[i] >= currentSystemSchedule.size())
 						{
 							finishedSystems |= currentMask;
-						}
-						else
-						{
-							functionManager.ResetAvailability(Unpack(currentSystemSchedule[0]));
+							shouldReset = false;
 						}
 						break;
 					}
 				}
-				if (!wasDeleted)
+				if (shouldReset)
 				{
-					functionManager.ResetAvailability(Unpack(currentSystemSchedule[0]));
+					functionManager.ResetAvailability(Unpack(currentSystemSchedule[currentIndices[i]]));
 				}
 			}
 		}
 	}
-	return finishedSystems == requirementFlags;
+	shouldInitializeOrHasRestarted = finishedSystems == requirementFlags;
+	return shouldInitializeOrHasRestarted;
 }

@@ -46,7 +46,7 @@ FunctionManager::Scheduleable::~Scheduleable()
 		throw new std::exception("THIS IS ALREADY DEAD!\n");
 	}
 	IsDead = true;
-	//std::cout << "Scheduleable Destructed\n";
+	std::cout << "Scheduleable Destructed\n";
 };
 
 unsigned char FunctionManager::Scheduleable::GetRequirementFlags()
@@ -126,9 +126,9 @@ bool FunctionManager::RunIfReady(unsigned int scheduledID, unsigned char availab
 	bool result = database[scheduledID]->RunIfReady(availableSystem);
 	if (result)
 	{
-		for (std::function<void()> endBehavior : endBehaviors[scheduledID])
+		for (std::function<void()>& behavior : endBehaviors[scheduledID])
 		{
-			endBehavior();
+			behavior();
 		}
 		//do end of function logic
 		//throw std::exception("not implemented"); //UNCOMMENT THIS!!
@@ -149,7 +149,7 @@ void FunctionManager::ResetAvailability(unsigned int ID)
 	database[ID]->ResetAvailability();
 }
 
-void FunctionManager::Subscribe(unsigned int targetID, std::function<void()> endBehavior)
+void FunctionManager::SubscribeToEnd(unsigned int targetID, std::function<void()> endBehavior)
 {
 	endBehaviors[targetID].push_back(endBehavior);
 }

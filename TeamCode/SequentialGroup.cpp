@@ -1,6 +1,6 @@
 //#include "../../inc/SchedulerInc/SequentialGroup.h"
 #include "SequentialGroup.h"
-
+#include "Scheduler.h"
 
 SequentialGroup::SequentialGroup(std::vector<std::shared_ptr<FunctionManager::Scheduleable>> scheduleablesToSchedule)
 	:GroupBase(GetRequirementFlags(scheduleablesToSchedule), SchedulerTypes::Sequential)
@@ -10,10 +10,10 @@ SequentialGroup::SequentialGroup(std::vector<std::shared_ptr<FunctionManager::Sc
 	for (int i = 1; i < scheduleablesToSchedule.size(); i ++)
 	{
 		currentID = GroupBase::Schedule(scheduleablesToSchedule[i]);
-		SetBar(currentID);
-		Subscribe(previousID, std::function<void()>([&, currentID]() {
-			RemoveBar(currentID); //add the head tracker to scheduler(maybe functionality for scheduler to cleanup too)
-			}));
+		initializeFunctions.push_back([&, previousID, currentID](GroupBase& group) {group.SetBar(currentID); group.SubscribeToEnd(previousID, [&, currentID]() {group.RemoveBar(currentID); }); });
+		
+		//GroupBase::SetBar(currentID);
+		//GroupBase::SubscribeToEnd(previousID, std::function<void()>([&, currentID]() {group.RemoveBar(currentID);}));
 		previousID = currentID;
 	}
 	//for (std::shared_ptr<FunctionManager::Scheduleable> scheduleable : scheduleablesToSchedule)
