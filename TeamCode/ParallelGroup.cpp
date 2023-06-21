@@ -9,7 +9,7 @@
 //}
 
 ParallelGroup::ParallelGroup(std::vector<std::shared_ptr<Scheduleable>> scheduleablesToSchedule)
-	: GroupBase(GetRequirementFlags(scheduleablesToSchedule), SchedulerTypes::Parallel)
+	: RescheduleableGroup(GetRequirementFlags(scheduleablesToSchedule), SchedulerTypes::Parallel)
 {
 	for (std::shared_ptr<Scheduleable> scheduleable : scheduleablesToSchedule)
 	{

@@ -1,7 +1,7 @@
 #pragma once
-#include "GroupBase.h"
+#include "RescheduleableGroup.h"
 
-class ParallelGroup : public GroupBase
+class ParallelGroup : public RescheduleableGroup
 {
 private:
 

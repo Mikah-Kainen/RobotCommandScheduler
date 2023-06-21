@@ -3,17 +3,17 @@
 #include "Scheduler.h"
 
 SequentialGroup::SequentialGroup(std::vector<std::shared_ptr<Scheduleable>> scheduleablesToSchedule)
-	:GroupBase(GetRequirementFlags(scheduleablesToSchedule), SchedulerTypes::Sequential)
+	:RescheduleableGroup(GetRequirementFlags(scheduleablesToSchedule), SchedulerTypes::Sequential)
 {
 	unsigned int previousID = GroupBase::Schedule(scheduleablesToSchedule[0]);
 	unsigned int currentID;
 	for (int i = 1; i < scheduleablesToSchedule.size(); i ++)
 	{
 		currentID = GroupBase::Schedule(scheduleablesToSchedule[i]);
-		initializeFunctions.push_back([&, previousID, currentID](GroupBase& group) {group.SetBar(currentID); group.SubscribeToEnd(previousID, [&, currentID]() {group.RemoveBar(currentID); }); });
-		
+		initializeFunctions.push_back([&, currentID](GroupBase& group) {group.SetBar(currentID); });
+		SubscribeToEnd(previousID, std::function<void(GroupBase&)>([&, currentID](GroupBase& group) {group.RemoveBar(currentID); }));
 		//GroupBase::SetBar(currentID);
-		//GroupBase::SubscribeToEnd(previousID, std::function<void()>([&, currentID]() {group.RemoveBar(currentID);}));
+		//GroupBase::SubscribeToEnd(previousID, std::function<void()>([&, currentID]() {group.RefmoveBar(currentID);}));
 		previousID = currentID;
 	}
 	//for (std::shared_ptr<Scheduleable> scheduleable : scheduleablesToSchedule)

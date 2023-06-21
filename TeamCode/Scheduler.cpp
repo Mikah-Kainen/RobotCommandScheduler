@@ -2,7 +2,7 @@
 #include "Scheduler.h"
 
 Scheduler::Scheduler()
-	: GroupBase((unsigned char)Systems::All, SchedulerTypes::Base)
+	: RescheduleableGroup((unsigned char)Systems::All, SchedulerTypes::Base)
 {
 }
 

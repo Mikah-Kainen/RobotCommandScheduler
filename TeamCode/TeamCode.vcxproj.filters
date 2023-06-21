@@ -24,9 +24,6 @@
     <ClCompile Include="CommandBuilder.cpp">
       <Filter>src\SchedulerSrc</Filter>
     </ClCompile>
-    <ClCompile Include="FunctionManager.cpp">
-      <Filter>src\SchedulerSrc</Filter>
-    </ClCompile>
     <ClCompile Include="ParallelGroup.cpp">
       <Filter>src\SchedulerSrc</Filter>
     </ClCompile>
@@ -60,6 +57,12 @@
     <ClCompile Include="Scheduleable.cpp">
       <Filter>src\SchedulerSrc</Filter>
     </ClCompile>
+    <ClCompile Include="RescheduleableGroup.cpp">
+      <Filter>src\SchedulerSrc</Filter>
+    </ClCompile>
+    <ClCompile Include="ConsumingGroup.cpp">
+      <Filter>src\SchedulerSrc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scheduler.h">
@@ -72,9 +75,6 @@
       <Filter>inc\SchedulerInc</Filter>
     </ClInclude>
     <ClInclude Include="GroupBase.h">
-      <Filter>inc\SchedulerInc</Filter>
-    </ClInclude>
-    <ClInclude Include="FunctionManager.h">
       <Filter>inc\SchedulerInc</Filter>
     </ClInclude>
     <ClInclude Include="Timer.h">
@@ -90,6 +90,12 @@
       <Filter>inc\SchedulerInc</Filter>
     </ClInclude>
     <ClInclude Include="Scheduleable.h">
+      <Filter>inc\SchedulerInc</Filter>
+    </ClInclude>
+    <ClInclude Include="RescheduleableGroup.h">
+      <Filter>inc\SchedulerInc</Filter>
+    </ClInclude>
+    <ClInclude Include="ConsumingGroup.h">
       <Filter>inc\SchedulerInc</Filter>
     </ClInclude>
   </ItemGroup>

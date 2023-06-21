@@ -130,11 +130,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CommandBuilder.cpp" />
-    <ClCompile Include="FunctionManager.cpp" />
+    <ClCompile Include="ConsumingGroup.cpp" />
     <ClCompile Include="MemoryEater.cpp" />
     <ClCompile Include="Motor.cpp" />
     <ClCompile Include="ParallelGroup.cpp" />
     <ClCompile Include="PolyFills.cpp" />
+    <ClCompile Include="RescheduleableGroup.cpp" />
     <ClCompile Include="Robot.cpp" />
     <ClCompile Include="Scheduleable.cpp" />
     <ClCompile Include="Scheduler.cpp" />
@@ -144,9 +145,10 @@
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FunctionManager.h" />
+    <ClInclude Include="ConsumingGroup.h" />
     <ClInclude Include="Motor.h" />
     <ClInclude Include="ParallelGroup.h" />
+    <ClInclude Include="RescheduleableGroup.h" />
     <ClInclude Include="Robot.h" />
     <ClInclude Include="Scheduleable.h" />
     <ClInclude Include="Scheduler.h" />

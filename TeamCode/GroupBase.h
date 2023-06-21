@@ -59,7 +59,7 @@ protected:
 
 	public:
 		std::unordered_map<unsigned int, std::shared_ptr<Scheduleable>> scheduleableMap;
-		std::unordered_map<unsigned int, std::vector<std::function<void()>>> endBehaviors;
+		std::unordered_map<unsigned int, std::vector<std::function<void(GroupBase&)>>> endBehaviors;
 
 		Database();
 
@@ -75,19 +75,24 @@ protected:
 
 		void ResetAvailability(unsigned int ID);
 
-		void SubscribeToEnd(unsigned int targetID, std::function<void()> endBehavior);
+		void SubscribeToEnd(unsigned int targetID, std::function<void(GroupBase&)> endBehavior);
 	};
 
 private:
+	SchedulerTypes schedulerType;
+	unsigned int schedulerID; //for debugging
+
+	virtual void PreRun() = 0;
+
+	virtual bool PostRun(std::vector<unsigned int> packedIDsToDelete) = 0;
+
+protected:
 	std::vector<unsigned int>* schedule;
 	unsigned int* currentIndices;
 	Database database;
-	SchedulerTypes schedulerType;
-	unsigned int schedulerID; //for debugging
-	bool shouldInitializeOrHasRestarted = true;
 
-protected:
 	std::vector<std::function<void(GroupBase&)>> initializeFunctions; //used to set CleanupFunctions in the CopyConstructor
+	bool shouldInitializeOrHasRestarted = true;
 
 	GroupBase(unsigned char systemFlags, SchedulerTypes type);
 
@@ -123,7 +128,7 @@ public:
 
 	void ReplaceID(unsigned int oldPackedID, unsigned int newPackedID);
 
-	void SubscribeToEnd(unsigned int targetID, std::function<void()> endBehavior);
+	void SubscribeToEnd(unsigned int targetID, std::function<void(GroupBase&)> endBehavior);
 	
 	void Update();
 
