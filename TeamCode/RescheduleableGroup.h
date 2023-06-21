@@ -4,9 +4,13 @@
 class RescheduleableGroup : public GroupBase
 {
 private:
-	virtual void PreRun() override;
+	bool shouldInitializeOrHasRestarted = true;
 
-	virtual bool PostRun(std::vector<unsigned int> packedIDsToDelete) override;
+	virtual void Initialize() override;
+
+	virtual void Remove(unsigned int packedID) override;
+
+	virtual bool Return(bool isFinished) override;
 
 protected:
 	RescheduleableGroup(unsigned char systemFlags, SchedulerTypes type);

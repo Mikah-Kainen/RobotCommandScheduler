@@ -82,9 +82,12 @@ private:
 	SchedulerTypes schedulerType;
 	unsigned int schedulerID; //for debugging
 
-	virtual void PreRun() = 0;
+	virtual void Initialize() = 0;
 
-	virtual bool PostRun(std::vector<unsigned int> packedIDsToDelete) = 0;
+	virtual void Remove(unsigned int packedID) = 0;
+
+	virtual bool Return(bool isFinished) = 0;
+	//virtual bool PostRun(std::vector<unsigned int> packedIDsToDelete) = 0;
 
 protected:
 	std::vector<unsigned int>* schedule;
@@ -92,7 +95,7 @@ protected:
 	Database database;
 
 	std::vector<std::function<void(GroupBase&)>> initializeFunctions; //used to set CleanupFunctions in the CopyConstructor
-	bool shouldInitializeOrHasRestarted = true;
+	//bool shouldInitializeOrHasRestarted = true;
 
 	GroupBase(unsigned char systemFlags, SchedulerTypes type);
 

@@ -1,7 +1,6 @@
 #include "RescheduleableGroup.h"
 
-
-void RescheduleableGroup::PreRun()
+void RescheduleableGroup::Initialize()
 {
 	if (shouldInitializeOrHasRestarted)
 	{
@@ -17,47 +16,15 @@ void RescheduleableGroup::PreRun()
 	}
 }
 
-bool RescheduleableGroup::PostRun(std::vector<unsigned int> packedIDsToDelete)
+void RescheduleableGroup::Remove(unsigned int packedID)
 {
-	unsigned char finishedSystems = 0;
-	for (unsigned int i = 0; i < SystemsCount; i++)
-	{
-		unsigned char currentMask = 1 << i;
-		if ((requirementFlags & currentMask) >> i == 1)
-		{
-			Systems currentSystem = (Systems)currentMask;
-			std::vector<unsigned int>& currentSystemSchedule = schedule[i];
-			if (currentIndices[i] >= currentSystemSchedule.size())
-			{
-				finishedSystems |= currentMask;
-			}
-			else
-			{
-				bool shouldReset = true;
-				for (unsigned int packedID : packedIDsToDelete)
-				{
-					if (Unpack(currentSystemSchedule[currentIndices[i]]) == Unpack(packedID))
-					{
-						//database.Remove(Unpack(packedID));
-						//Pop_Front<unsigned int>(currentSystemSchedule);
-						currentIndices[i]++;
-						if (currentIndices[i] >= currentSystemSchedule.size())
-						{
-							finishedSystems |= currentMask;
-							shouldReset = false;
-						}
-						break;
-					}
-				}
-				if (shouldReset)
-				{
-					database.ResetAvailability(Unpack(currentSystemSchedule[currentIndices[i]]));
-				}
-			}
-		}
-	}
-	shouldInitializeOrHasRestarted = finishedSystems == requirementFlags;
-	return shouldInitializeOrHasRestarted;
+	//RescheduleableGroups don't remove anything
+}
+
+bool RescheduleableGroup::Return(bool isFinished)
+{
+	shouldInitializeOrHasRestarted = isFinished;
+	return isFinished;
 }
 
 RescheduleableGroup::RescheduleableGroup(unsigned char systemFlags, SchedulerTypes type)

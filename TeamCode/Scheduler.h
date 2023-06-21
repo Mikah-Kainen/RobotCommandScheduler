@@ -1,7 +1,7 @@
 #pragma once
-#include "RescheduleableGroup.h"
+#include "ConsumingGroup.h"
 
-class Scheduler : public RescheduleableGroup
+class Scheduler : public ConsumingGroup
 {
 private:
 	Scheduler();

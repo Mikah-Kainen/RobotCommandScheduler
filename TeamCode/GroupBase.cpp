@@ -232,7 +232,7 @@ void GroupBase::ReplaceIDUnpacked(unsigned int unpackedID, unsigned int newPacke
 GroupBase::GroupBase(const GroupBase& copyGroupBase)
 	: Scheduleable(copyGroupBase.requirementFlags), initializeFunctions{std::vector<std::function<void(GroupBase&)>>()}, 
 	database{copyGroupBase.database},schedulerType{ copyGroupBase.schedulerType }, schedulerID{ copyGroupBase.schedulerID }, 
-	schedule{ new std::vector<unsigned int>[SystemsCount] }, currentIndices{ new unsigned int[SystemsCount] }, shouldInitializeOrHasRestarted{copyGroupBase.shouldInitializeOrHasRestarted}
+	schedule{ new std::vector<unsigned int>[SystemsCount] }, currentIndices{ new unsigned int[SystemsCount] }
 {
 	for (int i = 0; i < copyGroupBase.initializeFunctions.size(); i ++)
 	{
@@ -326,7 +326,7 @@ bool GroupBase::Run()
 	//	}
 	//	shouldInitializeOrHasRestarted = false;
 	//}
-	PreRun();
+	Initialize();
 
 	for (int i = 0; i < SystemsCount; i++) //maybe use the requirementFlag instead of SystemsCount at some point
 	{
@@ -353,6 +353,16 @@ bool GroupBase::Run()
 							database.endBehaviors[Unpack(currentID)][x](*this);
 							//database.endBehaviors[Unpack(currentID)].erase(database.endBehaviors[Unpack(currentID)].begin() + x);
 						}
+
+						currentIndices[i]++;
+						for (int x = 0; x < i; x++)
+						{
+							if (currentIndices[x] < schedule[x].size() && schedule[x][currentIndices[x]] == currentID)
+							{
+								currentIndices[x] ++;
+							}
+						}
+						Remove(currentID);
 						//functionManager.Remove(currentSystemSchedule.front());
 					}
 				}
@@ -370,7 +380,25 @@ bool GroupBase::Run()
 		currentAvailableSystem <<= 1;
 	}
 
-	return PostRun(packedIDsToDelete);
+	unsigned char finishedSystems = 0;
+	for (int i = 0; i < SystemsCount; i++)
+	{
+		unsigned char currentMask = 1 << i;
+		if ((requirementFlags & currentMask) >> i == 1)
+		{
+			Systems currentSystem = (Systems)currentMask;
+			std::vector<unsigned int>& currentSystemSchedule = schedule[i];
+			if (currentIndices[i] >= currentSystemSchedule.size())
+			{
+				finishedSystems |= currentMask;
+			}
+			else
+			{
+				database.ResetAvailability(Unpack(currentSystemSchedule[currentIndices[i]]));
+			}
+		}
+	}
+	return Return(finishedSystems == requirementFlags);
 	//unsigned char finishedSystems = 0;
 	//for (unsigned int i = 0; i < SystemsCount; i++)
 	//{
