@@ -5,15 +5,7 @@ void RescheduleableGroup::Initialize()
 {
 	if (shouldInitializeOrHasRestarted)
 	{
-		for (int i = 0; i < SystemsCount; i++)
-		{
-			currentIndices[i] = 0;
-		}
-		for (std::function<void(GroupBase&)> func : initializeFunctions)
-		{
-			func(*this);
-		}
-		shouldInitializeOrHasRestarted = false;
+		InitializeBody();
 	}
 }
 
@@ -26,6 +18,19 @@ bool RescheduleableGroup::Return(bool isFinished)
 {
 	shouldInitializeOrHasRestarted = isFinished;
 	return isFinished;
+}
+
+void RescheduleableGroup::InitializeBody()
+{
+	for (int i = 0; i < SystemsCount; i++)
+	{
+		currentIndices[i] = 0;
+	}
+	for (std::function<void(GroupBase&)> func : initializeFunctions)
+	{
+		func(*this);
+	}
+	shouldInitializeOrHasRestarted = false;
 }
 
 RescheduleableGroup::RescheduleableGroup(unsigned char systemFlags, SchedulerTypes type)

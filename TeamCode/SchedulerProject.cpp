@@ -6,6 +6,7 @@
 #include "Static.h"
 #include "ParallelGroup.h"
 #include "SequentialGroup.h"
+#include "LoopGroup.h"
 #include "Robot.h"
 #include "Motor.h"
 #include "Timer.h"
@@ -393,7 +394,7 @@ int main() //Unit tests with GoogleTest
 	scheduler.Schedule(tempSequentialGroupCombinationTest);
 	*/
 	
-	scheduler.Schedule(std::make_shared<SequentialGroup>(SequentialGroup({ parallelGroupCombinationTest, tempSequentialGroupCombinationTest })));
+	scheduler.Schedule(std::make_shared<LoopGroup>(LoopGroup({ std::make_shared<SequentialGroup>(SequentialGroup({ parallelGroupCombinationTest, tempSequentialGroupCombinationTest })) }, [&](LoopGroup& group) {return group.currentIteration >= 2; })));
 	//Make sure scheduleables are destructed properly in the main Scheduler
 	scheduler.Schedule(parallelGroupCombinationTest);
 	scheduler.Schedule(tempSequentialGroupCombinationTest);

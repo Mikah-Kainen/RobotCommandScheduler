@@ -40,10 +40,12 @@ Scheduleable::~Scheduleable()
 {
 	if (IsDead)
 	{
-		throw new std::exception("THIS IS ALREADY DEAD!\n");
+		//throw new std::exception("THIS IS ALREADY DEAD!\n");
+		std::cout << "THIS IS ALREADY DEAD!\n" << std::endl;
+		while (true);
 	}
 	IsDead = true;
-	std::cout << "Scheduleable Destructed\n";
+	//std::cout << "Scheduleable Destructed\n";
 };
 
 unsigned char Scheduleable::GetRequirementFlags()

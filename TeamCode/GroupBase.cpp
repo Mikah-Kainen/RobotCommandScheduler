@@ -341,7 +341,9 @@ bool GroupBase::Run()
 				if (IsFlagSet(currentID, EndEarlyMask))
 				{
 					//functionManager.EndEarly(Unpack(currentSystemSchedule[0])); //Add EndEarly to function Manager
-					throw std::exception("Add EndEarly function to FunctionManger!!");
+					//throw std::exception("Add EndEarly function to FunctionManger!!");
+					std::cout << "Add EndEarly function to GroupBase!!" << std::endl;
+					while (true);
 				}
 				else if (!IsFlagSet(currentID, BarMask)) //I should change this check after I add in the current node array for the schedule lists
 				{

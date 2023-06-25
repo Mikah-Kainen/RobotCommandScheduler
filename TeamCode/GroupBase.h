@@ -81,7 +81,7 @@ protected:
 		void SubscribeToEnd(unsigned int targetID, std::function<void(GroupBase&)> endBehavior);
 	};
 
-private:
+protected:
 	SchedulerTypes schedulerType;
 	unsigned int schedulerID; //for debugging
 
@@ -92,7 +92,6 @@ private:
 	virtual bool Return(bool isFinished) = 0;
 	//virtual bool PostRun(std::vector<unsigned int> packedIDsToDelete) = 0;
 
-protected:
 	std::vector<unsigned int>* schedule;
 	unsigned int* currentIndices;
 	Database database;

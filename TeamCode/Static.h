@@ -38,7 +38,7 @@ static std::function<bool()> ReturnTrue = std::function<bool()>([&]() {return tr
 
 static std::function<bool()> ThrowError = std::function<bool()>([&]()
 {
-	throw std::exception("Saving User from Wierd Error Message");
+	//throw std::exception("Saving User from Wierd Error Message");
 	std::cout << "~~~!ERROR!~~~!ERROR!~~~!ERROR!~~~" << std::endl;
 	while (true) {};
 	return false;
@@ -46,7 +46,7 @@ static std::function<bool()> ThrowError = std::function<bool()>([&]()
 
 static std::function<bool()> NoFunctionProvided = std::function<bool()>([&]()
 {
-	throw std::exception("No Function Provided");
+	//throw std::exception("No Function Provided");
 	std::cout << "NOFUNCTIONPROVIDED" << std::endl;
 	while (true);
 	return false;
