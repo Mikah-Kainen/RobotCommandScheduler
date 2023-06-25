@@ -1,6 +1,5 @@
 //#include "../../inc/SchedulerInc/SequentialGroup.h"
 #include "SequentialGroup.h"
-#include "Scheduler.h"
 
 SequentialGroup::SequentialGroup(std::vector<std::shared_ptr<Scheduleable>> scheduleablesToSchedule)
 	:RescheduleableGroup(GetRequirementFlags(scheduleablesToSchedule), SchedulerTypes::Sequential)

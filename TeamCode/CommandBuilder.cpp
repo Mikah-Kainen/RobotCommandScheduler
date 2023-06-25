@@ -4,12 +4,12 @@
 #include <iostream>
 #include <tuple>
 #include <utility>
+#include <memory>
+#include "Polyfills.cpp"
 //#include "../../inc/SchedulerInc/Scheduleable.h"
 //#include "../../inc/SchedulerInc/Static.h"
-//#include "../../inc/SchedulerInc/Polyfills.h"
 #include "Scheduleable.h"
 #include "Static.h"
-#include "Polyfills.cpp"
 
 //class ScheduleableCommand : Scheduleable
 //{
@@ -29,8 +29,8 @@ private:
 
 	bool Run() override
 	{
-		return std::apply(backingFunction, params);
-		//return PolyFills::GetInstance().Apply(backingFunction, params);
+		//return std::apply(backingFunction, params);
+		return PolyFills::GetInstance().Apply(backingFunction, params);
 	}
 
 public:

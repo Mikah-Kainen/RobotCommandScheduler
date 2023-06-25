@@ -3,6 +3,8 @@
 #include <vector>
 #include <list>
 #include <iostream>
+#include <unordered_map>
+#include <memory>
 #include "Scheduleable.h"
 #include "Static.h"
 
