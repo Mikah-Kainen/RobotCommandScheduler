@@ -6,13 +6,13 @@ class RescheduleableGroup : public GroupBase
 private:
 	bool shouldInitializeOrHasRestarted = true;
 
+protected:
 	virtual void Initialize() override;
 
 	virtual void Remove(unsigned int packedID) override;
 
 	virtual bool Return(bool isFinished) override;
 
-protected:
 	RescheduleableGroup(unsigned char systemFlags, SchedulerTypes type);
 
 	RescheduleableGroup(std::vector<unsigned char> systemFlags, SchedulerTypes type);

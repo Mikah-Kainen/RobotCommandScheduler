@@ -63,6 +63,9 @@
     <ClCompile Include="ConsumingGroup.cpp">
       <Filter>src\SchedulerSrc</Filter>
     </ClCompile>
+    <ClCompile Include="LoopGroup.cpp">
+      <Filter>src\SchedulerSrc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scheduler.h">
@@ -96,6 +99,9 @@
       <Filter>inc\SchedulerInc</Filter>
     </ClInclude>
     <ClInclude Include="ConsumingGroup.h">
+      <Filter>inc\SchedulerInc</Filter>
+    </ClInclude>
+    <ClInclude Include="LoopGroup.h">
       <Filter>inc\SchedulerInc</Filter>
     </ClInclude>
   </ItemGroup>

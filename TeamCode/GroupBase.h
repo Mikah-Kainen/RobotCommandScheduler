@@ -20,6 +20,7 @@ protected:
 		Base,
 		Parallel,
 		Sequential,
+		Loop,
 	};
 
 	//Bar flags use one bit per value i.e. 3 bits = 3 values as opposed to 3 bits = 8 values. This is for readability so that anything with a bar set will be an odd number

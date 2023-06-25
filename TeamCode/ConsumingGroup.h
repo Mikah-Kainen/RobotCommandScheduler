@@ -4,13 +4,14 @@
 class ConsumingGroup : public GroupBase
 {
 private:
+
+protected:
 	virtual void Initialize() override;
 
 	virtual void Remove(unsigned int packedID) override;
 
 	virtual bool Return(bool isFinished) override;
 
-protected:
 	ConsumingGroup(unsigned char systemFlags, SchedulerTypes type);
 
 	ConsumingGroup(std::vector<unsigned char> systemFlags, SchedulerTypes type);

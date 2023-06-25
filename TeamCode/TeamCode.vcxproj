@@ -131,6 +131,7 @@
   <ItemGroup>
     <ClCompile Include="CommandBuilder.cpp" />
     <ClCompile Include="ConsumingGroup.cpp" />
+    <ClCompile Include="LoopGroup.cpp" />
     <ClCompile Include="MemoryEater.cpp" />
     <ClCompile Include="Motor.cpp" />
     <ClCompile Include="ParallelGroup.cpp" />
@@ -146,6 +147,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConsumingGroup.h" />
+    <ClInclude Include="LoopGroup.h" />
     <ClInclude Include="Motor.h" />
     <ClInclude Include="ParallelGroup.h" />
     <ClInclude Include="RescheduleableGroup.h" />
