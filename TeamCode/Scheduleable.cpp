@@ -131,14 +131,14 @@ bool Scheduleable::Initialize()
 	return true;
 }
 
-bool Scheduleable::SetInitializationScheduleable(std::shared_ptr<Scheduleable> scheduleable)
+bool Scheduleable::SetInitializationScheduleable(std::shared_ptr<Scheduleable> scheduleable) //Make sure to check that the requirementFlags are a subset of the current Scheduleable's requirement flags!
 {
 	initializationScheduleable = scheduleable;
 	startingState = ScheduleableStates::Initialize;
 	return true;
 }
 
-bool Scheduleable::SetCleanupScheduleable(std::shared_ptr<Scheduleable> scheduleable)
+bool Scheduleable::SetCleanupScheduleable(std::shared_ptr<Scheduleable> scheduleable) //Make sure to check that the requirementFlags are a subset of the current Scheduleable's requirement flags!
 {
 	cleanupScheduleable = scheduleable;
 	endingState = GetNextState(ScheduleableStates::Cleanup);
