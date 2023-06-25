@@ -5,6 +5,7 @@ bool LoopGroup::Return(bool isFinished)
 {
 	if (isFinished)
 	{
+		currentIteration++;
 		if (endCondition(*this))
 		{
 #ifndef DebugMode
@@ -14,12 +15,12 @@ bool LoopGroup::Return(bool isFinished)
 #ifdef DebugMode
 			shouldResetIterations = true;
 #endif
+			InitializeBody();
 			return true;
 		}
 		else
 		{
 			InitializeBody();
-			currentIteration++;
 			return false;
 		}
 	}

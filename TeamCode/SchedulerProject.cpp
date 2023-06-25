@@ -226,6 +226,12 @@ int main() //Unit tests with GoogleTest
 	CommandBuilder<int> DisplayNumberVal = CommandBuilder<int>(std::function<bool(int)>([&](int number) {std::cout << number << std::endl; return true; }), (unsigned char)Systems::LeftMotor);
 	CommandBuilder<> UpdateLeftMotorTime = CommandBuilder<>(std::bind(&Motor::UpdateTime, robot.GetLeftMotor()), (unsigned char)Systems::LeftMotor);
 
+
+	auto Increment = CommandBuilder<int&>([&](int& value) {value++; return true; }, Systems::Other);
+	auto Set = CommandBuilder<int&, int>([&](int& value, int target) {value = target; return true; }, Systems::Other);
+	auto Display = CommandBuilder<std::string>([&](std::string message) {std::cout << message << std::endl; return true; }, Systems::Other);
+	auto DisplayFromArray = CommandBuilder<std::string*, int&>([&](std::string* array, int& index) {std::cout << array[index] << std::endl; return true; }, Systems::Other);
+
 	//Cat cat = Cat(600, "SuperCat");
 	//auto bindResult = std::bind(&Cat::Display, Cat(600, "SuperCat"));
 	//Command<> TakesCatBind = Command<>(std::bind(&Cat::Display, cat), Systems::RightMotor);
@@ -382,6 +388,26 @@ int main() //Unit tests with GoogleTest
 	}));
 #pragma endregion
 
+#pragma region LoopGroupTests
+	int loopGroupTestsCount = 0;
+	std::string loopGroupTestsCountMessages[] = {
+	std::string("Cycle 0 Complete"),
+	std::string("Cycle 1 Complete"),
+	std::string("Cycle 2 Complete"),
+	std::string("Cycle 3 Complete"),
+	std::string("Cycle 4 Complete"),
+	std::string("Cycle 5 Complete"),
+	};
+	std::shared_ptr<LoopGroup> loopGroupTest = std::make_shared<LoopGroup>(LoopGroup({
+		DisplayFromArray.CreateCommand(loopGroupTestsCountMessages, loopGroupTestsCount),
+		Increment.CreateCommand(loopGroupTestsCount),
+		}, 4));
+
+	std::shared_ptr<LoopGroup> multipleLoopGroupTest = std::make_shared<LoopGroup>(LoopGroup({
+		Set.CreateCommand(loopGroupTestsCount, 0),
+		loopGroupTest,
+		}, 4));
+#pragma endregion
 
 	std::string otherMessage = "End of Functions, Current Time: ";
 	std::shared_ptr<Scheduleable> endFunction = std::make_shared<Scheduleable>([&]() {std::cout << otherMessage << Timer::GetInstance().ElapsedMilliseconds() << std::endl; return true; }, (unsigned char)Systems::All);
@@ -394,11 +420,12 @@ int main() //Unit tests with GoogleTest
 	scheduler.Schedule(tempSequentialGroupCombinationTest);
 	*/
 	
-	scheduler.Schedule(std::make_shared<LoopGroup>(LoopGroup({ std::make_shared<SequentialGroup>(SequentialGroup({ parallelGroupCombinationTest, tempSequentialGroupCombinationTest })) }, [&](LoopGroup& group) {return group.currentIteration >= 2; })));
+	//scheduler.Schedule(std::make_shared<LoopGroup>(LoopGroup({ std::make_shared<SequentialGroup>(SequentialGroup({ parallelGroupCombinationTest, tempSequentialGroupCombinationTest })) }, [&](LoopGroup& group) {return group.currentIteration >= 2; })));
 	//Make sure scheduleables are destructed properly in the main Scheduler
-	scheduler.Schedule(parallelGroupCombinationTest);
-	scheduler.Schedule(tempSequentialGroupCombinationTest);
+	//scheduler.Schedule(parallelGroupCombinationTest);
+	//scheduler.Schedule(tempSequentialGroupCombinationTest);
 	//scheduler.Schedule([&]() {std::cout << std::endl; return true; }, (unsigned char)Systems::Six);
+	scheduler.Schedule(multipleLoopGroupTest);
 	scheduler.Schedule(endFunction);
 
 	//if (true)
