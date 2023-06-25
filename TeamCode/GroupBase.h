@@ -35,10 +35,10 @@ protected:
 	//static const unsigned int InterruptableDigit = 29;  //IF Val ~ 1mil
 
 	static const unsigned int EndEarlyMask = 1 << EndEarlyDigit;
-	//static const unsigned int ShouldInitializeMask = 1 << ShouldInitializeDigit;
+	static const unsigned int ShouldInitializeMask = 1 << ShouldInitializeDigit;
 	//static const unsigned int InterruptableMask = 1 << InterruptableDigit;
 
-	static const unsigned int UnpackMask = ~(BarMask | /*ShouldInitializeMask |*/ EndEarlyMask);
+	static const unsigned int UnpackMask = ~(BarMask | ShouldInitializeMask | EndEarlyMask);
 	//Cool Flags: EndEarly, Bar, Interruptable, Initialized, RunDefault?, Branching???
 
 	static unsigned int Unpack(unsigned int packedID);
@@ -85,7 +85,7 @@ protected:
 	SchedulerTypes schedulerType;
 	unsigned int schedulerID; //for debugging
 
-	virtual void Initialize() = 0;
+	virtual void InitializeGroup() = 0;
 
 	virtual void Remove(unsigned int packedID) = 0;
 

@@ -1,6 +1,12 @@
 //#include "../../inc/SchedulerInc/Scheduleable.h"
 #include "Scheduleable.h"
 
+
+Scheduleable::ScheduleableStates Scheduleable::GetNextState(ScheduleableStates state)
+{
+	return (ScheduleableStates)((int)ScheduleableStates::Run + 1);
+}
+
 bool Scheduleable::Run()
 {
 	return backingFunction();
@@ -10,7 +16,8 @@ Scheduleable::Scheduleable(unsigned char requirementFlags)
 	:Scheduleable(NoFunctionProvided, requirementFlags) {}
 
 Scheduleable::Scheduleable(std::function<bool()> backingFunction, unsigned char requirementFlags)
-	:backingFunction{ backingFunction }, requirementFlags{ requirementFlags }, availableSystems{(unsigned char)0}, IsDead{ false } {}
+	:backingFunction{ backingFunction }, startingState{ ScheduleableStates::Run }, endingState{ GetNextState(ScheduleableStates::Run)}, currentState{ScheduleableStates::Run},
+	requirementFlags {requirementFlags}, availableSystems{ (unsigned char)0 }, IsDead{ false } {}
 
 Scheduleable::Scheduleable(std::function<bool()> backingFunction, Systems requiredSystem)
 	:Scheduleable(backingFunction, (unsigned char)requiredSystem) {}
@@ -31,7 +38,9 @@ Scheduleable::Scheduleable(std::function<bool()> backingFunction, Systems requir
 //Scheduleable::Scheduleable() {}
 
 Scheduleable::Scheduleable(const Scheduleable& copyScheduleable)
-	:availableSystems{ copyScheduleable.availableSystems }, backingFunction{ copyScheduleable.backingFunction }, IsDead{ copyScheduleable.IsDead }, requirementFlags{copyScheduleable.requirementFlags}
+	:availableSystems{ copyScheduleable.availableSystems }, backingFunction{ copyScheduleable.backingFunction }, initializationScheduleable{ copyScheduleable.initializationScheduleable }, 
+	cleanupScheduleable{copyScheduleable.cleanupScheduleable}, startingState {copyScheduleable.startingState}, endingState{ copyScheduleable.endingState }, 
+	currentState{ copyScheduleable.currentState }, IsDead{ copyScheduleable.IsDead }, requirementFlags{copyScheduleable.requirementFlags}
 {
 	//std::cout << "Scheduleable Copied!!" << std::endl;
 }
@@ -68,7 +77,42 @@ bool Scheduleable::RunIfReady(unsigned char availableSystem)
 	availableSystems |= availableSystem;
 	if ((availableSystems & requirementFlags) == requirementFlags)
 	{
-		return Run();
+		switch (currentState)
+		{
+		case ScheduleableStates::Initialize:
+			if (initializationScheduleable->Run())
+			{
+				currentState = GetNextState(currentState);
+				return currentState == endingState;
+			}
+			break;
+
+		case ScheduleableStates::Run:
+			if (Run())
+			{
+				currentState = GetNextState(currentState);
+				return currentState == endingState;
+			}
+			break;
+
+		case ScheduleableStates::Cleanup:
+			if (cleanupScheduleable->Run())
+			{
+				currentState = GetNextState(currentState);
+				return currentState == endingState;
+			}
+			break;
+
+		case ScheduleableStates::Return:
+			std::cout << "IMPOSSIBLE STATE" << std::endl;
+			while (true);
+			break;
+
+		default:
+			std::cout << "IMPOSSIBLE STATE" << std::endl;
+			while (true);
+			break;
+		}
 	}
 	else
 	{
@@ -79,4 +123,24 @@ bool Scheduleable::RunIfReady(unsigned char availableSystem)
 void Scheduleable::ResetAvailability()
 {
 	availableSystems = 0;
+}
+
+bool Scheduleable::Initialize()
+{
+	currentState = startingState;
+	return true;
+}
+
+bool Scheduleable::SetInitializationScheduleable(std::shared_ptr<Scheduleable> scheduleable)
+{
+	initializationScheduleable = scheduleable;
+	startingState = ScheduleableStates::Initialize;
+	return true;
+}
+
+bool Scheduleable::SetCleanupScheduleable(std::shared_ptr<Scheduleable> scheduleable)
+{
+	cleanupScheduleable = scheduleable;
+	endingState = GetNextState(ScheduleableStates::Cleanup);
+	return true;
 }

@@ -3,7 +3,7 @@
 
 
 
-void ConsumingGroup::Initialize()
+void ConsumingGroup::InitializeGroup()
 {
 	//ConsumingGroups should initialize in their constructors
 }

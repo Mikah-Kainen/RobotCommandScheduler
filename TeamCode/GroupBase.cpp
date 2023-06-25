@@ -150,7 +150,7 @@ unsigned int GroupBase::Schedule(std::shared_ptr<Scheduleable> scheduleable)
 {
 	unsigned char scheduleableRequirementFlags = scheduleable->GetRequirementFlags();
 	unsigned int unpackedID = database.Add(scheduleable);
-	unsigned int packedID = Pack(unpackedID) /*| ShouldInitializeMask*/;
+	unsigned int packedID = Pack(unpackedID) | ShouldInitializeMask;
 	for (unsigned int i = 0; i < SystemsCount; i++)
 	{
 		unsigned char currentMask = 1 << i;
@@ -326,7 +326,7 @@ bool GroupBase::Run()
 	//	}
 	//	shouldInitializeOrHasRestarted = false;
 	//}
-	Initialize();
+	InitializeGroup();
 
 	for (int i = 0; i < SystemsCount; i++) //maybe use the requirementFlag instead of SystemsCount at some point
 	{
@@ -347,6 +347,11 @@ bool GroupBase::Run()
 				}
 				else if (!IsFlagSet(currentID, BarMask)) //I should change this check after I add in the current node array for the schedule lists
 				{
+					if (IsFlagSet(currentID, ShouldInitializeMask))
+					{
+						database.scheduleableMap[Unpack(currentID)]->Initialize();
+						ReplaceID(currentID, currentID & ~ShouldInitializeMask);
+					}
 					if (database.RunIfReady(Unpack(currentID), currentAvailableSystem))
 					{
 						packedIDsToDelete.push_back(currentID);

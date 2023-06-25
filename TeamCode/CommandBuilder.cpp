@@ -49,6 +49,8 @@ class CommandBuilder
 private:
 	unsigned char requirementFlags;
 	std::function<bool(Ts...)> backingFunction;
+	std::shared_ptr<Scheduleable> initializationScheduleable;
+	std::shared_ptr<Scheduleable> cleanupScheduleable;
 
 public:
 	CommandBuilder(std::function<bool(Ts...)> backingFunction, unsigned char requirementFlags)
@@ -82,7 +84,16 @@ public:
 
 	std::shared_ptr<ScheduledCommand<Ts...>> CreateCommand(Ts... params) //maybe this?
 	{
-		return std::make_shared<ScheduledCommand<Ts...>>(backingFunction, params..., requirementFlags);
+		std::shared_ptr<ScheduledCommand<Ts...>> returnScheduleable = std::make_shared<ScheduledCommand<Ts...>>(backingFunction, params..., requirementFlags);
+		if (initializationScheduleable)
+		{
+			returnScheduleable->Scheduleable::SetInitializationScheduleable(initializationScheduleable);
+		}
+		if (cleanupScheduleable)
+		{
+			returnScheduleable->Scheduleable::SetCleanupScheduleable(cleanupScheduleable);
+		}
+		return returnScheduleable;
 	}
 
 	//std::shared_ptr<ScheduledCommand> ScheduleWith(bool useNothing) //function for debugging
@@ -90,13 +101,13 @@ public:
 	//	return std::make_shared<ScheduledCommand>([&]() {std::cout << "Yay this ran\n";  return true; }, requirementFlags, true);
 	//}
 
-	void SetInitializationBehavior()
+	void SetInitialization(std::shared_ptr<Scheduleable> scheduleable)
 	{
-
+		initializationScheduleable = scheduleable;
 	}
 
-	void SetEndBehavior()
+	void SetCleanup(std::shared_ptr<Scheduleable> scheduleable)
 	{
-
+		cleanupScheduleable = scheduleable;
 	}
 };

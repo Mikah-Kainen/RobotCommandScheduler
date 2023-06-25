@@ -5,7 +5,7 @@ class RescheduleableGroup : public GroupBase
 {
 private:
 	bool shouldInitializeOrHasRestarted = true;
-	void Initialize() override;
+	void InitializeGroup() override;
 
 protected:
 	virtual void Remove(unsigned int packedID) override;
@@ -22,5 +22,7 @@ protected:
 
 public:
 	RescheduleableGroup(const RescheduleableGroup& copyRescheduleableGroup);
+
+	bool Initialize() override;
 };
 

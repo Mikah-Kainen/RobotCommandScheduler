@@ -142,6 +142,7 @@ void TakeConstRef(const int& constRef)
 
 /* To do list:
 	Remove FunctionManager
+	Probably remove InitializeGroup
 	Add its dictionaries to GroupBase(scheduleables and endBehavior)
 	Give GroupBase initialize functions that take in a GroupBase&(don't forget to get rid of the part where I remove cleanup functions once they have been run)
 	Change setting flags to have two functions, change int and set int
@@ -407,6 +408,15 @@ int main() //Unit tests with GoogleTest
 		Set.CreateCommand(loopGroupTestsCount, 0),
 		loopGroupTest,
 		}, 4));
+
+	std::shared_ptr<LoopGroup> loopGroupWithSequentialGroupTest = std::make_shared<LoopGroup>(LoopGroup({
+		std::make_shared<SequentialGroup>(SequentialGroup({
+			Display.CreateCommand(loopGroupTestsCountMessages[0]),
+			Display.CreateCommand(loopGroupTestsCountMessages[1]),
+			Display.CreateCommand(loopGroupTestsCountMessages[2]),
+			Display.CreateCommand(loopGroupTestsCountMessages[3]),
+			})),
+		}, 4));
 #pragma endregion
 
 	std::string otherMessage = "End of Functions, Current Time: ";
@@ -425,7 +435,7 @@ int main() //Unit tests with GoogleTest
 	//scheduler.Schedule(parallelGroupCombinationTest);
 	//scheduler.Schedule(tempSequentialGroupCombinationTest);
 	//scheduler.Schedule([&]() {std::cout << std::endl; return true; }, (unsigned char)Systems::Six);
-	scheduler.Schedule(multipleLoopGroupTest);
+	scheduler.Schedule(loopGroupWithSequentialGroupTest);
 	scheduler.Schedule(endFunction);
 
 	//if (true)

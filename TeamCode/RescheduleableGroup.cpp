@@ -1,7 +1,7 @@
 //#include "../../inc/SchedulerInc/RescheduleableGroup.h"
 #include "RescheduleableGroup.h"
 
-void RescheduleableGroup::Initialize()
+void RescheduleableGroup::InitializeGroup()
 {
 	if (shouldInitializeOrHasRestarted)
 	{
@@ -31,6 +31,7 @@ void RescheduleableGroup::InitializeBody()
 		func(*this);
 	}
 	shouldInitializeOrHasRestarted = false;
+	Initialize();
 }
 
 RescheduleableGroup::RescheduleableGroup(unsigned char systemFlags, SchedulerTypes type)
@@ -52,7 +53,21 @@ RescheduleableGroup::RescheduleableGroup(std::vector<Systems> schedulerSystems, 
 }
 
 RescheduleableGroup::RescheduleableGroup(const RescheduleableGroup& copyRescheduleableGroup)
-	:GroupBase(copyRescheduleableGroup)
+	:GroupBase(copyRescheduleableGroup), shouldInitializeOrHasRestarted{ copyRescheduleableGroup.shouldInitializeOrHasRestarted }
 {
 
+}
+
+bool RescheduleableGroup::Initialize()
+{
+	for (int i = 0; i < SystemsCount; i ++)
+	{
+		std::vector<unsigned int>& currentSystemSchedule = schedule[i];
+		for (int x = 0; x < currentSystemSchedule.size(); x ++)
+		{
+			currentSystemSchedule[x] |= ShouldInitializeMask;
+		}
+	}
+	Scheduleable::Initialize();
+	return true;
 }

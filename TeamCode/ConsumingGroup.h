@@ -6,7 +6,7 @@ class ConsumingGroup : public GroupBase
 private:
 
 protected:
-	virtual void Initialize() override;
+	virtual void InitializeGroup() override;
 
 	virtual void Remove(unsigned int packedID) override;
 
