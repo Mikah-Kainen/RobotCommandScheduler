@@ -4,7 +4,7 @@
 
 Scheduleable::ScheduleableStates Scheduleable::GetNextState(ScheduleableStates state)
 {
-	return (ScheduleableStates)((int)ScheduleableStates::Run + 1);
+	return (ScheduleableStates)((int)state + 1);
 }
 
 bool Scheduleable::Run()
