@@ -326,7 +326,6 @@ bool GroupBase::Run()
 	//	}
 	//	shouldInitializeOrHasRestarted = false;
 	//}
-	InitializeGroup();
 
 	for (int i = 0; i < SystemsCount; i++) //maybe use the requirementFlag instead of SystemsCount at some point
 	{
@@ -352,7 +351,7 @@ bool GroupBase::Run()
 						database.scheduleableMap[Unpack(currentID)]->Initialize();
 						ReplaceID(currentID, currentID & ~ShouldInitializeMask);
 					}
-					if (database.RunIfReady(Unpack(currentID), currentAvailableSystem))
+					else if (database.RunIfReady(Unpack(currentID), currentAvailableSystem))
 					{
 						packedIDsToDelete.push_back(currentID);
 						for (int x = 0; x < database.endBehaviors[Unpack(currentID)].size(); x ++)
@@ -445,5 +444,10 @@ bool GroupBase::Run()
 	//}
 	//shouldInitializeOrHasRestarted = finishedSystems == requirementFlags;
 	//return shouldInitializeOrHasRestarted;
+}
+
+bool GroupBase::Initialize()
+{
+	return Scheduleable::Initialize();
 }
 #pragma endregion

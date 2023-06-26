@@ -3,10 +3,10 @@
 
 
 
-void ConsumingGroup::InitializeGroup()
-{
-	//ConsumingGroups should initialize in their constructors
-}
+//void ConsumingGroup::InitializeGroup()
+//{
+//	//ConsumingGroups should initialize in their constructors
+//}
 
 void ConsumingGroup::Remove(unsigned int packedID)
 {

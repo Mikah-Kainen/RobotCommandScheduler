@@ -4,15 +4,15 @@
 class RescheduleableGroup : public GroupBase
 {
 private:
-	bool shouldInitializeOrHasRestarted = true;
-	void InitializeGroup() override;
+	//bool shouldInitializeOrHasRestarted = true;
+	//void InitializeGroup() override;
 
 protected:
 	virtual void Remove(unsigned int packedID) override;
 
 	virtual bool Return(bool isFinished) override;
 
-	virtual void InitializeBody();
+	//virtual void InitializeBody();
 
 	RescheduleableGroup(unsigned char systemFlags, SchedulerTypes type);
 

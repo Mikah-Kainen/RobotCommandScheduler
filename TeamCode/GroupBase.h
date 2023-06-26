@@ -85,7 +85,7 @@ protected:
 	SchedulerTypes schedulerType;
 	unsigned int schedulerID; //for debugging
 
-	virtual void InitializeGroup() = 0;
+	//virtual void InitializeGroup() = 0;
 
 	virtual void Remove(unsigned int packedID) = 0;
 
@@ -138,5 +138,7 @@ public:
 	void Update();
 
 	bool Run() override;
+
+	virtual bool Initialize() override;
 };
 

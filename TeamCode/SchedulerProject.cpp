@@ -20,13 +20,13 @@ public:
 	bool IsDead;
 
 	Cat(int age, std::string name)
-		: Age{ age }, Name{ name }, IsDead{false} 
+		: Age{ age }, Name{ name }, IsDead{ false }
 	{
 		//std::cout << "Cat Made" << std::endl;
 	}
 
 	Cat(const Cat& copyCat)
-		: Age{ copyCat.Age }, Name{ copyCat.Name }, IsDead{copyCat.IsDead}
+		: Age{ copyCat.Age }, Name{ copyCat.Name }, IsDead{ copyCat.IsDead }
 	{
 		//std::cout << "Cat Copied" << std::endl;
 	}
@@ -207,7 +207,7 @@ int main() //Unit tests with GoogleTest
 	std::function<bool(const std::string&)> myFunc = std::function<bool(const std::string&)>([&](const std::string& message) {std::cout << message; return true; });
 	myFunc("Hi\n\n");
 	CommandBuilder<std::string*> DisplayStringPointer = CommandBuilder<std::string*>(std::function<bool(std::string*)>([&](std::string* message) {std::cout << *message; return true; }), Systems::RightMotor);
-	CommandBuilder<const std::string&> DisplayStringReference = CommandBuilder<const std::string&>([&](const std::string& message){std::cout << message; return true; }, Systems::RightMotor);
+	CommandBuilder<const std::string&> DisplayStringReference = CommandBuilder<const std::string&>([&](const std::string& message) {std::cout << message; return true; }, Systems::RightMotor);
 	CommandBuilder<std::string> DisplayStringValue = CommandBuilder<std::string>([&](std::string message) {std::cout << message; return true; }, Systems::RightMotor);
 
 	CommandBuilder<Cat*> DisplayCatPointerFive = CommandBuilder<Cat*>([&](Cat* cat) {return cat->Display(); }, Systems::Five);
@@ -322,7 +322,7 @@ int main() //Unit tests with GoogleTest
 		DisplayCatValueFive.CreateCommand(Cat(sequentialGroupTestCat3.Age + 4, sequentialGroupTestCat3.Name)),
 		DisplayCatValueSix.CreateCommand(sequentialGroupTestCat8and9),
 		DisplayCatReferenceSix.CreateCommand(sequentialGroupTestCat8and9),
-	}));
+		}));
 	sequentialGroupTestCat6.Age = 6;
 	sequentialGroupTestCat8and9.Age = 9;
 #pragma endregion
@@ -337,11 +337,11 @@ int main() //Unit tests with GoogleTest
 		DisplayCatValueFour.CreateCommand(Cat(1, "Systems 4")),
 		DisplayCatReferenceFive.CreateCommand(parallelGroupTestCat2),
 		DisplayCatPointerFour.CreateCommand(new Cat(2, "Systems 4")),
-		DisplayCatPointerFour.CreateCommand(  parallelGroupTestCat3),
+		DisplayCatPointerFour.CreateCommand(parallelGroupTestCat3),
 		DisplayCatReferenceFour.CreateCommand(parallelGroupTestCat4),
 		DisplayCatValueFive.CreateCommand(Cat(parallelGroupTestCat3->Age, parallelGroupTestCat2.Name)),
-		DisplayCatValueSix.CreateCommand(     parallelGroupTestCat1and2),
-		DisplayCatReferenceSix.CreateCommand( parallelGroupTestCat1and2),
+		DisplayCatValueSix.CreateCommand(parallelGroupTestCat1and2),
+		DisplayCatReferenceSix.CreateCommand(parallelGroupTestCat1and2),
 		}));
 	parallelGroupTestCat4.Age = 4;
 	parallelGroupTestCat1and2.Age = 2;
@@ -361,7 +361,7 @@ int main() //Unit tests with GoogleTest
 		DisplayCatValueFive.CreateCommand(parallelGroup4and5TestCat3and4),
 		DisplayCatReferenceFive.CreateCommand(parallelGroup4and5TestCat3and4),
 		DisplayCatValueFour.CreateCommand(parallelGroup4and5TestCat2Systems4),
-	}));
+		}));
 	parallelGroup4and5TestCat1 = Cat(1, "Systems 5");
 	parallelGroup4and5TestCat3and4.Age = 4;
 
@@ -375,18 +375,18 @@ int main() //Unit tests with GoogleTest
 		IncrimentCatAgeSix.CreateCommand(parallelGroup6TestCat6and7, 1),
 		DisplayCatValueSix.CreateCommand(parallelGroup6TestCat6and7),
 		DisplayCatReferenceSix.CreateCommand(parallelGroup6TestCat6and7),
-	}));
+		}));
 	parallelGroup6TestCat1and2and4.Age++;
 
 	std::shared_ptr<ParallelGroup> parallelGroupCombinationTest = std::make_shared<ParallelGroup>(ParallelGroup({
 		parallelGroup4and5,
 		parallelGroup6,
-	}));
+		}));
 
 	std::shared_ptr<SequentialGroup> tempSequentialGroupCombinationTest = std::make_shared<SequentialGroup>(SequentialGroup({
 		parallelGroup6,
 		parallelGroup4and5,
-	}));
+		}));
 #pragma endregion
 
 #pragma region LoopGroupTests
@@ -419,6 +419,55 @@ int main() //Unit tests with GoogleTest
 		}, 4));
 #pragma endregion
 
+
+	CommandBuilder<> UEChassis = CommandBuilder<>([&]() {return true; }, Systems::Chassis);
+	CommandBuilder<int, int, int, int> MoveRobot = CommandBuilder<int, int, int, int>([&](int, int, int, int) {return true; }, Systems::Chassis);
+	CommandBuilder<> ResetIntakeTime = CommandBuilder<>([&]() {return true; }, Systems::ContainerIntake);
+	CommandBuilder<int, int> MoveIntakeByTime = CommandBuilder<int, int>([&](int, int) {return true; }, Systems::ContainerIntake);
+
+	int count = 0;
+	std::string countMessages[] = {
+	std::string("Cycle 0 Complete"),
+	std::string("Cycle 1 Complete"),
+	std::string("Cycle 2 Complete"),
+	std::string("Cycle 3 Complete"),
+	};
+
+	std::string message2 = "HAHAHAHAAHA";
+
+	std::shared_ptr<SequentialGroup> sequentialGroup = std::make_shared<SequentialGroup>(SequentialGroup({
+		Display.CreateCommand(message2),
+		UEChassis.CreateCommand(),
+		Display.CreateCommand(message2),
+		MoveRobot.CreateCommand(50, 500, 50, 500),
+		Display.CreateCommand(message2),
+		UEChassis.CreateCommand(),
+		MoveRobot.CreateCommand(50, 200, -50, 200),
+
+		Set.CreateCommand(count, 0),
+		std::make_shared<ParallelGroup>(ParallelGroup({
+			std::make_shared<LoopGroup>(LoopGroup({
+				UEChassis.CreateCommand(),
+				MoveRobot.CreateCommand(-30, 350, -30, 350),
+			}, [&](LoopGroup&) {return count >= 2; })),
+
+			std::make_shared<LoopGroup>(LoopGroup({
+				std::make_shared<SequentialGroup>(SequentialGroup({
+					ResetIntakeTime.CreateCommand(),
+					MoveIntakeByTime.CreateCommand(-35, 700),
+					ResetIntakeTime.CreateCommand(),
+					MoveIntakeByTime.CreateCommand(35, 700),
+					DisplayFromArray.CreateCommand(countMessages, count),
+					Increment.CreateCommand(count),
+				})),
+			}, 4)),
+			UEChassis.CreateCommand(),
+			MoveRobot.CreateCommand(15, 50, 15, 50),
+		})),
+		UEChassis.CreateCommand(),
+		MoveRobot.CreateCommand(-50, 200, 50, 200),
+		}));
+
 	std::string otherMessage = "End of Functions, Current Time: ";
 	std::shared_ptr<Scheduleable> endFunction = std::make_shared<Scheduleable>([&]() {std::cout << otherMessage << Timer::GetInstance().ElapsedMilliseconds() << std::endl; return true; }, (unsigned char)Systems::All);
 	//otherMessage = "Haha I changed it ";
@@ -429,13 +478,15 @@ int main() //Unit tests with GoogleTest
 	scheduler.Schedule(parallelGroupCombinationTest);
 	scheduler.Schedule(tempSequentialGroupCombinationTest);
 	*/
-	
+
 	//scheduler.Schedule(std::make_shared<LoopGroup>(LoopGroup({ std::make_shared<SequentialGroup>(SequentialGroup({ parallelGroupCombinationTest, tempSequentialGroupCombinationTest })) }, [&](LoopGroup& group) {return group.currentIteration >= 2; })));
 	//Make sure scheduleables are destructed properly in the main Scheduler
 	//scheduler.Schedule(parallelGroupCombinationTest);
 	//scheduler.Schedule(tempSequentialGroupCombinationTest);
 	//scheduler.Schedule([&]() {std::cout << std::endl; return true; }, (unsigned char)Systems::Six);
-	scheduler.Schedule(loopGroupWithSequentialGroupTest);
+	
+	//scheduler.Schedule(loopGroupWithSequentialGroupTest);
+	scheduler.Schedule(sequentialGroup);
 	scheduler.Schedule(endFunction);
 
 	//if (true)
