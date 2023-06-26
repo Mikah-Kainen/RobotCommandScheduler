@@ -140,6 +140,12 @@ void TakeConstRef(const int& constRef)
 	std::cout << constRef << std::endl;
 }
 
+/*Don't forget
+	The state machine of Scheduleables runs Initialize and Cleanup functions directly, so the Initialize/Cleanup functions of Initialize or Cleanup Scheduleables will not run.
+	There is no System-usage protection in the Initialize and Cleanup functions of Scheduleable.
+	Add Systems::None (all flags set to 0, always runs(unless barred))
+*/
+
 /* To do list:
 	Remove FunctionManager
 	Probably remove InitializeGroup
