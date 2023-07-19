@@ -126,3 +126,8 @@ static unsigned char GetRequirementFlag(std::vector<unsigned char> systems)
 	}
 	return flag;
 }
+
+static bool IsSubset(unsigned char flag, unsigned char set)
+{
+	return (flag & set) == flag;
+}

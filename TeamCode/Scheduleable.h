@@ -28,6 +28,10 @@ class Scheduleable
 	protected:
 		Scheduleable(unsigned char requirementFlags);
 
+		void SetInitializationScheduleableDirect(std::shared_ptr<Scheduleable> scheduleable);
+
+		void SetCleanupScheduleableDirect(std::shared_ptr<Scheduleable> scheduleable);
+
 	public:
 		//virtual void ThisIsAbstract() = 0;
 		ScheduleableStates currentState;

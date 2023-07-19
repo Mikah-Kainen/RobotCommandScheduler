@@ -12,6 +12,18 @@ bool Scheduleable::Run()
 	return backingFunction();
 }
 
+void Scheduleable::SetInitializationScheduleableDirect(std::shared_ptr<Scheduleable> scheduleable)
+{
+	initializationScheduleable = scheduleable;
+	startingState = ScheduleableStates::Initialize;
+}
+
+void Scheduleable::SetCleanupScheduleableDirect(std::shared_ptr<Scheduleable> scheduleable)
+{
+	cleanupScheduleable = scheduleable;
+	endingState = GetNextState(ScheduleableStates::Cleanup);
+}
+
 Scheduleable::Scheduleable(unsigned char requirementFlags)
 	:Scheduleable(NoFunctionProvided, requirementFlags) {}
 
@@ -131,16 +143,22 @@ bool Scheduleable::Initialize()
 	return true;
 }
 
-bool Scheduleable::SetInitializationScheduleable(std::shared_ptr<Scheduleable> scheduleable) //Make sure to check that the requirementFlags are a subset of the current Scheduleable's requirement flags!
+bool Scheduleable::SetInitializationScheduleable(std::shared_ptr<Scheduleable> scheduleable)
 {
-	initializationScheduleable = scheduleable;
-	startingState = ScheduleableStates::Initialize;
-	return true;
+	if (IsSubset(scheduleable->requirementFlags, requirementFlags))
+	{
+		SetInitializationScheduleableDirect(scheduleable);
+		return true;
+	}
+	return false;
 }
 
-bool Scheduleable::SetCleanupScheduleable(std::shared_ptr<Scheduleable> scheduleable) //Make sure to check that the requirementFlags are a subset of the current Scheduleable's requirement flags!
+bool Scheduleable::SetCleanupScheduleable(std::shared_ptr<Scheduleable> scheduleable)
 {
-	cleanupScheduleable = scheduleable;
-	endingState = GetNextState(ScheduleableStates::Cleanup);
-	return true;
+	if (IsSubset(scheduleable->requirementFlags, requirementFlags))
+	{
+		SetCleanupScheduleableDirect(scheduleable);
+		return true;
+	}
+	return false;
 }
