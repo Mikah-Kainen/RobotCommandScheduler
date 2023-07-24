@@ -81,6 +81,16 @@ protected:
 		void SubscribeToEnd(unsigned int targetID, std::function<void(GroupBase&)> endBehavior);
 	};
 
+	enum class Behaviors
+	{
+		Bar,
+		EndEarly,
+		Initialize,
+		Run,
+	};
+
+	Behaviors GetNextBehavior(int packedID);
+
 protected:
 	SchedulerTypes schedulerType;
 	unsigned int schedulerID; //for debugging
@@ -92,7 +102,7 @@ protected:
 	virtual bool Return(bool isFinished) = 0;
 	//virtual bool PostRun(std::vector<unsigned int> packedIDsToDelete) = 0;
 
-	std::vector<unsigned int>* schedule;
+	std::vector<unsigned int>* schedule; //maybe change this to a list of nodes of the current scheduleableID
 	unsigned int* currentIndices;
 	Database database;
 
@@ -137,7 +147,7 @@ public:
 	
 	void Update();
 
-	bool Run() override;
+	bool Run() override; //This function does too much. I should split it at some point
 
 	virtual bool Initialize() override;
 };
