@@ -11,6 +11,10 @@
 
 void RescheduleableGroup::Remove(unsigned int packedID)
 {
+	if (requirementFreeScheduleables.count(packedID) > 0)
+	{
+		initializeRequirementFreeScheduleables.insert(packedID);
+	}
 	//RescheduleableGroups don't remove anything
 }
 
@@ -34,31 +38,36 @@ bool RescheduleableGroup::Return(bool isFinished)
 //}
 
 RescheduleableGroup::RescheduleableGroup(unsigned char systemFlags, SchedulerTypes type)
-	:GroupBase(systemFlags, type)
+	:GroupBase(systemFlags, type), initializeRequirementFreeScheduleables{ std::unordered_set<unsigned int>() }
 {
-
 }
 
 RescheduleableGroup::RescheduleableGroup(std::vector<unsigned char> systemFlags, SchedulerTypes type)
-	:GroupBase(systemFlags, type)
+	:GroupBase(systemFlags, type), initializeRequirementFreeScheduleables{ std::unordered_set<unsigned int>() }
 {
-
 }
 
 RescheduleableGroup::RescheduleableGroup(std::vector<Systems> schedulerSystems, SchedulerTypes type)
-	:GroupBase(schedulerSystems, type)
+	:GroupBase(schedulerSystems, type), initializeRequirementFreeScheduleables{ std::unordered_set<unsigned int>() }
 {
-
 }
 
 RescheduleableGroup::RescheduleableGroup(const RescheduleableGroup& copyRescheduleableGroup)
-	:GroupBase(copyRescheduleableGroup)/*, shouldInitializeOrHasRestarted{ copyRescheduleableGroup.shouldInitializeOrHasRestarted }*/
+	:GroupBase(copyRescheduleableGroup), initializeRequirementFreeScheduleables{ std::unordered_set<unsigned int>() }/*, shouldInitializeOrHasRestarted{ copyRescheduleableGroup.shouldInitializeOrHasRestarted }*/
 {
-
+	for (unsigned int packedID : copyRescheduleableGroup.initializeRequirementFreeScheduleables)
+	{
+		initializeRequirementFreeScheduleables.insert(packedID);
+	}
 }
 
 bool RescheduleableGroup::Initialize()
 {
+	for (unsigned int packedID : initializeRequirementFreeScheduleables)
+	{
+		requirementFreeScheduleables.insert(packedID);
+	}
+	initializeRequirementFreeScheduleables.clear();
 	for (int i = 0; i < SystemsCount; i ++)
 	{
 		currentIndices[i] = 0;

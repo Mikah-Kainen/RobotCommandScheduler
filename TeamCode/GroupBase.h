@@ -4,6 +4,7 @@
 #include <list>
 #include <iostream>
 #include <unordered_map>
+#include <unordered_set>
 #include <memory>
 #include "Scheduleable.h"
 #include "Static.h"
@@ -101,6 +102,8 @@ protected:
 
 	virtual bool Return(bool isFinished) = 0;
 	//virtual bool PostRun(std::vector<unsigned int> packedIDsToDelete) = 0;
+
+	std::unordered_set<unsigned int> requirementFreeScheduleables;
 
 	std::vector<unsigned int>* schedule; //maybe change this to a list of nodes of the current scheduleableID
 	unsigned int* currentIndices;

@@ -37,20 +37,20 @@ static unsigned int NextAvailableSchedulerID;
 static std::function<bool()> ReturnTrue = std::function<bool()>([&]() {return true; });
 
 static std::function<bool()> ThrowError = std::function<bool()>([&]()
-{
-	//throw std::exception("Saving User from Wierd Error Message");
-	std::cout << "~~~!ERROR!~~~!ERROR!~~~!ERROR!~~~" << std::endl;
-	while (true) {};
-	return false;
-});
+	{
+		//throw std::exception("Saving User from Wierd Error Message");
+		std::cout << "~~~!ERROR!~~~!ERROR!~~~!ERROR!~~~" << std::endl;
+		while (true) {};
+		return false;
+	});
 
 static std::function<bool()> NoFunctionProvided = std::function<bool()>([&]()
-{
-	//throw std::exception("No Function Provided");
-	std::cout << "NOFUNCTIONPROVIDED" << std::endl;
-	while (true);
-	return false;
-});
+	{
+		//throw std::exception("No Function Provided");
+		std::cout << "NOFUNCTIONPROVIDED" << std::endl;
+		while (true);
+		return false;
+	});
 
 template <typename T>
 static bool Contains(std::vector<T> list, T value)
@@ -69,7 +69,7 @@ template <typename T>
 static void Pop_Front(std::vector<T>& list)
 {
 	std::vector<T> newList = std::vector<T>();
-	for (int i = 1; i < list.size(); i ++)
+	for (int i = 1; i < list.size(); i++)
 	{
 		newList.push_back(list[i]);
 	}
@@ -79,14 +79,21 @@ static void Pop_Front(std::vector<T>& list)
 static std::vector<Systems> GetSystems(unsigned char systemFlags)
 {
 	std::vector<Systems> returnSystems;
-	for (unsigned int i = 0; i < SystemsCount; i++)
+	if (systemFlags == 0)
 	{
-		unsigned char currentMask = 1 << i;
-		if ((systemFlags & currentMask) >> i == 1)
+		returnSystems.push_back(Systems::None);
+	}
+	else
+	{
+		for (unsigned int i = 0; i < SystemsCount; i++)
 		{
-			//Systems currentSystem = (Systems)((unsigned char)pow(2, i));
-			Systems currentSystem = (Systems)currentMask;
-			returnSystems.push_back(currentSystem);
+			unsigned char currentMask = 1 << i;
+			if ((systemFlags & currentMask) >> i == 1)
+			{
+				//Systems currentSystem = (Systems)((unsigned char)pow(2, i));
+				Systems currentSystem = (Systems)currentMask;
+				returnSystems.push_back(currentSystem);
+			}
 		}
 	}
 	return returnSystems;
@@ -96,11 +103,18 @@ static std::vector<Systems> GetSystems(unsigned char systemFlags)
 static std::vector<Systems> GetSystems(std::vector<unsigned char> systemFlags)
 {
 	std::vector<Systems> returnSystems;
-	for (unsigned char flag : systemFlags)
+	if (systemFlags.size() == 0)
 	{
-		if (!Contains<Systems>(returnSystems, (Systems)flag))
+		returnSystems.push_back(Systems::None);
+	}
+	else
+	{
+		for (unsigned char flag : systemFlags)
 		{
-			returnSystems.push_back((Systems)flag);
+			if (!Contains<Systems>(returnSystems, (Systems)flag))
+			{
+				returnSystems.push_back((Systems)flag);
+			}
 		}
 	}
 	return returnSystems;

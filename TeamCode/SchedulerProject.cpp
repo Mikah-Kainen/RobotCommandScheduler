@@ -234,10 +234,10 @@ int main() //Unit tests with GoogleTest
 	CommandBuilder<> UpdateLeftMotorTime = CommandBuilder<>(std::bind(&Motor::UpdateTime, robot.GetLeftMotor()), (unsigned char)Systems::LeftMotor);
 
 
-	auto Increment = CommandBuilder<int&>([&](int& value) {value++; return true; }, Systems::Other);
-	auto Set = CommandBuilder<int&, int>([&](int& value, int target) {value = target; return true; }, Systems::Other);
-	auto Display = CommandBuilder<std::string>([&](std::string message) {std::cout << message << std::endl; return true; }, Systems::Other);
-	auto DisplayFromArray = CommandBuilder<std::string*, int&>([&](std::string* array, int& index) {std::cout << array[index] << std::endl; return true; }, Systems::Other);
+	auto Increment = CommandBuilder<int&>([&](int& value) {value++; return true; }, Systems::None);
+	auto Set = CommandBuilder<int&, int>([&](int& value, int target) {value = target; return true; }, Systems::None);
+	auto Display = CommandBuilder<std::string>([&](std::string message) {std::cout << message << std::endl; return true; }, Systems::None);
+	auto DisplayFromArray = CommandBuilder<std::string*, int&>([&](std::string* array, int& index) {std::cout << array[index] << std::endl; return true; }, Systems::None);
 
 	//Cat cat = Cat(600, "SuperCat");
 	//auto bindResult = std::bind(&Cat::Display, Cat(600, "SuperCat"));
@@ -444,6 +444,15 @@ int main() //Unit tests with GoogleTest
 
 	std::string message2 = "HAHAHAHAAHA";
 
+	std::shared_ptr<ParallelGroup> testSystemsNone = std::make_shared<ParallelGroup>(ParallelGroup({
+		Display.CreateCommand("One"),
+		Display.CreateCommand("Two"),
+		Display.CreateCommand("Three"),
+		DisplayNumberVal.CreateCommand(1),
+		DisplayNumberVal.CreateCommand(2),
+		Display.CreateCommand("Four"),
+	}));
+
 	std::shared_ptr<SequentialGroup> sequentialGroup = std::make_shared<SequentialGroup>(SequentialGroup({
 		//Display.CreateCommand(message2),
 		//UEChassis.CreateCommand(),
@@ -495,7 +504,9 @@ int main() //Unit tests with GoogleTest
 	//scheduler.Schedule([&]() {std::cout << std::endl; return true; }, (unsigned char)Systems::Six);
 	
 	//scheduler.Schedule(loopGroupWithSequentialGroupTest);
-	scheduler.Schedule(sequentialGroup);
+	
+	//scheduler.Schedule(sequentialGroup);
+	scheduler.Schedule(testSystemsNone);
 	scheduler.Schedule(endFunction);
 
 	//if (true)

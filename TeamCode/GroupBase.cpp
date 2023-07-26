@@ -110,7 +110,7 @@ void GroupBase::Database::SubscribeToEnd(unsigned int targetID, std::function<vo
 #pragma region GroupBase
 GroupBase::GroupBase(unsigned char systemFlags, SchedulerTypes type)
 	:Scheduleable(systemFlags), initializeFunctions{ std::vector<std::function<void(GroupBase&)>>() }, database{ Database() },
-	schedulerID{ NextAvailableSchedulerID++ }, schedulerType{ type }, schedule{ new std::vector<unsigned int>[SystemsCount] },
+	schedulerID{ NextAvailableSchedulerID++ }, schedulerType{ type }, requirementFreeScheduleables{std::unordered_set<unsigned int>()}, schedule{new std::vector<unsigned int>[SystemsCount]},
 	currentIndices{ new unsigned int[SystemsCount] }
 {
 	for (int i = 0; i < SystemsCount; i++)
@@ -151,17 +151,24 @@ unsigned int GroupBase::Schedule(std::shared_ptr<Scheduleable> scheduleable)
 	unsigned char scheduleableRequirementFlags = scheduleable->GetRequirementFlags();
 	unsigned int unpackedID = database.Add(scheduleable);
 	unsigned int packedID = Pack(unpackedID) | ShouldInitializeMask;
-	for (unsigned int i = 0; i < SystemsCount; i++)
+	if (scheduleableRequirementFlags == 0)
 	{
-		unsigned char currentMask = 1 << i;
-		if ((scheduleableRequirementFlags & currentMask) >> i == 1)
+		requirementFreeScheduleables.insert(packedID);
+	}
+	else
+	{
+		for (unsigned int i = 0; i < SystemsCount; i++)
 		{
-			schedule[i].push_back(packedID);
-			//	Systems currentSystem = (Systems)currentMask;
-			//	schedule[currentSystem].push_back(newID);
+			unsigned char currentMask = 1 << i;
+			if ((scheduleableRequirementFlags & currentMask) >> i == 1)
+			{
+				schedule[i].push_back(packedID);
+				//	Systems currentSystem = (Systems)currentMask;
+				//	schedule[currentSystem].push_back(newID);
+			}
 		}
 	}
-	//Definitely put stuff here
+	//Maybe put stuff here
 	return packedID;
 }
 
@@ -177,6 +184,15 @@ unsigned int GroupBase::Schedule(std::function<bool()> function, std::vector<Sys
 
 void GroupBase::ReplaceIDUnpacked(unsigned int unpackedID, unsigned int newPackedID)
 {
+	for (unsigned int currentPackedID : requirementFreeScheduleables)
+	{
+		if (Unpack(currentPackedID) == unpackedID)
+		{
+			requirementFreeScheduleables.erase(currentPackedID);
+			requirementFreeScheduleables.insert(newPackedID);
+			break;
+		}
+	}
 	for (int i = 0; i < SystemsCount; i++)
 	{
 		std::vector<unsigned int>& currentSystemSchedule = schedule[i];
@@ -232,11 +248,17 @@ void GroupBase::ReplaceIDUnpacked(unsigned int unpackedID, unsigned int newPacke
 GroupBase::GroupBase(const GroupBase& copyGroupBase)
 	: Scheduleable(copyGroupBase.requirementFlags), initializeFunctions{ std::vector<std::function<void(GroupBase&)>>() },
 	database{ copyGroupBase.database }, schedulerType{ copyGroupBase.schedulerType }, schedulerID{ copyGroupBase.schedulerID },
-	schedule{ new std::vector<unsigned int>[SystemsCount] }, currentIndices{ new unsigned int[SystemsCount] }
+	requirementFreeScheduleables{std::unordered_set<unsigned int>()}, schedule{new std::vector<unsigned int>[SystemsCount]}, 
+	currentIndices{new unsigned int[SystemsCount]}
 {
 	for (int i = 0; i < copyGroupBase.initializeFunctions.size(); i++)
 	{
 		initializeFunctions.push_back(copyGroupBase.initializeFunctions[i]);
+	}
+
+	for (unsigned int packedID : copyGroupBase.requirementFreeScheduleables)
+	{
+		requirementFreeScheduleables.insert(packedID);
 	}
 
 	for (int i = 0; i < SystemsCount; i++)
@@ -388,6 +410,51 @@ bool GroupBase::Run()
 	//	shouldInitializeOrHasRestarted = false;
 	//}
 
+	if (requirementFreeScheduleables.size() > 0)
+	{
+		for (unsigned int packedID : requirementFreeScheduleables)
+		{
+			GroupBase::Behaviors nextBehavior = GetNextBehavior(packedID);
+			switch (nextBehavior)
+			{
+			case Behaviors::EndEarly:
+				//functionManager.EndEarly(Unpack(currentSystemSchedule[0])); //Add EndEarly to function Manager
+				//throw std::exception("Add EndEarly function to FunctionManger!!");
+				std::cout << "Add EndEarly function to GroupBase!!" << std::endl;
+				while (true);
+				break;
+
+			case Behaviors::Bar:
+				//run default function for system
+				break;
+
+			case Behaviors::Initialize:
+				database.scheduleableMap[Unpack(packedID)]->Initialize();
+				ReplaceID(packedID, packedID & ~ShouldInitializeMask);
+				break;
+
+			case Behaviors::Run:
+				if (database.RunIfReady(Unpack(packedID), currentAvailableSystem)) //SINCE THERES NO REQUIREMENTS SKIP RUN IF READY AND JUST CALL RUN!!
+				{
+					for (int x = 0; x < database.endBehaviors[Unpack(packedID)].size(); x++)
+					{
+						database.endBehaviors[Unpack(packedID)][x](*this);
+						//database.endBehaviors[Unpack(currentID)].erase(database.endBehaviors[Unpack(currentID)].begin() + x);
+					}
+
+					currentIndices[0]++;
+					Remove(packedID);
+					requirementFreeScheduleables.erase(packedID);
+					//functionManager.Remove(currentSystemSchedule.front());
+				}
+				break;
+			}
+		}
+	}
+	else
+	{
+		//run default function for Systems::None
+	}
 	for (int i = 0; i < SystemsCount; i++) //maybe use the requirementFlag instead of SystemsCount at some point
 	{
 		unsigned char currentMask = 1 << i;
