@@ -56,20 +56,23 @@ protected:
 
 protected:
 	//Interesting link: https://jguegant.github.io/blogs/tech/performing-try-emplace.html
-	class Database
+	class DictionaryManager //Rename PackedID to FlagsID and UnpackedID to DictionaryID //maybe just have dictionaryFunctions unpack
 	{
 	private:
 		unsigned int nextAvailableID;
+		std::function<unsigned int(unsigned int)> removeFlagsFunc;
 
 	public:
 		std::unordered_map<unsigned int, std::shared_ptr<Scheduleable>> scheduleableMap;
 		std::unordered_map<unsigned int, std::vector<std::function<void(GroupBase&)>>> endBehaviors;
 
-		Database();
+		DictionaryManager(std::function<unsigned int(unsigned int)> removeFlagsFunc);
 
-		Database(const Database& copyDatabase);
+		DictionaryManager();
 
-		~Database();
+		DictionaryManager(const DictionaryManager& copyDictionaryManager);
+
+		~DictionaryManager();
 
 		unsigned int Add(std::shared_ptr<Scheduleable> scheduledItem);
 
@@ -107,7 +110,7 @@ protected:
 
 	std::vector<unsigned int>* schedule; //maybe change this to a list of nodes of the current scheduleableID
 	unsigned int* currentIndices;
-	Database database;
+	DictionaryManager database;
 
 	std::vector<std::function<void(GroupBase&)>> initializeFunctions; //used to set CleanupFunctions in the CopyConstructor
 	//bool shouldInitializeOrHasRestarted = true;
@@ -152,6 +155,6 @@ public:
 
 	bool Run() override; //This function does too much. I should split it at some point
 
-	virtual bool Initialize() override;
+	virtual void Initialize() override;
 };
 

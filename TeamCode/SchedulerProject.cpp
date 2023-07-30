@@ -426,7 +426,8 @@ int main() //Unit tests with GoogleTest
 #pragma endregion
 
 
-	CommandBuilder<> UEChassis = CommandBuilder<>([&]() {std::cout << "Updating Encoders" << std::endl; return true; }, Systems::Chassis);
+	CommandBuilder<> UEChassis = CommandBuilder<>([&]() { return true; }, Systems::Chassis);
+	UEChassis.SetInitialization(Display.CreateCommand("Updating Encoders"));
 	CommandBuilder<int, int, int, int> MoveRobot = CommandBuilder<int, int, int, int>([&](int, int, int, int) {std::cout << "Moving" << std::endl; return true; }, Systems::Chassis);
 	MoveRobot.SetInitialization(UEChassis.CreateCommand());
 
@@ -442,7 +443,7 @@ int main() //Unit tests with GoogleTest
 	std::string("Cycle 3 Complete"),
 	};
 
-	std::string message2 = "HAHAHAHAAHA";
+	std::string message2 = "Thing";
 
 	std::shared_ptr<ParallelGroup> testSystemsNone = std::make_shared<ParallelGroup>(ParallelGroup({
 		Display.CreateCommand("One"),
@@ -464,10 +465,10 @@ int main() //Unit tests with GoogleTest
 
 		Set.CreateCommand(count, 0),
 		std::make_shared<ParallelGroup>(ParallelGroup({
-			std::make_shared<LoopGroup>(LoopGroup({
-				//UEChassis.CreateCommand(),
-				MoveRobot.CreateCommand(-30, 350, -30, 350),
-			}, [&](LoopGroup&) {return count >= 2; })),
+			//std::make_shared<LoopGroup>(LoopGroup({
+			//	//UEChassis.CreateCommand(),
+			//	MoveRobot.CreateCommand(-30, 350, -30, 350),
+			//}, [&](LoopGroup&) {return count >= 2; })),
 
 			std::make_shared<LoopGroup>(LoopGroup({
 				std::make_shared<SequentialGroup>(SequentialGroup({
@@ -478,13 +479,14 @@ int main() //Unit tests with GoogleTest
 					DisplayFromArray.CreateCommand(countMessages, count),
 					Increment.CreateCommand(count),
 				})),
+				Display.CreateCommand("HI"),
 			}, 4)),
 			//UEChassis.CreateCommand(),
 			MoveRobot.CreateCommand(15, 50, 15, 50),
 		})),
-		//UEChassis.CreateCommand(),
+		////UEChassis.CreateCommand(),
 		MoveRobot.CreateCommand(-50, 200, 50, 200),
-		}));
+	}));
 
 	std::string otherMessage = "End of Functions, Current Time: ";
 	std::shared_ptr<Scheduleable> endFunction = std::make_shared<Scheduleable>([&]() {std::cout << otherMessage << Timer::GetInstance().ElapsedMilliseconds() << std::endl; return true; }, (unsigned char)Systems::All);
@@ -505,9 +507,9 @@ int main() //Unit tests with GoogleTest
 	
 	//scheduler.Schedule(loopGroupWithSequentialGroupTest);
 	
-	//scheduler.Schedule(sequentialGroup);
-	scheduler.Schedule(testSystemsNone);
-	scheduler.Schedule(endFunction);
+	//scheduler.Schedule(testSystemsNone);
+	scheduler.Schedule(sequentialGroup);
+	//scheduler.Schedule(endFunction);
 
 	//if (true)
 	//{

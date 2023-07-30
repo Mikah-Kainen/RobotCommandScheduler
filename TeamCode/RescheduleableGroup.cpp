@@ -61,7 +61,7 @@ RescheduleableGroup::RescheduleableGroup(const RescheduleableGroup& copyReschedu
 	}
 }
 
-bool RescheduleableGroup::Initialize()
+void RescheduleableGroup::Initialize()
 {
 	for (unsigned int packedID : initializeRequirementFreeScheduleables)
 	{
@@ -82,5 +82,5 @@ bool RescheduleableGroup::Initialize()
 	{
 		func(*this);
 	}
-	return GroupBase::Initialize();
+	GroupBase::Initialize();
 }

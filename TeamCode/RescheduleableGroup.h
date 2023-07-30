@@ -24,6 +24,6 @@ protected:
 public:
 	RescheduleableGroup(const RescheduleableGroup& copyRescheduleableGroup);
 
-	bool Initialize() override;
+	void Initialize() override;
 };
 

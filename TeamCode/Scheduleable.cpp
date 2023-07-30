@@ -28,7 +28,8 @@ Scheduleable::Scheduleable(unsigned char requirementFlags)
 	:Scheduleable(NoFunctionProvided, requirementFlags) {}
 
 Scheduleable::Scheduleable(std::function<bool()> backingFunction, unsigned char requirementFlags)
-	:backingFunction{ backingFunction }, startingState{ ScheduleableStates::Run }, endingState{ GetNextState(ScheduleableStates::Run)}, currentState{ScheduleableStates::Run},
+	:backingFunction{ backingFunction }, initializationScheduleable{ nullptr }, cleanupScheduleable{nullptr}, startingState {ScheduleableStates::Run}, 
+	endingState{ GetNextState(ScheduleableStates::Run) }, currentState{ ScheduleableStates::Run },
 	requirementFlags {requirementFlags}, availableSystems{ (unsigned char)0 }, IsDead{ false } {}
 
 Scheduleable::Scheduleable(std::function<bool()> backingFunction, Systems requiredSystem)
@@ -79,68 +80,143 @@ void Scheduleable::AddRequirement(unsigned char newRequirementFlags)
 	requirementFlags |= newRequirementFlags;
 }
 
-bool Scheduleable::RunIfReady(unsigned char availableSystem) 
-//An IScheduleable that doesn't require any systems will never run(unless availableSystem is 0) because RunIfReady always adds an available system before checking the requirements 
+void Scheduleable::AddAvailability(unsigned char availableSystem)
 {
-	if (IsDead)
-	{
-		std::cout << "THIS ALREADY DIED!! ALERT, THIS IS DEAD ALREADY!";
-	}
 	availableSystems |= availableSystem;
-	if ((availableSystems & requirementFlags) == requirementFlags)
+}
+
+bool Scheduleable::IsReady()
+{
+	return (availableSystems & requirementFlags) == requirementFlags;
+}
+
+bool Scheduleable::RunFSM()
+{
+	switch (currentState)
 	{
-		switch (currentState)
+	case ScheduleableStates::Initialize:
+		if (initializationScheduleable->RunFSM())
 		{
-		case ScheduleableStates::Initialize:
-			if (initializationScheduleable->Run())
+			currentState = GetNextState(currentState);
+			if (currentState == endingState)
 			{
-				currentState = GetNextState(currentState);
-				return currentState == endingState;
+				std::cout << "ReturningTrue" << std::endl;
 			}
-			break;
-
-		case ScheduleableStates::Run:
-			if (Run())
-			{
-				currentState = GetNextState(currentState);
-				return currentState == endingState;
-			}
-			break;
-
-		case ScheduleableStates::Cleanup:
-			if (cleanupScheduleable->Run())
-			{
-				currentState = GetNextState(currentState);
-				return currentState == endingState;
-			}
-			break;
-
-		case ScheduleableStates::Return:
-			std::cout << "IMPOSSIBLE STATE" << std::endl;
-			while (true);
-			break;
-
-		default:
-			std::cout << "IMPOSSIBLE STATE" << std::endl;
-			while (true);
-			break;
+			return currentState == endingState;
 		}
+		break;
+
+	case ScheduleableStates::Run:
+		if (Run())
+		{
+			currentState = GetNextState(currentState);
+			if (currentState == endingState)
+			{
+				std::cout << "ReturningTrue" << std::endl;
+			}
+			return currentState == endingState;
+		}
+		break;
+
+	case ScheduleableStates::Cleanup:
+		if (cleanupScheduleable->RunFSM())
+		{
+			currentState = GetNextState(currentState);
+			if (currentState == endingState)
+			{
+				std::cout << "ReturningTrue" << std::endl;
+			}
+			return currentState == endingState;
+		}
+		break;
+
+	case ScheduleableStates::Return:
+		std::cout << "IMPOSSIBLE STATE" << std::endl;
+		while (true);
+		break;
+
+	default:
+		std::cout << "IMPOSSIBLE STATE" << std::endl;
+		while (true);
+		break;
 	}
-	else
+	return false;
+}
+
+void Scheduleable::Initialize()
+{
+	currentState = startingState;
+}
+
+void Scheduleable::InitializeFSM()
+{
+	Initialize();
+	if (startingState == ScheduleableStates::Initialize)
 	{
-		return false;
+		initializationScheduleable->InitializeFSM();
+	}
+	if (endingState == ScheduleableStates::Return)
+	{
+		cleanupScheduleable->InitializeFSM();
 	}
 }
+
+//bool Scheduleable::RunIfReady(unsigned char availableSystem) 
+////An IScheduleable that doesn't require any systems will never run(unless availableSystem is 0) because RunIfReady always adds an available system before checking the requirements 
+//{
+//	if (IsDead)
+//	{
+//		std::cout << "THIS ALREADY DIED!! ALERT, THIS IS DEAD ALREADY!";
+//	}
+//  availableSystems |= availableSystem;
+//	if ((availableSystems & requirementFlags) == requirementFlags)
+//	{
+//		switch (currentState)
+//		{
+//		case ScheduleableStates::Initialize:
+//			if (initializationScheduleable->Run())
+//			{
+//				currentState = GetNextState(currentState);
+//				return currentState == endingState;
+//			}
+//			break;
+//
+//		case ScheduleableStates::Run:
+//			if (Run())
+//			{
+//				currentState = GetNextState(currentState);
+//				return currentState == endingState;
+//			}
+//			break;
+//
+//		case ScheduleableStates::Cleanup:
+//			if (cleanupScheduleable->Run())
+//			{
+//				currentState = GetNextState(currentState);
+//				return currentState == endingState;
+//			}
+//			break;
+//
+//		case ScheduleableStates::Return:
+//			std::cout << "IMPOSSIBLE STATE" << std::endl;
+//			while (true);
+//			break;
+//
+//		default:
+//			std::cout << "IMPOSSIBLE STATE" << std::endl;
+//			while (true);
+//			break;
+//		}
+//	}
+//	else
+//	{
+//		return false;
+//	}
+//}
 
 void Scheduleable::ResetAvailability()
 {
 	availableSystems = 0;
-}
-
-bool Scheduleable::Initialize()
-{
-	currentState = startingState;
-	return true;
 }
 
 bool Scheduleable::SetInitializationScheduleable(std::shared_ptr<Scheduleable> scheduleable)
