@@ -28,7 +28,8 @@ enum class Systems : unsigned char
 
 	//Custom flags
 	All = 255,
-	Chassis = 6,
+	Chassis = LeftMotor + RightMotor,
+	Robot = Chassis + ContainerIntake + HoopIntake,
 };
 
 static const unsigned int SystemsCount = 8;
