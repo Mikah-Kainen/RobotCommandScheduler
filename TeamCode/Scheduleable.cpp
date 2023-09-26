@@ -100,7 +100,7 @@ bool Scheduleable::RunFSM()
 			currentState = GetNextState(currentState);
 			if (currentState == endingState)
 			{
-				std::cout << "ReturningTrue" << std::endl;
+				//std::cout << "ReturningTrue" << std::endl;
 			}
 			return currentState == endingState;
 		}
@@ -112,7 +112,7 @@ bool Scheduleable::RunFSM()
 			currentState = GetNextState(currentState);
 			if (currentState == endingState)
 			{
-				std::cout << "ReturningTrue" << std::endl;
+				//std::cout << "ReturningTrue" << std::endl;
 			}
 			return currentState == endingState;
 		}
@@ -124,7 +124,7 @@ bool Scheduleable::RunFSM()
 			currentState = GetNextState(currentState);
 			if (currentState == endingState)
 			{
-				std::cout << "ReturningTrue" << std::endl;
+				//std::cout << "ReturningTrue" << std::endl;
 			}
 			return currentState == endingState;
 		}
@@ -146,20 +146,28 @@ bool Scheduleable::RunFSM()
 void Scheduleable::Initialize()
 {
 	currentState = startingState;
-}
-
-void Scheduleable::InitializeFSM()
-{
-	Initialize();
 	if (startingState == ScheduleableStates::Initialize)
 	{
-		initializationScheduleable->InitializeFSM();
+		initializationScheduleable->Initialize();
 	}
 	if (endingState == ScheduleableStates::Return)
 	{
-		cleanupScheduleable->InitializeFSM();
+		cleanupScheduleable->Initialize();
 	}
 }
+
+//void Scheduleable::InitializeFSM()
+//{
+//	Initialize(); //figutre out this
+//	if (startingState == ScheduleableStates::Initialize)
+//	{
+//		initializationScheduleable->InitializeFSM();
+//	}
+//	if (endingState == ScheduleableStates::Return)
+//	{
+//		cleanupScheduleable->InitializeFSM();
+//	}
+//}
 
 //bool Scheduleable::RunIfReady(unsigned char availableSystem) 
 ////An IScheduleable that doesn't require any systems will never run(unless availableSystem is 0) because RunIfReady always adds an available system before checking the requirements 

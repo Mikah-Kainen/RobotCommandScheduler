@@ -444,7 +444,7 @@ bool GroupBase::Run()
 				break;
 
 			case Behaviors::Initialize:
-				database.scheduleableMap[Unpack(packedID)]->InitializeFSM();
+				database.scheduleableMap[Unpack(packedID)]->Initialize(); //was InitializeFSM
 				noRequirementPackedIDsToReplace.push_back(std::tuple<unsigned int, unsigned int>(packedID, packedID & ~ShouldInitializeMask));
 				break;
 
@@ -509,7 +509,7 @@ bool GroupBase::Run()
 						break;
 
 					case Behaviors::Initialize:
-						database.scheduleableMap[Unpack(currentPackedID)]->InitializeFSM();
+						database.scheduleableMap[Unpack(currentPackedID)]->Initialize(); //was InitializeFSM
 						ReplaceID(currentPackedID, currentPackedID & ~ShouldInitializeMask);
 						break;
 
@@ -564,7 +564,8 @@ bool GroupBase::Run()
 			}
 		}
 	}
-	return Return(finishedSystems == requirementFlags);
+
+	return Return(finishedSystems == requirementFlags & requirementFreeScheduleables.size() == 0);
 	//unsigned char finishedSystems = 0;
 	//for (unsigned int i = 0; i < SystemsCount; i++)
 	//{

@@ -65,7 +65,7 @@ void RescheduleableGroup::Initialize()
 {
 	for (unsigned int packedID : initializeRequirementFreeScheduleables)
 	{
-		requirementFreeScheduleables.insert(packedID);
+		requirementFreeScheduleables.insert(packedID | ShouldInitializeMask);
 	}
 	initializeRequirementFreeScheduleables.clear();
 	for (int i = 0; i < SystemsCount; i ++)

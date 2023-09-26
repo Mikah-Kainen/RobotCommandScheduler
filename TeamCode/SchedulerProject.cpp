@@ -211,7 +211,7 @@ int main() //Unit tests with GoogleTest
 	CommandBuilder<int> MoveLeftMotorByTimeVal = CommandBuilder<int>(std::bind(&Motor::MoveByTime, robot.GetLeftMotor(), std::placeholders::_1), (unsigned char)Systems::LeftMotor);
 	//Command<const std::vector<std::string>&> DisplayMessage = Command<const std::vector<std::string>&>([&](const std::vector<std::string>& messages) {for (std::string message : messages) { std::cout << message; } std::cout << std::flush; return true; }, (unsigned char)Systems::RightMotor);
 	std::function<bool(const std::string&)> myFunc = std::function<bool(const std::string&)>([&](const std::string& message) {std::cout << message; return true; });
-	myFunc("Hi\n\n");
+	//myFunc("Hi\n\n");
 	CommandBuilder<std::string*> DisplayStringPointer = CommandBuilder<std::string*>(std::function<bool(std::string*)>([&](std::string* message) {std::cout << *message; return true; }), Systems::RightMotor);
 	CommandBuilder<const std::string&> DisplayStringReference = CommandBuilder<const std::string&>([&](const std::string& message) {std::cout << message; return true; }, Systems::RightMotor);
 	CommandBuilder<std::string> DisplayStringValue = CommandBuilder<std::string>([&](std::string message) {std::cout << message; return true; }, Systems::RightMotor);
@@ -425,7 +425,6 @@ int main() //Unit tests with GoogleTest
 		}, 4));
 #pragma endregion
 
-
 	CommandBuilder<> UEChassis = CommandBuilder<>([&]() { return true; }, Systems::Chassis);
 	UEChassis.SetInitialization(Display.CreateCommand("Updating Encoders"));
 	CommandBuilder<int, int, int, int> MoveRobot = CommandBuilder<int, int, int, int>([&](int, int, int, int) {std::cout << "Moving" << std::endl; return true; }, Systems::Chassis);
@@ -455,37 +454,37 @@ int main() //Unit tests with GoogleTest
 	}));
 
 	std::shared_ptr<SequentialGroup> sequentialGroup = std::make_shared<SequentialGroup>(SequentialGroup({
+		////Display.CreateCommand(message2),
+		////UEChassis.CreateCommand(),
+		////Display.CreateCommand(message2),
+		//MoveRobot.CreateCommand(50, 500, 50, 500),
 		//Display.CreateCommand(message2),
-		//UEChassis.CreateCommand(),
-		//Display.CreateCommand(message2),
-		MoveRobot.CreateCommand(50, 500, 50, 500),
-		Display.CreateCommand(message2),
-		//UEChassis.CreateCommand(),
-		MoveRobot.CreateCommand(50, 200, -50, 200),
+		////UEChassis.CreateCommand(),
+		//MoveRobot.CreateCommand(50, 200, -50, 200),
 
 		Set.CreateCommand(count, 0),
 		std::make_shared<ParallelGroup>(ParallelGroup({
-			//std::make_shared<LoopGroup>(LoopGroup({
-			//	//UEChassis.CreateCommand(),
-			//	MoveRobot.CreateCommand(-30, 350, -30, 350),
-			//}, [&](LoopGroup&) {return count >= 2; })),
+			std::make_shared<LoopGroup>(LoopGroup({
+				//UEChassis.CreateCommand(),
+				MoveRobot.CreateCommand(-30, 350, -30, 350),
+			}, [&](LoopGroup&) {return count >= 1; })),
 
 			std::make_shared<LoopGroup>(LoopGroup({
 				std::make_shared<SequentialGroup>(SequentialGroup({
-					//ResetIntakeTime.CreateCommand(),
-					MoveIntakeByTime.CreateCommand(-35, 700),
-					//ResetIntakeTime.CreateCommand(),
-					MoveIntakeByTime.CreateCommand(35, 700),
-					DisplayFromArray.CreateCommand(countMessages, count),
+					////ResetIntakeTime.CreateCommand(),
+					//MoveIntakeByTime.CreateCommand(-35, 700),
+					////ResetIntakeTime.CreateCommand(),
+					//MoveIntakeByTime.CreateCommand(35, 700),
+					//DisplayFromArray.CreateCommand(countMessages, count),
 					Increment.CreateCommand(count),
 				})),
-				Display.CreateCommand("HI"),
+				//Display.CreateCommand("HI"),
 			}, 4)),
 			//UEChassis.CreateCommand(),
 			MoveRobot.CreateCommand(15, 50, 15, 50),
 		})),
-		////UEChassis.CreateCommand(),
-		MoveRobot.CreateCommand(-50, 200, 50, 200),
+	//	////UEChassis.CreateCommand(),
+	//	MoveRobot.CreateCommand(-50, 200, 50, 200),
 	}));
 
 	std::string otherMessage = "End of Functions, Current Time: ";

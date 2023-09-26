@@ -65,7 +65,7 @@ class Scheduleable
 		//virtual bool Initialize(); //Use this and just keep state of initialization of InitializeFunc, MainRun, and CleanupFunc if I need initializations with more than one cycle
 		virtual void Initialize();
 
-		void InitializeFSM();
+		//void InitializeFSM();
 
 		void ResetAvailability();
 

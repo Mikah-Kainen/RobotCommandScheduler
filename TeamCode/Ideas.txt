@@ -14,6 +14,8 @@ Downside: If the array is not managed properly, it could end up taking much more
 Upside: We don't have to store the same function multiple times if it requires multiple systems
 Critical upside: It is much easier to replace functions or branch
 
+Maybe make loop group check condition at start of function
+Add support for the .Schedule function with groups other than Parallel
 
 I should get rid of FunctionManager
 Groups shouldn't subscribe end behavior functions every time at initialization, but should subscribe them in constructors and copy constructors. The initialization list is just for copyConstructors
