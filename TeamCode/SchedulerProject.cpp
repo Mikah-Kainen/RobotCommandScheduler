@@ -434,6 +434,9 @@ int main() //Unit tests with GoogleTest
 	CommandBuilder<int, int> MoveIntakeByTime = CommandBuilder<int, int>([&](int, int) {return true; }, Systems::ContainerIntake);
 	MoveIntakeByTime.SetInitialization(ResetIntakeTime.CreateCommand());
 
+	CommandBuilder<int&> WaitTillThree = CommandBuilder<int&>([&](int& count) {count++; std::cout << count << std::endl; return count >= 4; }, Systems::None);
+	CommandBuilder<int&> SetToZero = CommandBuilder<int&>([&](int& target) {target = 0; return true; }, Systems::None);
+
 	int count = 0;
 	std::string countMessages[] = {
 	std::string("Cycle 0 Complete"),
@@ -453,6 +456,8 @@ int main() //Unit tests with GoogleTest
 		Display.CreateCommand("Four"),
 	}));
 
+	int zero = 0;
+
 	std::shared_ptr<SequentialGroup> sequentialGroup = std::make_shared<SequentialGroup>(SequentialGroup({
 		////Display.CreateCommand(message2),
 		////UEChassis.CreateCommand(),
@@ -464,21 +469,22 @@ int main() //Unit tests with GoogleTest
 
 		Set.CreateCommand(count, 0),
 		std::make_shared<ParallelGroup>(ParallelGroup({
-			std::make_shared<LoopGroup>(LoopGroup({
-				//UEChassis.CreateCommand(),
-				MoveRobot.CreateCommand(-30, 350, -30, 350),
-			}, [&](LoopGroup&) {return count >= 1; })),
+			//std::make_shared<LoopGroup>(LoopGroup({
+			//	//UEChassis.CreateCommand(),
+			//	MoveRobot.CreateCommand(-30, 350, -30, 350),
+			//}, [&](LoopGroup&) {return count >= 1; })),
 
 			std::make_shared<LoopGroup>(LoopGroup({
-				std::make_shared<SequentialGroup>(SequentialGroup({
-					////ResetIntakeTime.CreateCommand(),
-					//MoveIntakeByTime.CreateCommand(-35, 700),
-					////ResetIntakeTime.CreateCommand(),
-					//MoveIntakeByTime.CreateCommand(35, 700),
-					//DisplayFromArray.CreateCommand(countMessages, count),
-					Increment.CreateCommand(count),
-				})),
-				//Display.CreateCommand("HI"),
+				//std::make_shared<SequentialGroup>(SequentialGroup({
+				//	//ResetIntakeTime.CreateCommand(),
+				//	MoveIntakeByTime.CreateCommand(-35, 700),
+				//	//ResetIntakeTime.CreateCommand(),
+				//	MoveIntakeByTime.CreateCommand(35, 700),
+				//	DisplayFromArray.CreateCommand(countMessages, count),
+				//	Increment.CreateCommand(count),
+				//})),
+				Display.CreateCommand("HI"),
+				WaitTillThree.CreateCommand(zero),
 			}, 4)),
 			//UEChassis.CreateCommand(),
 			MoveRobot.CreateCommand(15, 50, 15, 50),
