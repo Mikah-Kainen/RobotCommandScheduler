@@ -223,6 +223,11 @@ void GroupBase::ReplaceIDUnpacked(unsigned int unpackedID, unsigned int newPacke
 	}
 }
 
+unsigned int GroupBase::GetUniversalID(unsigned int unpackedID)
+{
+	return (schedulerID << 16) | (unpackedID & 0xFFFF);
+}
+
 //void GroupBase::SetShouldInitialize(unsigned int packedID)
 //{
 //	int unpackedID = Unpack(packedID);
@@ -259,10 +264,9 @@ void GroupBase::ReplaceIDUnpacked(unsigned int unpackedID, unsigned int newPacke
 //	}
 //}
 
-
 GroupBase::GroupBase(const GroupBase& copyGroupBase)
 	: Scheduleable(copyGroupBase.requirementFlags), initializeFunctions{ std::vector<std::function<void(GroupBase&)>>() },
-	database{ copyGroupBase.database }, schedulerType{ copyGroupBase.schedulerType }, schedulerID{ copyGroupBase.schedulerID },
+	database{ copyGroupBase.database }, schedulerType{ copyGroupBase.schedulerType }, schedulerID{ NextAvailableSchedulerID++ },
 	requirementFreeScheduleables{std::unordered_set<unsigned int>()}, schedule{new std::vector<unsigned int>[SystemsCount]}, 
 	currentIndices{new unsigned int[SystemsCount]}
 {
@@ -429,6 +433,7 @@ bool GroupBase::Run()
 		std::vector<std::tuple<unsigned int, unsigned int>> noRequirementPackedIDsToReplace = std::vector<std::tuple<unsigned int, unsigned int>>();
 		for (unsigned int packedID : requirementFreeScheduleables)
 		{
+			unsigned int unpackedID = Unpack(packedID);
 			GroupBase::Behaviors nextBehavior = GetNextBehavior(packedID);
 			switch (nextBehavior)
 			{
@@ -444,16 +449,23 @@ bool GroupBase::Run()
 				break;
 
 			case Behaviors::Initialize:
-				database.scheduleableMap[Unpack(packedID)]->Initialize(); //was InitializeFSM
-				noRequirementPackedIDsToReplace.push_back(std::tuple<unsigned int, unsigned int>(packedID, packedID & ~ShouldInitializeMask));
+				if (database.scheduleableMap[unpackedID]->TryUnlock(GetUniversalID(unpackedID)))
+				{
+					database.scheduleableMap[unpackedID]->Initialize();
+					noRequirementPackedIDsToReplace.push_back(std::tuple<unsigned int, unsigned int>(packedID, packedID & ~ShouldInitializeMask));
+				}
 				break;
 
 			case Behaviors::Run:
-				if (database.RunIfReady(Unpack(packedID), (unsigned char)Systems::None)) //SINCE THERES NO REQUIREMENTS SKIP RUN IF READY AND JUST CALL RUN!!
+				if (database.scheduleableMap[unpackedID]->TryUnlock(GetUniversalID(unpackedID)) && database.scheduleableMap[unpackedID]->RunFSM())
+					//Doesn't call RunIfReady because Systems::None has no requirements
+					//This will break if I ever add more functionality to RunIfReady
 				{
-					for (int x = 0; x < database.endBehaviors[Unpack(packedID)].size(); x++)
+					database.scheduleableMap[unpackedID]->ResetLock();
+
+					for (int x = 0; x < database.endBehaviors[unpackedID].size(); x++)
 					{
-						database.endBehaviors[Unpack(packedID)][x](*this);
+						database.endBehaviors[unpackedID][x](*this);
 						//database.endBehaviors[Unpack(currentID)].erase(database.endBehaviors[Unpack(currentID)].begin() + x);
 					}
 

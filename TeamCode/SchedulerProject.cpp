@@ -140,12 +140,6 @@ void TakeConstRef(const int& constRef)
 	std::cout << constRef << std::endl;
 }
 
-/*Don't forget
-	The state machine of Scheduleables runs Initialize and Cleanup functions directly, so the Initialize/Cleanup functions of Initialize or Cleanup Scheduleables will not run.
-	There is no System-usage protection in the Initialize and Cleanup functions of Scheduleable.
-	Add Systems::None (all flags set to 0, always runs(unless barred))
-*/
-
 /* To do list:
 	Remove FunctionManager
 	Probably remove InitializeGroup
@@ -156,12 +150,9 @@ void TakeConstRef(const int& constRef)
 	Add initialized flag to GroupBase IDs
 	Stop removing from FunctionManager when scheduleables are done
 	Add reset functions to initialize of scheduleables and reset initialize flag after things are run and figure out general initialize stuff
-	Add state enum to scheduleable to transition between Initialize, Run, and Cleanup
-	Add Systems::Other
 	Change Schedule to keep track of current index for each system instead of just removing
 	Change deconstructor of GroupBase to clean up Scheduleables
 	Maybe make ProgramScheduler remove scheduleables from the schedule when they are finished (virtual bool cleanup that can be overriden by Scheduler)
-	Polyfill std::apply
 	Add interruptable flag
 	Add while groups
 	Add GroupBuilder
@@ -228,11 +219,6 @@ int main() //Unit tests with GoogleTest
 	CommandBuilder<Cat&> DisplayCatReferenceSix = CommandBuilder<Cat&>([&](Cat& cat) {return cat.Display(); }, Systems::Six);
 	CommandBuilder<Cat> DisplayCatValueSix = CommandBuilder<Cat>([&](Cat cat) {return cat.Display(); }, Systems::Six);
 	CommandBuilder<Cat&, int> IncrimentCatAgeSix = CommandBuilder<Cat&, int>([&](Cat& cat, int age) {cat.Age += age; std::cout << "System Six being used" << std::endl; return true; }, Systems::Six);
-
-	CommandBuilder<int&> DisplayNumber = CommandBuilder<int&>(std::function<bool(int&)>([&](int& number) {std::cout << number << std::endl; return true; }), (unsigned char)Systems::LeftMotor);
-	CommandBuilder<int> DisplayNumberVal = CommandBuilder<int>(std::function<bool(int)>([&](int number) {std::cout << number << std::endl; return true; }), (unsigned char)Systems::LeftMotor);
-	CommandBuilder<> UpdateLeftMotorTime = CommandBuilder<>(std::bind(&Motor::UpdateTime, robot.GetLeftMotor()), (unsigned char)Systems::LeftMotor);
-
 
 	auto Increment = CommandBuilder<int&>([&](int& value) {value++; return true; }, Systems::None);
 	auto Set = CommandBuilder<int&, int>([&](int& value, int target) {value = target; return true; }, Systems::None);
@@ -434,8 +420,12 @@ int main() //Unit tests with GoogleTest
 	CommandBuilder<int, int> MoveIntakeByTime = CommandBuilder<int, int>([&](int, int) {return true; }, Systems::ContainerIntake);
 	MoveIntakeByTime.SetInitialization(ResetIntakeTime.CreateCommand());
 
-	CommandBuilder<int&> WaitTillThree = CommandBuilder<int&>([&](int& count) {count++; std::cout << count << std::endl; return count >= 4; }, Systems::None);
-	CommandBuilder<int&> SetToZero = CommandBuilder<int&>([&](int& target) {target = 0; return true; }, Systems::None);
+	int CountToThreeRightMotorCount = 0;
+	CommandBuilder<> CountToThreeRightMotor = CommandBuilder<>([&, &count = CountToThreeRightMotorCount]() {std::cout << "RightMotorCount: " << count << std::endl; if (count == 3) { count = 0; return true; }; count++; return false; }, { Systems::RightMotor, Systems::None });
+	int CountToThreeLeftMotorCount = 0;
+	CommandBuilder<> CountToThreeLeftMotor = CommandBuilder<>([&, &count = CountToThreeLeftMotorCount]() {std::cout << "LeftMotorCount: " << count << std::endl; if (count == 3) { count = 0; return true; }; count++; return false; }, { Systems::LeftMotor, Systems::None });
+
+
 
 	int count = 0;
 	std::string countMessages[] = {
@@ -451,9 +441,21 @@ int main() //Unit tests with GoogleTest
 		Display.CreateCommand("One"),
 		Display.CreateCommand("Two"),
 		Display.CreateCommand("Three"),
-		DisplayNumberVal.CreateCommand(1),
-		DisplayNumberVal.CreateCommand(2),
 		Display.CreateCommand("Four"),
+	}));
+
+	std::shared_ptr<ParallelGroup> testNoRequirements = std::make_shared<ParallelGroup>(ParallelGroup({
+		std::make_shared<ParallelGroup>(ParallelGroup({
+		CountToThreeRightMotor.CreateCommand(),
+		testSystemsNone,
+		})),
+
+		std::make_shared<ParallelGroup>(ParallelGroup({
+		CountToThreeLeftMotor.CreateCommand(),
+		testSystemsNone,
+		})),
+
+		testSystemsNone,
 	}));
 
 	int zero = 0;
@@ -484,7 +486,6 @@ int main() //Unit tests with GoogleTest
 				//	Increment.CreateCommand(count),
 				//})),
 				Display.CreateCommand("HI"),
-				WaitTillThree.CreateCommand(zero),
 			}, 4)),
 			//UEChassis.CreateCommand(),
 			MoveRobot.CreateCommand(15, 50, 15, 50),
@@ -512,8 +513,9 @@ int main() //Unit tests with GoogleTest
 	
 	//scheduler.Schedule(loopGroupWithSequentialGroupTest);
 	
-	//scheduler.Schedule(testSystemsNone);
-	scheduler.Schedule(sequentialGroup);
+	scheduler.Schedule(testSystemsNone);
+	scheduler.Schedule(testNoRequirements);
+	//scheduler.Schedule(sequentialGroup);
 	//scheduler.Schedule(endFunction);
 
 	//if (true)

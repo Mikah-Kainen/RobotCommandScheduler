@@ -97,7 +97,7 @@ protected:
 
 protected:
 	SchedulerTypes schedulerType;
-	unsigned int schedulerID; //for debugging
+	unsigned int schedulerID;
 
 	//virtual void InitializeGroup() = 0;
 
@@ -139,6 +139,8 @@ protected:
 	//virtual void Cleanup(int packedID) = 0; //ADD THIS! Then add derived class NonConsumingGroup and ConsumingGroup
 
 	//void AddToInitialize(std::function<void(GroupBase&)> initializeFunction);
+
+	unsigned int GetUniversalID(unsigned int unpackedID);
 
 public:
 	GroupBase(const GroupBase& copyGroupBase);

@@ -33,7 +33,7 @@ enum class Systems : unsigned char
 };
 
 static const unsigned int SystemsCount = 8;
-static unsigned int NextAvailableSchedulerID;
+static unsigned int NextAvailableSchedulerID = 1; //Starts at 1 so that zero can be used to represent no unlockKeys for scheduleables
 
 static std::function<bool()> ReturnTrue = std::function<bool()>([&]() {return true; });
 

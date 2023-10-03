@@ -16,6 +16,7 @@ Critical upside: It is much easier to replace functions or branch
 
 Maybe make loop group check condition at start of function
 Add support for the .Schedule function with groups other than Parallel
+Add lock so that the same scheduleable won't run at the same time if it doesn't have any requirements
 
 I should get rid of FunctionManager
 Groups shouldn't subscribe end behavior functions every time at initialization, but should subscribe them in constructors and copy constructors. The initialization list is just for copyConstructors

@@ -29,7 +29,7 @@ Scheduleable::Scheduleable(unsigned char requirementFlags)
 
 Scheduleable::Scheduleable(std::function<bool()> backingFunction, unsigned char requirementFlags)
 	:backingFunction{ backingFunction }, initializationScheduleable{ nullptr }, cleanupScheduleable{nullptr}, startingState {ScheduleableStates::Run}, 
-	endingState{ GetNextState(ScheduleableStates::Run) }, currentState{ ScheduleableStates::Run },
+	endingState{ GetNextState(ScheduleableStates::Run) }, currentState{ ScheduleableStates::Run }, lock{ false }, unlockKey{0},
 	requirementFlags {requirementFlags}, availableSystems{ (unsigned char)0 }, IsDead{ false } {}
 
 Scheduleable::Scheduleable(std::function<bool()> backingFunction, Systems requiredSystem)
@@ -52,7 +52,7 @@ Scheduleable::Scheduleable(std::function<bool()> backingFunction, Systems requir
 
 Scheduleable::Scheduleable(const Scheduleable& copyScheduleable)
 	:availableSystems{ copyScheduleable.availableSystems }, backingFunction{ copyScheduleable.backingFunction }, initializationScheduleable{ copyScheduleable.initializationScheduleable }, 
-	cleanupScheduleable{copyScheduleable.cleanupScheduleable}, startingState {copyScheduleable.startingState}, endingState{ copyScheduleable.endingState }, 
+	cleanupScheduleable{ copyScheduleable.cleanupScheduleable }, startingState{ copyScheduleable.startingState }, endingState{ copyScheduleable.endingState }, lock{ false }, unlockKey{0},
 	currentState{ copyScheduleable.currentState }, IsDead{ copyScheduleable.IsDead }, requirementFlags{copyScheduleable.requirementFlags}
 {
 	//std::cout << "Scheduleable Copied!!" << std::endl;
@@ -92,16 +92,22 @@ bool Scheduleable::IsReady()
 
 bool Scheduleable::RunFSM()
 {
+	if (!requirementFlags & lock)
+	{
+		return false;
+	}
+	lock = true;
+
 	switch (currentState)
 	{
 	case ScheduleableStates::Initialize:
 		if (initializationScheduleable->RunFSM())
 		{
 			currentState = GetNextState(currentState);
-			if (currentState == endingState)
-			{
-				//std::cout << "ReturningTrue" << std::endl;
-			}
+			//if (currentState == endingState)
+			//{
+			//	//std::cout << "ReturningTrue" << std::endl;
+			//}
 			return currentState == endingState;
 		}
 		break;
@@ -110,10 +116,10 @@ bool Scheduleable::RunFSM()
 		if (Run())
 		{
 			currentState = GetNextState(currentState);
-			if (currentState == endingState)
-			{
-				//std::cout << "ReturningTrue" << std::endl;
-			}
+			//if (currentState == endingState)
+			//{
+			//	//std::cout << "ReturningTrue" << std::endl;
+			//}
 			return currentState == endingState;
 		}
 		break;
@@ -122,10 +128,10 @@ bool Scheduleable::RunFSM()
 		if (cleanupScheduleable->RunFSM())
 		{
 			currentState = GetNextState(currentState);
-			if (currentState == endingState)
-			{
-				//std::cout << "ReturningTrue" << std::endl;
-			}
+			//if (currentState == endingState)
+			//{
+			//	//std::cout << "ReturningTrue" << std::endl;
+			//}
 			return currentState == endingState;
 		}
 		break;
@@ -245,4 +251,25 @@ bool Scheduleable::SetCleanupScheduleable(std::shared_ptr<Scheduleable> schedule
 		return true;
 	}
 	return false;
+}
+
+bool Scheduleable::TryUnlock(unsigned int key)
+{
+	if (!unlockKey)
+	{
+		unlockKey = key;
+		lock = false;
+		return true;
+	}
+	if (unlockKey == key)
+	{
+		lock = false;
+		return true;
+	}
+	return false;
+}
+
+void Scheduleable::ResetLock()
+{
+	unlockKey = 0;
 }
