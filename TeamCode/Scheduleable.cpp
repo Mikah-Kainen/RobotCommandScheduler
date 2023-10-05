@@ -28,9 +28,9 @@ Scheduleable::Scheduleable(unsigned char requirementFlags)
 	:Scheduleable(NoFunctionProvided, requirementFlags) {}
 
 Scheduleable::Scheduleable(std::function<bool()> backingFunction, unsigned char requirementFlags)
-	:backingFunction{ backingFunction }, initializationScheduleable{ nullptr }, cleanupScheduleable{nullptr}, startingState {ScheduleableStates::Run}, 
-	endingState{ GetNextState(ScheduleableStates::Run) }, currentState{ ScheduleableStates::Run }, lock{ false }, unlockKey{0},
-	requirementFlags {requirementFlags}, availableSystems{ (unsigned char)0 }, IsDead{ false } {}
+	:backingFunction{ backingFunction }, initializationScheduleable{ nullptr }, cleanupScheduleable{nullptr},
+	startingState {ScheduleableStates::Run}, endingState{ GetNextState(ScheduleableStates::Run) }, currentState{ScheduleableStates::Run}, 
+	lock{ false }, unlockKey{ 0 }, requirementFlags {requirementFlags}, availableSystems{ (unsigned char)0 }, IsDead{ false } {}
 
 Scheduleable::Scheduleable(std::function<bool()> backingFunction, Systems requiredSystem)
 	:Scheduleable(backingFunction, (unsigned char)requiredSystem) {}

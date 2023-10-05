@@ -30,6 +30,20 @@ private:
 	virtual bool Run();
 
 protected:
+	/*Ok this is probably not actually necessary. The group knows IDs when scheduling, and initialization and cleanup functions can be added to the lists that take care of the rest
+	enum class ReturnCodes : unsigned int
+	{
+		Unassigned = 0,
+		None = 1,
+		ReInitialize = 2, //Eventually Change LoopGroup to use this
+		SwapMapping = 256, //Uses auxiliary field to know which mapping to swap to
+						   //Make sure to reset lock!
+		//RunNextScheduleable, //HAHAHAAHAHAH I BETTER NOT USE THIS BECAUSE IT WILL KILLLLLLLLLLLLLLLLL EVERYTHING
+	};
+	ReturnCodes returnCode;
+	unsigned int auxiliarlyUnpackedID; //used to supplement the certain ReturnCodes behavior, such as SwapMapping
+	*/
+
 	Scheduleable(unsigned char requirementFlags);
 
 	void SetInitializationScheduleableDirect(std::shared_ptr<Scheduleable> scheduleable);

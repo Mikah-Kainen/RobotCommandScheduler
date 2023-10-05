@@ -22,6 +22,8 @@ protected:
 		Parallel,
 		Sequential,
 		Loop,
+		Conditional,
+		TryCatch,
 	};
 
 	//Bar flags use one bit per value i.e. 3 bits = 3 values as opposed to 3 bits = 8 values. This is for readability so that anything with a bar set will be an odd number
@@ -59,7 +61,7 @@ protected:
 	class DictionaryManager //Rename PackedID to FlagsID and UnpackedID to DictionaryID //maybe just have dictionaryFunctions unpack
 	{
 	private:
-		unsigned int nextAvailableID;
+		unsigned int nextAvailableID; //Starts at 1 to allow 0 for NoID checks (such as with the Scheduleable::AuxiliaryID)
 		std::function<unsigned int(unsigned int)> removeFlagsFunc;
 
 	public:

@@ -515,6 +515,7 @@ int main() //Unit tests with GoogleTest
 	
 	scheduler.Schedule(testSystemsNone);
 	scheduler.Schedule(testNoRequirements);
+	scheduler.Schedule(parallelGroupCombinationTest); //test this
 	//scheduler.Schedule(sequentialGroup);
 	//scheduler.Schedule(endFunction);
 

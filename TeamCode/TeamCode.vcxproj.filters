@@ -66,6 +66,12 @@
     <ClCompile Include="LoopGroup.cpp">
       <Filter>src\SchedulerSrc</Filter>
     </ClCompile>
+    <ClCompile Include="ConditionalGroup.cpp">
+      <Filter>src\SchedulerSrc</Filter>
+    </ClCompile>
+    <ClCompile Include="TryCatchGroup.cpp">
+      <Filter>src\SchedulerSrc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scheduler.h">
@@ -102,6 +108,12 @@
       <Filter>inc\SchedulerInc</Filter>
     </ClInclude>
     <ClInclude Include="LoopGroup.h">
+      <Filter>inc\SchedulerInc</Filter>
+    </ClInclude>
+    <ClInclude Include="ConditionalGroup.h">
+      <Filter>inc\SchedulerInc</Filter>
+    </ClInclude>
+    <ClInclude Include="TryCatchGroup.h">
       <Filter>inc\SchedulerInc</Filter>
     </ClInclude>
   </ItemGroup>

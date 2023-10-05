@@ -43,7 +43,7 @@ bool GroupBase::IsFlagSet(unsigned int packedID, unsigned int mask)
 #pragma region DictionaryManager
 GroupBase::DictionaryManager::DictionaryManager(std::function<unsigned int(unsigned int)> removeFlagsFunc)
 	:removeFlagsFunc{removeFlagsFunc}, scheduleableMap {std::unordered_map<unsigned int, std::shared_ptr<Scheduleable>>()},
-	endBehaviors{ std::unordered_map<unsigned int, std::vector<std::function<void(GroupBase&)>>>() }, nextAvailableID{ 0 }
+	endBehaviors{ std::unordered_map<unsigned int, std::vector<std::function<void(GroupBase&)>>>() }, nextAvailableID{ 1 }
 {
 }
 
@@ -434,14 +434,12 @@ bool GroupBase::Run()
 		for (unsigned int packedID : requirementFreeScheduleables)
 		{
 			unsigned int unpackedID = Unpack(packedID);
+			bool finished = false;
 			GroupBase::Behaviors nextBehavior = GetNextBehavior(packedID);
 			switch (nextBehavior)
 			{
 			case Behaviors::EndEarly:
-				//functionManager.EndEarly(Unpack(currentSystemSchedule[0])); //Add EndEarly to function Manager
-				//throw std::exception("Add EndEarly function to FunctionManger!!");
-				std::cout << "Add EndEarly function to GroupBase!!" << std::endl;
-				while (true);
+				finished = true;
 				break;
 
 			case Behaviors::Bar:
@@ -457,22 +455,23 @@ bool GroupBase::Run()
 				break;
 
 			case Behaviors::Run:
-				if (database.scheduleableMap[unpackedID]->TryUnlock(GetUniversalID(unpackedID)) && database.scheduleableMap[unpackedID]->RunFSM())
+				finished = database.scheduleableMap[unpackedID]->TryUnlock(GetUniversalID(unpackedID)) && database.scheduleableMap[unpackedID]->RunFSM();
 					//Doesn't call RunIfReady because Systems::None has no requirements
 					//This will break if I ever add more functionality to RunIfReady
-				{
-					database.scheduleableMap[unpackedID]->ResetLock();
-
-					for (int x = 0; x < database.endBehaviors[unpackedID].size(); x++)
-					{
-						database.endBehaviors[unpackedID][x](*this);
-						//database.endBehaviors[Unpack(currentID)].erase(database.endBehaviors[Unpack(currentID)].begin() + x);
-					}
-
-					noRequirementPackedIDsToDelete.push_back(packedID);
-					//functionManager.Remove(currentSystemSchedule.front());
-				}
 				break;
+			}
+			if (finished)
+			{
+				database.scheduleableMap[unpackedID]->ResetLock();
+
+				for (int x = 0; x < database.endBehaviors[unpackedID].size(); x++)
+				{
+					database.endBehaviors[unpackedID][x](*this);
+					//database.endBehaviors[Unpack(currentID)].erase(database.endBehaviors[Unpack(currentID)].begin() + x);
+				}
+
+				noRequirementPackedIDsToDelete.push_back(packedID);
+				//functionManager.Remove(currentSystemSchedule.front());
 			}
 		}
 		for (std::tuple<unsigned int, unsigned int> tuple : noRequirementPackedIDsToReplace)
@@ -506,14 +505,12 @@ bool GroupBase::Run()
 				currentScheduleable->AddAvailability(currentAvailableSystem);
 				if (currentScheduleable->IsReady())
 				{
+					bool finished = false;
 					GroupBase::Behaviors nextBehavior = GetNextBehavior(currentPackedID);
 					switch (nextBehavior)
 					{
 					case Behaviors::EndEarly:
-						//functionManager.EndEarly(Unpack(currentSystemSchedule[0])); //Add EndEarly to function Manager
-						//throw std::exception("Add EndEarly function to FunctionManger!!");
-						std::cout << "Add EndEarly function to GroupBase!!" << std::endl;
-						while (true);
+						finished = true;
 						break;
 
 					case Behaviors::Bar:
@@ -526,27 +523,28 @@ bool GroupBase::Run()
 						break;
 
 					case Behaviors::Run:
-						if (currentScheduleable->RunFSM())
-						{
-							packedIDsToDelete.push_back(currentPackedID);
-							for (int x = 0; x < database.endBehaviors[Unpack(currentPackedID)].size(); x++)
-							{
-								database.endBehaviors[Unpack(currentPackedID)][x](*this);
-								//database.endBehaviors[Unpack(currentID)].erase(database.endBehaviors[Unpack(currentID)].begin() + x);
-							}
-
-							currentIndices[i]++;
-							for (int x = 0; x < i; x++)
-							{
-								if (currentIndices[x] < schedule[x].size() && schedule[x][currentIndices[x]] == currentPackedID)
-								{
-									currentIndices[x] ++;
-								}
-							}
-							Remove(currentPackedID);
-							//functionManager.Remove(currentSystemSchedule.front());
-						}
+						finished = currentScheduleable->RunFSM();
 						break;
+					}
+					if (finished)
+					{
+						packedIDsToDelete.push_back(currentPackedID);
+						for (int x = 0; x < database.endBehaviors[Unpack(currentPackedID)].size(); x++)
+						{
+							database.endBehaviors[Unpack(currentPackedID)][x](*this);
+							//database.endBehaviors[Unpack(currentID)].erase(database.endBehaviors[Unpack(currentID)].begin() + x);
+						}
+
+						currentIndices[i]++;
+						for (int x = 0; x < i; x++)
+						{
+							if (currentIndices[x] < schedule[x].size() && schedule[x][currentIndices[x]] == currentPackedID)
+							{
+								currentIndices[x] ++;
+							}
+						}
+						Remove(currentPackedID);
+						//functionManager.Remove(currentSystemSchedule.front());
 					}
 				}
 			}
