@@ -130,7 +130,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CommandBuilder.cpp" />
-    <ClCompile Include="ConditionalGroup.cpp" />
+    <ClCompile Include="ConditionWrapper.cpp" />
     <ClCompile Include="ConsumingGroup.cpp" />
     <ClCompile Include="LoopGroup.cpp" />
     <ClCompile Include="MemoryEater.cpp" />
@@ -148,7 +148,7 @@
     <ClCompile Include="TryCatchGroup.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ConditionalGroup.h" />
+    <ClInclude Include="ConditionWrapper.h" />
     <ClInclude Include="ConsumingGroup.h" />
     <ClInclude Include="LoopGroup.h" />
     <ClInclude Include="Motor.h" />

@@ -2,7 +2,7 @@
 #include "Scheduler.h"
 
 Scheduler::Scheduler()
-	: ConsumingGroup((unsigned char)Systems::All, SchedulerTypes::Base)
+	: ConsumingGroup((unsigned char)Systems::All, GroupTypes::Base)
 {
 }
 

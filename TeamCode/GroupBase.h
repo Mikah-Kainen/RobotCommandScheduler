@@ -14,18 +14,6 @@
 class GroupBase : public Scheduleable
 {
 protected:
-	static unsigned char GetRequirementFlags(std::vector<std::shared_ptr<Scheduleable>> scheduleables);
-
-	enum class SchedulerTypes
-	{
-		Base,
-		Parallel,
-		Sequential,
-		Loop,
-		Conditional,
-		TryCatch,
-	};
-
 	//Bar flags use one bit per value i.e. 3 bits = 3 values as opposed to 3 bits = 8 values. This is for readability so that anything with a bar set will be an odd number
 	//BarBits: 00I for 1 bar, 0II for two bars, III for three bars. To check for bar just check first bit, to add bar shift left, to remove bar shift right
 	static const int BarBitCount = 3; //Represents the number of Bar flags
@@ -44,17 +32,37 @@ protected:
 	static const unsigned int UnpackMask = ~(BarMask | ShouldInitializeMask | EndEarlyMask);
 	//Cool Flags: EndEarly, Bar, Interruptable, Initialized, RunDefault?, Branching???
 
+	static bool IsFlagSet(unsigned int packedID, unsigned int mask);
+
+	static unsigned char GetRequirementFlags(std::vector<std::shared_ptr<Scheduleable>> scheduleables);
+
+	enum class GroupTypes
+	{
+		Base,
+		Parallel,
+		Sequential,
+		Loop,
+		Conditional,
+		TryCatch,
+	};
+
+	enum class GroupFlags : unsigned char
+	{
+		None = 0x0,
+		EndEarly = 0x1,
+	};
+
 	static unsigned int Unpack(unsigned int packedID);
 
 	static unsigned int Pack(unsigned int  unpackedID);
 
-	//static bool IsBarSet(unsigned int packedID);
+#pragma region ProtectedFlagHelperFunctions
+	static bool IsScheduleableBarSet(unsigned int packedID);
 
-	static bool IsFlagSet(unsigned int packedID, unsigned int mask);
+	static bool IsScheduleableShouldInitializeSet(unsigned int packedID);
 
-	//static bool IsShouldInitializeSet(unsigned int packedID);
-
-	//static bool IsEndEarlySet(unsigned int packedID);
+	static bool IsScheduleableEndEarlySet(unsigned int packedID);
+#pragma endregion
 
 protected:
 	//Interesting link: https://jguegant.github.io/blogs/tech/performing-try-emplace.html
@@ -98,8 +106,9 @@ protected:
 	Behaviors GetNextBehavior(int packedID);
 
 protected:
-	SchedulerTypes schedulerType;
-	unsigned int schedulerID;
+	GroupTypes groupType;
+	unsigned int groupID;
+	unsigned char groupFlags;
 
 	//virtual void InitializeGroup() = 0;
 
@@ -117,11 +126,11 @@ protected:
 	std::vector<std::function<void(GroupBase&)>> initializeFunctions; //used to set CleanupFunctions in the CopyConstructor
 	//bool shouldInitializeOrHasRestarted = true;
 
-	GroupBase(unsigned char systemFlags, SchedulerTypes type);
+	GroupBase(unsigned char systemFlags, GroupTypes type);
 
-	GroupBase(std::vector<unsigned char> systemFlags, SchedulerTypes type);
+	GroupBase(std::vector<unsigned char> systemFlags, GroupTypes type);
 
-	GroupBase(std::vector<Systems> schedulerSystems, SchedulerTypes type);
+	GroupBase(std::vector<Systems> schedulerSystems, GroupTypes type);
 
 
 	unsigned int Schedule(std::shared_ptr<Scheduleable> scheduleable);
@@ -144,12 +153,22 @@ protected:
 
 	unsigned int GetUniversalID(unsigned int unpackedID);
 
+	bool IsGroupEndEarlySet();
+
 public:
 	GroupBase(const GroupBase& copyGroupBase);
 
-	void SetBar(unsigned int packedID); //multiple bars can be set
+#pragma region PublicFlagHelperFunctions
+	void AddBar(unsigned int packedID); //multiple bars can be set
 
 	void RemoveBar(unsigned int packedID);
+
+	void SetScheduleableEndEarly(unsigned int packedID, bool value); //Sets the EndEarly bit for a particular ID to value
+
+	void SetScheduleableShouldInitialize(unsigned int packedID, bool value); //Sets the EndEarly bit for a particular ID to value
+
+	void SetGroupEndEarly(bool value); //Sets the EndEarly flag for the whole group to value
+#pragma endregion
 
 	void ReplaceID(unsigned int oldPackedID, unsigned int newPackedID);
 

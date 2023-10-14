@@ -7,6 +7,7 @@
 #include "ParallelGroup.h"
 #include "SequentialGroup.h"
 #include "LoopGroup.h"
+#include "ConditionWrapper.h"
 #include "Robot.h"
 #include "Motor.h"
 #include "Timer.h"
@@ -140,6 +141,7 @@ void TakeConstRef(const int& constRef)
 	std::cout << constRef << std::endl;
 }
 
+//TECHNICALLLYYYYYYYYYYYY Scheduleables can store a weak pointer to the group that scheduled them and just set that at the beginning, instead of capturing it by reference
 /* To do list:
 	Remove FunctionManager
 	Probably remove InitializeGroup
@@ -515,7 +517,7 @@ int main() //Unit tests with GoogleTest
 	
 	scheduler.Schedule(testSystemsNone);
 	scheduler.Schedule(testNoRequirements);
-	scheduler.Schedule(parallelGroupCombinationTest); //test this
+	scheduler.Schedule(std::make_shared<ConditionWrapper>(ConditionWrapper(parallelGroupCombinationTest, [&]() {return false; })));
 	//scheduler.Schedule(sequentialGroup);
 	//scheduler.Schedule(endFunction);
 

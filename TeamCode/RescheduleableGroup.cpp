@@ -37,17 +37,17 @@ bool RescheduleableGroup::Return(bool isFinished)
 //	Initialize();
 //}
 
-RescheduleableGroup::RescheduleableGroup(unsigned char systemFlags, SchedulerTypes type)
+RescheduleableGroup::RescheduleableGroup(unsigned char systemFlags, GroupTypes type)
 	:GroupBase(systemFlags, type), initializeRequirementFreeScheduleables{ std::unordered_set<unsigned int>() }
 {
 }
 
-RescheduleableGroup::RescheduleableGroup(std::vector<unsigned char> systemFlags, SchedulerTypes type)
+RescheduleableGroup::RescheduleableGroup(std::vector<unsigned char> systemFlags, GroupTypes type)
 	:GroupBase(systemFlags, type), initializeRequirementFreeScheduleables{ std::unordered_set<unsigned int>() }
 {
 }
 
-RescheduleableGroup::RescheduleableGroup(std::vector<Systems> schedulerSystems, SchedulerTypes type)
+RescheduleableGroup::RescheduleableGroup(std::vector<Systems> schedulerSystems, GroupTypes type)
 	:GroupBase(schedulerSystems, type), initializeRequirementFreeScheduleables{ std::unordered_set<unsigned int>() }
 {
 }

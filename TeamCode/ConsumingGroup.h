@@ -12,11 +12,11 @@ protected:
 
 	virtual bool Return(bool isFinished) override;
 
-	ConsumingGroup(unsigned char systemFlags, SchedulerTypes type);
+	ConsumingGroup(unsigned char systemFlags, GroupTypes type);
 
-	ConsumingGroup(std::vector<unsigned char> systemFlags, SchedulerTypes type);
+	ConsumingGroup(std::vector<unsigned char> systemFlags, GroupTypes type);
 
-	ConsumingGroup(std::vector<Systems> schedulerSystems, SchedulerTypes type);
+	ConsumingGroup(std::vector<Systems> schedulerSystems, GroupTypes type);
 
 public:
 	ConsumingGroup(const ConsumingGroup& copyConsumingGroup);

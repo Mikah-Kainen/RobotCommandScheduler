@@ -18,19 +18,19 @@ bool ConsumingGroup::Return(bool isFinished)
 	return isFinished;
 }
 
-ConsumingGroup::ConsumingGroup(unsigned char systemFlags, SchedulerTypes type)
+ConsumingGroup::ConsumingGroup(unsigned char systemFlags, GroupTypes type)
 	:GroupBase(systemFlags, type)
 {
 
 }
 
-ConsumingGroup::ConsumingGroup(std::vector<unsigned char> systemFlags, SchedulerTypes type)
+ConsumingGroup::ConsumingGroup(std::vector<unsigned char> systemFlags, GroupTypes type)
 	:GroupBase(systemFlags, type)
 {
 
 }
 
-ConsumingGroup::ConsumingGroup(std::vector<Systems> schedulerSystems, SchedulerTypes type)
+ConsumingGroup::ConsumingGroup(std::vector<Systems> schedulerSystems, GroupTypes type)
 	:GroupBase(schedulerSystems, type)
 {
 

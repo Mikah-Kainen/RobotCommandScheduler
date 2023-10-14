@@ -21,7 +21,7 @@ bool LoopGroup::Return(bool isFinished)
 }
 
 LoopGroup::LoopGroup(std::vector<std::shared_ptr<Scheduleable>> scheduleablesToSchedule, std::function<bool(LoopGroup&)> endCondition)
-	:RescheduleableGroup(GetRequirementFlags(scheduleablesToSchedule), SchedulerTypes::Loop), endCondition{ endCondition }, currentIteration{ 0 }
+	:RescheduleableGroup(GetRequirementFlags(scheduleablesToSchedule), GroupTypes::Loop), endCondition{ endCondition }, currentIteration{ 0 }
 {
 	//initializeFunctions.push_back([&](GroupBase& group) {((LoopGroup&)group).currentIteration = 0; });
 	for (std::shared_ptr<Scheduleable> scheduleable : scheduleablesToSchedule)

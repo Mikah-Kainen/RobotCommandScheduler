@@ -15,11 +15,11 @@ protected:
 
 	//virtual void InitializeBody();
 
-	RescheduleableGroup(unsigned char systemFlags, SchedulerTypes type);
+	RescheduleableGroup(unsigned char systemFlags, GroupTypes type);
 
-	RescheduleableGroup(std::vector<unsigned char> systemFlags, SchedulerTypes type);
+	RescheduleableGroup(std::vector<unsigned char> systemFlags, GroupTypes type);
 
-	RescheduleableGroup(std::vector<Systems> schedulerSystems, SchedulerTypes type);
+	RescheduleableGroup(std::vector<Systems> schedulerSystems, GroupTypes type);
 
 public:
 	RescheduleableGroup(const RescheduleableGroup& copyRescheduleableGroup);

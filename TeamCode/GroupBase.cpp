@@ -35,6 +35,28 @@ unsigned int GroupBase::Pack(unsigned int unpackedID)
 //	return (packedID & BarMask) >= BarMin;
 //}
 
+#pragma region ProtectedFlagHelperFunctions
+bool GroupBase::IsScheduleableBarSet(unsigned int packedID)
+{
+	return (packedID & BarMask) >= BarMin;
+}
+
+bool GroupBase::IsScheduleableShouldInitializeSet(unsigned int packedID)
+{
+	return packedID & ShouldInitializeMask;
+}
+
+bool GroupBase::IsScheduleableEndEarlySet(unsigned int packedID)
+{
+	return packedID & EndEarlyMask;
+}
+
+bool GroupBase::IsGroupEndEarlySet()
+{
+	return groupFlags & (unsigned char)GroupFlags::EndEarly;
+}
+#pragma endregion
+
 bool GroupBase::IsFlagSet(unsigned int packedID, unsigned int mask)
 {
 	return (packedID & mask) != 0;
@@ -123,10 +145,10 @@ void GroupBase::DictionaryManager::SubscribeToEnd(unsigned int targetID, std::fu
 #pragma endregion
 
 #pragma region GroupBase
-GroupBase::GroupBase(unsigned char systemFlags, SchedulerTypes type)
+GroupBase::GroupBase(unsigned char systemFlags, GroupTypes type)
 	:Scheduleable(systemFlags), initializeFunctions{ std::vector<std::function<void(GroupBase&)>>() }, database{ DictionaryManager() },
-	schedulerID{ NextAvailableSchedulerID++ }, schedulerType{ type }, requirementFreeScheduleables{std::unordered_set<unsigned int>()}, schedule{new std::vector<unsigned int>[SystemsCount]},
-	currentIndices{ new unsigned int[SystemsCount] }
+	groupID{ NextAvailableGroupID++ }, groupType{ type }, groupFlags{(unsigned char)GroupFlags::None}, requirementFreeScheduleables{std::unordered_set<unsigned int>()},
+	schedule{new std::vector<unsigned int>[SystemsCount]}, currentIndices{ new unsigned int[SystemsCount] }
 {
 	for (int i = 0; i < SystemsCount; i++)
 	{
@@ -148,10 +170,10 @@ GroupBase::GroupBase(unsigned char systemFlags, SchedulerTypes type)
 	//NextAvailableSchedulerID++;
 }
 
-GroupBase::GroupBase(std::vector<unsigned char> systemFlags, SchedulerTypes type)
+GroupBase::GroupBase(std::vector<unsigned char> systemFlags, GroupTypes type)
 	:GroupBase(GetRequirementFlag(systemFlags), type) {}
 
-GroupBase::GroupBase(std::vector<Systems> schedulerSystems, SchedulerTypes type)
+GroupBase::GroupBase(std::vector<Systems> schedulerSystems, GroupTypes type)
 	:GroupBase(GetRequirementFlag(schedulerSystems), type) {}
 
 
@@ -225,48 +247,12 @@ void GroupBase::ReplaceIDUnpacked(unsigned int unpackedID, unsigned int newPacke
 
 unsigned int GroupBase::GetUniversalID(unsigned int unpackedID)
 {
-	return (schedulerID << 16) | (unpackedID & 0xFFFF);
+	return (groupID << 16) | (unpackedID & 0xFFFF);
 }
-
-//void GroupBase::SetShouldInitialize(unsigned int packedID)
-//{
-//	int unpackedID = Unpack(packedID);
-//	int newID = packedID | ShouldInitializeMask;
-//	for (int i = 0; i < SystemsCount; i++)
-//	{
-//		std::vector<unsigned int>& currentSystemSchedule = schedule[i];
-//		for (int x = 0; x < currentSystemSchedule.size(); x++)
-//		{
-//			if (Unpack(currentSystemSchedule[x]) == packedID)
-//			{
-//				currentSystemSchedule[x] = newID;
-//				break;
-//			}
-//		}
-//	}
-//}
-//
-//void GroupBase::SetEndEarly(unsigned int packedID)
-//{
-//	int unpackedID = Unpack(packedID);
-//	int newID = packedID | EndEarlyMask;
-//	for (int i = 0; i < SystemsCount; i++)
-//	{
-//		std::vector<unsigned int>& currentSystemSchedule = schedule[i];
-//		for (int x = 0; x < currentSystemSchedule.size(); x++)
-//		{
-//			if (Unpack(currentSystemSchedule[x]) == packedID)
-//			{
-//				currentSystemSchedule[x] = newID;
-//				break;
-//			}
-//		}
-//	}
-//}
 
 GroupBase::GroupBase(const GroupBase& copyGroupBase)
 	: Scheduleable(copyGroupBase.requirementFlags), initializeFunctions{ std::vector<std::function<void(GroupBase&)>>() },
-	database{ copyGroupBase.database }, schedulerType{ copyGroupBase.schedulerType }, schedulerID{ NextAvailableSchedulerID++ },
+	database{ copyGroupBase.database }, groupType{ copyGroupBase.groupType }, groupID{ NextAvailableGroupID++ }, groupFlags{copyGroupBase.groupFlags},
 	requirementFreeScheduleables{std::unordered_set<unsigned int>()}, schedule{new std::vector<unsigned int>[SystemsCount]}, 
 	currentIndices{new unsigned int[SystemsCount]}
 {
@@ -302,7 +288,8 @@ GroupBase::GroupBase(const GroupBase& copyGroupBase)
 	//}
 }
 
-void GroupBase::SetBar(unsigned int packedID)
+#pragma region PublicFlagHelperFunctions
+void GroupBase::AddBar(unsigned int packedID)
 {
 	unsigned int BarBits = ((packedID << 1) + BarMin) & BarMask;
 	unsigned int newPackedID = packedID | BarBits;
@@ -316,6 +303,22 @@ void GroupBase::RemoveBar(unsigned int packedID)
 	ReplaceID(packedID, newPackedID);
 }
 
+void GroupBase::SetScheduleableEndEarly(unsigned int packedID, bool value)
+{
+	ReplaceID(packedID, (packedID & ~EndEarlyMask) + EndEarlyMask * value);
+}
+
+void GroupBase::SetScheduleableShouldInitialize(unsigned int packedID, bool value)
+{
+	ReplaceID(packedID, (packedID & ~ShouldInitializeMask) + ShouldInitializeMask * value);
+}
+
+void GroupBase::SetGroupEndEarly(bool value)
+{
+	groupFlags = (groupFlags & !(unsigned char)GroupFlags::EndEarly) + (unsigned char)GroupFlags::EndEarly * value;
+}
+#pragma endregion
+
 void GroupBase::ReplaceID(unsigned int oldPackedID, unsigned int newPackedID)
 {
 	ReplaceIDUnpacked(Unpack(oldPackedID), newPackedID);
@@ -328,15 +331,15 @@ void GroupBase::SubscribeToEnd(unsigned int targetPackedID, std::function<void(G
 
 GroupBase::Behaviors GroupBase::GetNextBehavior(int packedID)
 {
-	if (IsFlagSet(packedID, EndEarlyMask))
+	if (IsScheduleableEndEarlySet(packedID))
 	{
 		return Behaviors::EndEarly;
 	}
-	else if (IsFlagSet(packedID, BarMask))
+	else if (IsScheduleableBarSet(packedID))
 	{
 		return Behaviors::Bar;
 	}
-	else if (IsFlagSet(packedID, ShouldInitializeMask))
+	else if (IsScheduleableShouldInitializeSet(packedID))
 	{
 		return Behaviors::Initialize;
 	}
@@ -426,6 +429,11 @@ bool GroupBase::Run()
 	//	}
 	//	shouldInitializeOrHasRestarted = false;
 	//}
+	
+	if (groupFlags & (unsigned char)GroupFlags::EndEarly)
+	{
+		return true;
+	}
 
 	if (requirementFreeScheduleables.size() > 0)
 	{
@@ -519,7 +527,7 @@ bool GroupBase::Run()
 
 					case Behaviors::Initialize:
 						database.scheduleableMap[Unpack(currentPackedID)]->Initialize(); //was InitializeFSM
-						ReplaceID(currentPackedID, currentPackedID & ~ShouldInitializeMask);
+						SetScheduleableShouldInitialize(currentPackedID, false);
 						break;
 
 					case Behaviors::Run:
