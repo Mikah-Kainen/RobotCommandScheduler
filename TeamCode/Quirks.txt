@@ -1,0 +1,5 @@
+Since ConditionWrappers return true to finish when their condition is not met, 
+WhenAnyGroups will finish as soon as any internal ConditionWrapper's condition is not met
+
+Scheduleables with no requirements are not guaranteed to be safe if they take more than one cycle
+to run. This is because two no requirement scheduleables could run in parallel

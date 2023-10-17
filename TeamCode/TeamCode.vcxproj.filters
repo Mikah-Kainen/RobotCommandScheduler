@@ -19,6 +19,9 @@
     <Filter Include="inc\SchedulerInc">
       <UniqueIdentifier>{6561061b-c09d-4517-a007-062f7f9c42b3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Ideas">
+      <UniqueIdentifier>{c8f5174a-bc22-433c-8761-2e604977161d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CommandBuilder.cpp">
@@ -72,6 +75,9 @@
     <ClCompile Include="TryCatchGroup.cpp">
       <Filter>src\SchedulerSrc</Filter>
     </ClCompile>
+    <ClCompile Include="WhenAnyGroup.cpp">
+      <Filter>src\SchedulerSrc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scheduler.h">
@@ -116,8 +122,17 @@
     <ClInclude Include="TryCatchGroup.h">
       <Filter>inc\SchedulerInc</Filter>
     </ClInclude>
+    <ClInclude Include="WhenAnyGroup.h">
+      <Filter>inc\SchedulerInc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Ideas.txt" />
+    <Text Include="Quirks.txt" />
+    <Text Include="Ideas.txt">
+      <Filter>Ideas</Filter>
+    </Text>
+    <Text Include="Lock.txt">
+      <Filter>Ideas</Filter>
+    </Text>
   </ItemGroup>
 </Project>

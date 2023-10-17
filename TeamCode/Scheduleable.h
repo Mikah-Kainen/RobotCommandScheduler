@@ -22,10 +22,6 @@ private:
 	std::shared_ptr<Scheduleable> cleanupScheduleable;
 	ScheduleableStates startingState;
 	ScheduleableStates endingState;
-	bool lock;
-	unsigned int unlockKey; //unlockKey = 16bits SchedulerID | 16bits ScheduleableID
-	//UnpackedID, Can safely start at zero because SchedulerID starts at 1
-	//Alsooooo, this might need to be special cased when I use typedef for the IDs... (I'm probably gonna forget this so sorry future self for the debugging pain)
 
 	virtual bool Run();
 
@@ -91,7 +87,4 @@ public:
 
 	bool SetCleanupScheduleable(std::shared_ptr<Scheduleable> scheduleable);
 
-	bool TryUnlock(unsigned int key);
-
-	void ResetLock();
 };

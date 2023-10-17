@@ -146,6 +146,7 @@
     <ClCompile Include="SequentialGroup.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="TryCatchGroup.cpp" />
+    <ClCompile Include="WhenAnyGroup.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConditionWrapper.h" />
@@ -162,9 +163,12 @@
     <ClInclude Include="GroupBase.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="TryCatchGroup.h" />
+    <ClInclude Include="WhenAnyGroup.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Ideas.txt" />
+    <Text Include="Lock.txt" />
+    <Text Include="Quirks.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

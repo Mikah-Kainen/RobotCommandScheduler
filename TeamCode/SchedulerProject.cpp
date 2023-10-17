@@ -8,6 +8,7 @@
 #include "SequentialGroup.h"
 #include "LoopGroup.h"
 #include "ConditionWrapper.h"
+#include "WhenAnyGroup.h"
 #include "Robot.h"
 #include "Motor.h"
 #include "Timer.h"
@@ -227,6 +228,23 @@ int main() //Unit tests with GoogleTest
 	auto Display = CommandBuilder<std::string>([&](std::string message) {std::cout << message << std::endl; return true; }, Systems::None);
 	auto DisplayFromArray = CommandBuilder<std::string*, int&>([&](std::string* array, int& index) {std::cout << array[index] << std::endl; return true; }, Systems::None);
 
+	CommandBuilder<int&, int> SetInt = CommandBuilder<int&, int>([&](int& variable, int value) {variable = value; return true; }, Systems::None);
+
+	int CountLeftMotorInt = 0;
+	CommandBuilder<int> CountLeftMotor = CommandBuilder<int>([&](int value) {std::cout << "CountLeftMotor: " << CountLeftMotorInt << std::endl; return CountLeftMotorInt++ >= value - 1; }, Systems::LeftMotor);
+	CountLeftMotor.SetInitialization(SetInt.CreateCommand(CountLeftMotorInt, 0));
+
+	int CountRightMotorInt = 0;
+	CommandBuilder<int> CountRightMotor = CommandBuilder<int>([&](int value) {std::cout << "CountRightMotor: " << CountRightMotorInt << std::endl;  return CountRightMotorInt++ >= value - 1; }, Systems::RightMotor);
+	CountRightMotor.SetInitialization(SetInt.CreateCommand(CountRightMotorInt, 0));
+
+	CommandBuilder<std::string> UltraDisplay = CommandBuilder<std::string>([&](std::string message) {std::cout << message << std::endl; return true; }, Systems::None);
+	auto UltraDisplayInitialization = Display.CreateCommand("Initialize");
+	UltraDisplayInitialization->SetInitializationScheduleable(Display.CreateCommand("Initialize of Initialize"));
+	UltraDisplay.SetInitialization(UltraDisplayInitialization);
+	auto UltraDisplayCleanup = Display.CreateCommand("Cleanup");
+	UltraDisplayCleanup->SetCleanupScheduleable(Display.CreateCommand("Cleanup of Cleanup"));
+	UltraDisplay.SetCleanup(UltraDisplayCleanup);
 	//Cat cat = Cat(600, "SuperCat");
 	//auto bindResult = std::bind(&Cat::Display, Cat(600, "SuperCat"));
 	//Command<> TakesCatBind = Command<>(std::bind(&Cat::Display, cat), Systems::RightMotor);
@@ -413,6 +431,73 @@ int main() //Unit tests with GoogleTest
 		}, 4));
 #pragma endregion
 
+#pragma region ConditionWrapperTests
+	int basicConditionWrapperTestInt = 0;
+	std::shared_ptr<SequentialGroup> basicConditionWrapperTest = std::make_shared<SequentialGroup>(SequentialGroup({
+		Increment.CreateCommand(basicConditionWrapperTestInt),
+		std::make_shared<ConditionWrapper>(Display.CreateCommand("YYAYAY, SHOULD RUN"), [&]() {return basicConditionWrapperTestInt > 0; }),
+		std::make_shared<ConditionWrapper>(Display.CreateCommand("NOOOOO, SHOULDNT RUN"), [&]() {return basicConditionWrapperTestInt < 0; }),
+		}));
+
+	int basicRunConditionallyTestInt = 0;
+	std::shared_ptr<SequentialGroup> basicRunConditionallyTest = std::make_shared<SequentialGroup>(SequentialGroup({
+		Increment.CreateCommand(basicRunConditionallyTestInt),
+		std::make_shared<ConditionWrapper>(Display.CreateCommand("YYAYAY, SHOULD RUN"), [&]() {return basicRunConditionallyTestInt > 0; }),
+		std::make_shared<ConditionWrapper>(Display.CreateCommand("NOOOOOO, SHOULDNT RUN"), [&]() {return basicRunConditionallyTestInt < 0; }),
+		}));
+#pragma endregion
+
+#pragma region WhenAnyGroupTests
+	std::shared_ptr<WhenAnyGroup> WhenAnyGroupBasicTest = std::make_shared<WhenAnyGroup>(WhenAnyGroup({
+		CountLeftMotor.CreateCommand(5),
+		CountRightMotor.CreateCommand(3),
+		}));
+
+	std::shared_ptr<WhenAnyGroup> WhenAnyGroupBasicTest2 = std::make_shared<WhenAnyGroup>(WhenAnyGroup({
+		CountRightMotor.CreateCommand(2),
+		CountLeftMotor.CreateCommand(4),
+		}));
+
+	std::shared_ptr<WhenAnyGroup> WhenAnyGroupAdvancedTest = std::make_shared<WhenAnyGroup>(WhenAnyGroup({
+		std::make_shared<SequentialGroup>(SequentialGroup({
+			//CountLeftMotor.CreateCommand(3),
+			//CountLeftMotor.CreateCommand(3),
+			//CountLeftMotor.CreateCommand(3),
+			CountLeftMotor.CreateCommand(30)})),
+
+		std::make_shared<LoopGroup>(LoopGroup({
+			CountRightMotor.CreateCommand(3)}, 4)),
+		}));
+
+	std::shared_ptr<WhenAnyGroup> WhenAnyGroupConditionTest = std::make_shared<WhenAnyGroup>(WhenAnyGroup({
+		std::make_shared<ConditionWrapper>(Display.CreateCommand("BADDD"), [&]() {return false; }),
+		std::make_shared<SequentialGroup>(SequentialGroup({
+			//CountLeftMotor.CreateCommand(3),
+			//CountLeftMotor.CreateCommand(3),
+			//CountLeftMotor.CreateCommand(3),
+			CountLeftMotor.CreateCommand(30)})),
+
+		std::make_shared<LoopGroup>(LoopGroup({
+			CountRightMotor.CreateCommand(3)}, 4)),
+		}));
+
+	std::shared_ptr<WhenAnyGroup> WhenAnyGroupAdvancedConditionTest = std::make_shared <WhenAnyGroup>(WhenAnyGroup({
+		std::make_shared<SequentialGroup>(SequentialGroup({
+			Display.CreateCommand("Writing something random for padding"),
+			UltraDisplay.CreateCommand("Ok I think I'm almost done"),
+			Display.CreateCommand("Finishedddd"),
+			std::make_shared<ConditionWrapper>(Display.CreateCommand("BADDD"), [&]() {return false; })})),
+		std::make_shared<SequentialGroup>(SequentialGroup({
+			//CountLeftMotor.CreateCommand(3),
+			//CountLeftMotor.CreateCommand(3),
+			//CountLeftMotor.CreateCommand(3),
+			CountLeftMotor.CreateCommand(30)})),
+
+		std::make_shared<LoopGroup>(LoopGroup({
+			CountRightMotor.CreateCommand(3)}, 4)),
+		}));
+#pragma endregion
+
 	CommandBuilder<> UEChassis = CommandBuilder<>([&]() { return true; }, Systems::Chassis);
 	UEChassis.SetInitialization(Display.CreateCommand("Updating Encoders"));
 	CommandBuilder<int, int, int, int> MoveRobot = CommandBuilder<int, int, int, int>([&](int, int, int, int) {std::cout << "Moving" << std::endl; return true; }, Systems::Chassis);
@@ -426,8 +511,6 @@ int main() //Unit tests with GoogleTest
 	CommandBuilder<> CountToThreeRightMotor = CommandBuilder<>([&, &count = CountToThreeRightMotorCount]() {std::cout << "RightMotorCount: " << count << std::endl; if (count == 3) { count = 0; return true; }; count++; return false; }, { Systems::RightMotor, Systems::None });
 	int CountToThreeLeftMotorCount = 0;
 	CommandBuilder<> CountToThreeLeftMotor = CommandBuilder<>([&, &count = CountToThreeLeftMotorCount]() {std::cout << "LeftMotorCount: " << count << std::endl; if (count == 3) { count = 0; return true; }; count++; return false; }, { Systems::LeftMotor, Systems::None });
-
-
 
 	int count = 0;
 	std::string countMessages[] = {
@@ -515,9 +598,13 @@ int main() //Unit tests with GoogleTest
 	
 	//scheduler.Schedule(loopGroupWithSequentialGroupTest);
 	
-	scheduler.Schedule(testSystemsNone);
-	scheduler.Schedule(testNoRequirements);
-	scheduler.Schedule(std::make_shared<ConditionWrapper>(ConditionWrapper(parallelGroupCombinationTest, [&]() {return false; })));
+	//scheduler.Schedule(testSystemsNone);
+	//scheduler.Schedule(testNoRequirements);
+	//scheduler.Schedule(std::make_shared<ConditionWrapper>(ConditionWrapper(parallelGroupCombinationTest, [&]() {return test > 0; })));
+	//scheduler.Schedule(basicConditionWrapperTest);
+	//scheduler.Schedule(basicRunConditionallyTest);
+	scheduler.Schedule(WhenAnyGroupAdvancedConditionTest);
+	//scheduler.Schedule(ComparisonGroup);
 	//scheduler.Schedule(sequentialGroup);
 	//scheduler.Schedule(endFunction);
 

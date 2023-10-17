@@ -44,6 +44,7 @@ protected:
 		Loop,
 		Conditional,
 		TryCatch,
+		WhenAny,
 	};
 
 	enum class GroupFlags : unsigned char
@@ -150,8 +151,6 @@ protected:
 	//virtual void Cleanup(int packedID) = 0; //ADD THIS! Then add derived class NonConsumingGroup and ConsumingGroup
 
 	//void AddToInitialize(std::function<void(GroupBase&)> initializeFunction);
-
-	unsigned int GetUniversalID(unsigned int unpackedID);
 
 	bool IsGroupEndEarlySet();
 

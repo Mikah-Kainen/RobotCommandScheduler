@@ -1,0 +1,41 @@
+Adding a Lock would allow Scheduleables with no requirements to take more than one cycle to run.
+
+However, this would be very difficult because then the Scheduleable::Run() would need to
+take as a parameter a int runningID, so that it could lock to that ID.
+
+Additionally, in WhenAny and FSM groups where scheduleables could be interrupted,
+before I return true I would need to loop through all scheduleables and check whether the lockID 
+is the currentID, and unlock it if it is.
+
+The best way to do this would be to add special cleaup functions that are guaranteed to run
+even if a scheduleable is interrupted.
+
+I might add such functions anyway at some point, so if I do, I will probably add back locks.
+
+
+To make locks work:
+
+I would need a function to get a unique ID for any scheduleable, which could be a combination of
+the local ID the group assigns it, and the group's globalID. However, I should make sure 0
+is not a valid ID, so I can use that to check if a Scheduleable has no locks.
+
+I should add a TryUnlock in the run, and free the lock before I return true;
+
+PseudoCode:
+
+//checks if the Scheduleable has no requirements and is locked i.e. shouldn't run
+!requirementFlags & lock
+
+//checks whether a Scheduleable can be unlocked, as well as sets a lock if none exist
+if (!unlockKey)
+{
+	unlockKey = key;
+	lock = false;
+	return true;
+}
+if (unlockKey == key)
+{
+	lock = false;
+	return true;
+}
+return false;
