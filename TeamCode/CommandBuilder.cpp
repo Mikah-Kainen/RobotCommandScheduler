@@ -24,7 +24,7 @@
 template <typename... Ts>
 class ScheduledCommand : public Scheduleable
 {
-	template <typename... Ts>
+	template <typename... Ts2>
 	friend class CommandBuilder;
 
 private:

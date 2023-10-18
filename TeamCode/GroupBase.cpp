@@ -474,7 +474,7 @@ bool GroupBase::Run()
 		}
 		for (std::tuple<unsigned int, unsigned int> tuple : noRequirementPackedIDsToReplace)
 		{
-			ReplaceID(tuple._Myfirst._Val, tuple._Get_rest()._Myfirst._Val);
+			ReplaceID(std::get<0>(tuple), std::get<1>(tuple));
 		}
 		for (unsigned int IDToDelete : noRequirementPackedIDsToDelete)
 		{

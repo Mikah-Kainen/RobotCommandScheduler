@@ -610,13 +610,11 @@ int main() //Unit tests with GoogleTest
 	
 	//scheduler.Schedule(testSystemsNone);
 	//scheduler.Schedule(testNoRequirements);
-	//scheduler.Schedule(std::make_shared<ConditionScheduleable>(ConditionScheduleable(parallelGroupCombinationTest, [&]() {return test > 0; })));
+	scheduler.Schedule(std::make_shared<ConditionScheduleable>(ConditionScheduleable(parallelGroupCombinationTest, [&]() {return 1 > 0; })));
 	//scheduler.Schedule(basicConditionScheduleableTest);
 	//scheduler.Schedule(basicRunConditionallyTest);
 	//scheduler.Schedule(WhenAnyGroupAdvancedConditionTest);
-	scheduler.Schedule(InitInitCleanCleanTest);
-	//scheduler.Schedule(ComparisonGroup);
-	//scheduler.Schedule(sequentialGroup);
+	//scheduler.Schedule(InitInitCleanCleanTest);
 	//scheduler.Schedule(endFunction);
 
 	//if (true)
