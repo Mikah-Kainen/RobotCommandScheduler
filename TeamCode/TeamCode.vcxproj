@@ -130,8 +130,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CommandBuilder.cpp" />
-    <ClCompile Include="ConditionScheduleable.cpp" />
+    <ClCompile Include="ConditionWrapper.cpp" />
     <ClCompile Include="ConsumingGroup.cpp" />
+    <ClCompile Include="FSMGroup.cpp" />
     <ClCompile Include="LoopGroup.cpp" />
     <ClCompile Include="MemoryEater.cpp" />
     <ClCompile Include="Motor.cpp" />
@@ -149,8 +150,9 @@
     <ClCompile Include="WhenAnyGroup.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ConditionScheduleable.h" />
+    <ClInclude Include="ConditionWrapper.h" />
     <ClInclude Include="ConsumingGroup.h" />
+    <ClInclude Include="FSMGroup.h" />
     <ClInclude Include="LoopGroup.h" />
     <ClInclude Include="Motor.h" />
     <ClInclude Include="ParallelGroup.h" />
@@ -169,6 +171,9 @@
     <Text Include="Ideas.txt" />
     <Text Include="Lock.txt" />
     <Text Include="Quirks.txt" />
+    <Text Include="Structors.txt" />
+    <Text Include="ThingsToRename.txt" />
+    <Text Include="Wrappers.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

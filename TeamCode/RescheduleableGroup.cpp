@@ -1,4 +1,4 @@
-//#include "../../inc/SchedulerInc/RescheduleableGroup.h"
+//#include "../../inc/Scheduler/RescheduleableGroup.h"
 #include "RescheduleableGroup.h"
 
 //void RescheduleableGroup::InitializeGroup()
@@ -63,6 +63,11 @@ RescheduleableGroup::RescheduleableGroup(const RescheduleableGroup& copyReschedu
 
 void RescheduleableGroup::Initialize()
 {
+	for (unsigned int packedID : requirementFreeScheduleables)
+	{
+		initializeRequirementFreeScheduleables.insert(packedID);
+	}
+	requirementFreeScheduleables.clear();
 	for (unsigned int packedID : initializeRequirementFreeScheduleables)
 	{
 		requirementFreeScheduleables.insert(packedID | ShouldInitializeMask);
@@ -81,6 +86,10 @@ void RescheduleableGroup::Initialize()
 	for (std::function<void(GroupBase&)> func : initializeFunctions)
 	{
 		func(*this);
+	}
+	for (std::pair<unsigned int, std::shared_ptr<Scheduleable>> kvp : database.scheduleableMap)
+	{
+		kvp.second->ResetAvailability();
 	}
 	GroupBase::Initialize();
 }

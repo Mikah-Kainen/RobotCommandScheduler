@@ -6,9 +6,11 @@
 #include <utility>
 #include <memory>
 #include "Polyfills.cpp"
-//#include "../../inc/SchedulerInc/Scheduleable.h"
-//#include "../../inc/SchedulerInc/Static.h"
+//#include "../../inc/Scheduler/Scheduleable.h"
+//#include "../../inc/Scheduler/ConditionWrapper.h"
+//#include "../../inc/Scheduler/Static.h"
 #include "Scheduleable.h"
+#include "ConditionWrapper.h"
 #include "Static.h"
 
 //class ScheduleableCommand : Scheduleable

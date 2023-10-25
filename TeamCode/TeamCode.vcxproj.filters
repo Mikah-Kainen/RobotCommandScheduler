@@ -13,31 +13,31 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="src\SchedulerSrc">
-      <UniqueIdentifier>{a72727be-5d9f-47ba-9a46-8b2862b67580}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="inc\SchedulerInc">
-      <UniqueIdentifier>{6561061b-c09d-4517-a007-062f7f9c42b3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Ideas">
       <UniqueIdentifier>{c8f5174a-bc22-433c-8761-2e604977161d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="inc\Scheduler">
+      <UniqueIdentifier>{6561061b-c09d-4517-a007-062f7f9c42b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Scheduler">
+      <UniqueIdentifier>{a72727be-5d9f-47ba-9a46-8b2862b67580}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CommandBuilder.cpp">
-      <Filter>src\SchedulerSrc</Filter>
+      <Filter>src\Scheduler</Filter>
     </ClCompile>
     <ClCompile Include="ParallelGroup.cpp">
-      <Filter>src\SchedulerSrc</Filter>
+      <Filter>src\Scheduler</Filter>
     </ClCompile>
     <ClCompile Include="Scheduler.cpp">
-      <Filter>src\SchedulerSrc</Filter>
+      <Filter>src\Scheduler</Filter>
     </ClCompile>
     <ClCompile Include="GroupBase.cpp">
-      <Filter>src\SchedulerSrc</Filter>
+      <Filter>src\Scheduler</Filter>
     </ClCompile>
     <ClCompile Include="SequentialGroup.cpp">
-      <Filter>src\SchedulerSrc</Filter>
+      <Filter>src\Scheduler</Filter>
     </ClCompile>
     <ClCompile Include="Timer.cpp">
       <Filter>src</Filter>
@@ -55,42 +55,45 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="PolyFills.cpp">
-      <Filter>src\SchedulerSrc</Filter>
+      <Filter>src\Scheduler</Filter>
     </ClCompile>
     <ClCompile Include="Scheduleable.cpp">
-      <Filter>src\SchedulerSrc</Filter>
+      <Filter>src\Scheduler</Filter>
     </ClCompile>
     <ClCompile Include="RescheduleableGroup.cpp">
-      <Filter>src\SchedulerSrc</Filter>
+      <Filter>src\Scheduler</Filter>
     </ClCompile>
     <ClCompile Include="ConsumingGroup.cpp">
-      <Filter>src\SchedulerSrc</Filter>
+      <Filter>src\Scheduler</Filter>
     </ClCompile>
     <ClCompile Include="LoopGroup.cpp">
-      <Filter>src\SchedulerSrc</Filter>
+      <Filter>src\Scheduler</Filter>
     </ClCompile>
-    <ClCompile Include="ConditionScheduleable.cpp">
-      <Filter>src\SchedulerSrc</Filter>
+    <ClCompile Include="ConditionWrapper.cpp">
+      <Filter>src\Scheduler</Filter>
     </ClCompile>
     <ClCompile Include="TryCatchGroup.cpp">
-      <Filter>src\SchedulerSrc</Filter>
+      <Filter>src\Scheduler</Filter>
     </ClCompile>
     <ClCompile Include="WhenAnyGroup.cpp">
-      <Filter>src\SchedulerSrc</Filter>
+      <Filter>src\Scheduler</Filter>
+    </ClCompile>
+    <ClCompile Include="FSMGroup.cpp">
+      <Filter>src\Scheduler</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scheduler.h">
-      <Filter>inc\SchedulerInc</Filter>
+      <Filter>inc\Scheduler</Filter>
     </ClInclude>
     <ClInclude Include="ParallelGroup.h">
-      <Filter>inc\SchedulerInc</Filter>
+      <Filter>inc\Scheduler</Filter>
     </ClInclude>
     <ClInclude Include="SequentialGroup.h">
-      <Filter>inc\SchedulerInc</Filter>
+      <Filter>inc\Scheduler</Filter>
     </ClInclude>
     <ClInclude Include="GroupBase.h">
-      <Filter>inc\SchedulerInc</Filter>
+      <Filter>inc\Scheduler</Filter>
     </ClInclude>
     <ClInclude Include="Timer.h">
       <Filter>inc</Filter>
@@ -102,28 +105,31 @@
       <Filter>inc</Filter>
     </ClInclude>
     <ClInclude Include="Static.h">
-      <Filter>inc\SchedulerInc</Filter>
+      <Filter>inc\Scheduler</Filter>
     </ClInclude>
     <ClInclude Include="Scheduleable.h">
-      <Filter>inc\SchedulerInc</Filter>
+      <Filter>inc\Scheduler</Filter>
     </ClInclude>
     <ClInclude Include="RescheduleableGroup.h">
-      <Filter>inc\SchedulerInc</Filter>
+      <Filter>inc\Scheduler</Filter>
     </ClInclude>
     <ClInclude Include="ConsumingGroup.h">
-      <Filter>inc\SchedulerInc</Filter>
+      <Filter>inc\Scheduler</Filter>
     </ClInclude>
     <ClInclude Include="LoopGroup.h">
-      <Filter>inc\SchedulerInc</Filter>
+      <Filter>inc\Scheduler</Filter>
     </ClInclude>
-    <ClInclude Include="ConditionScheduleable.h">
-      <Filter>inc\SchedulerInc</Filter>
+    <ClInclude Include="ConditionWrapper.h">
+      <Filter>inc\Scheduler</Filter>
     </ClInclude>
     <ClInclude Include="TryCatchGroup.h">
-      <Filter>inc\SchedulerInc</Filter>
+      <Filter>inc\Scheduler</Filter>
     </ClInclude>
     <ClInclude Include="WhenAnyGroup.h">
-      <Filter>inc\SchedulerInc</Filter>
+      <Filter>inc\Scheduler</Filter>
+    </ClInclude>
+    <ClInclude Include="FSMGroup.h">
+      <Filter>inc\Scheduler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -132,6 +138,15 @@
       <Filter>Ideas</Filter>
     </Text>
     <Text Include="Lock.txt">
+      <Filter>Ideas</Filter>
+    </Text>
+    <Text Include="Wrappers.txt">
+      <Filter>Ideas</Filter>
+    </Text>
+    <Text Include="Structors.txt">
+      <Filter>Ideas</Filter>
+    </Text>
+    <Text Include="ThingsToRename.txt">
       <Filter>Ideas</Filter>
     </Text>
   </ItemGroup>

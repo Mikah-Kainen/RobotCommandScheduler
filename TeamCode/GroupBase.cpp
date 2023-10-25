@@ -1,4 +1,4 @@
-//#include "../../inc/SchedulerInc/GroupBase.h"
+//#include "../../inc/Scheduler/GroupBase.h"
 #include "GroupBase.h"
 
 //Scheduler::ScheduledFunction::ScheduledFunction(std::function<bool()>& backingFunction, unsigned char requirementFlags)

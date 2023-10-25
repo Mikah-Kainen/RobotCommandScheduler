@@ -1,0 +1,13 @@
+So far, the three wrappers I might have are ConditionWrapper, LoopWrapper, and FSMWrapper
+
+Wrappers take in a Scheduleable and add functionality to it, such as a condition, looping, or FSM behavior
+
+Wrappers will probably be private and friended by Scheduleable(If that's possible)
+
+The way to create wrappers is by calling functions on scheduleable, such as "AddCondition", "AddLoop", and "AddFSM"
+These functions would return a shared_ptr to a new scheduleable, one of the wrappers
+This would allow the functions to be chainable, so Scheduleable->AddLoop()->AddCondition() would work
+
+It is important to note that the order in which functions are chained matters
+For example, Scheduleable->AddLoop()->AddCondition() checks the condition once at the start while
+			 Scheduleable->AddCondition()->AddLoop() checks the condition every loop cycle

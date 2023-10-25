@@ -1,0 +1,10 @@
+CopyConstructors:
+
+Stop being dumb and remove all my loops in copy constructors, C++ datatypes have default copy 
+constructors that do that for me!
+But also test just to make sure it doesn't break anything
+
+
+Destructors:
+
+Add destructors

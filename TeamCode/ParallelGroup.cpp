@@ -1,4 +1,4 @@
-//#include "../../inc/SchedulerInc/ParallelGroup.h"
+//#include "../../inc/Scheduler/ParallelGroup.h"
 #include "ParallelGroup.h"
 
 //Pretty sure this function is completely useless

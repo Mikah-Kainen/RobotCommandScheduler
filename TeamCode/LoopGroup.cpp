@@ -1,4 +1,4 @@
-//#include "../../inc/SchedulerInc/LoopGroup.h"
+//#include "../../inc/Scheduler/LoopGroup.h"
 #include "LoopGroup.h"
 
 bool LoopGroup::Return(bool isFinished)

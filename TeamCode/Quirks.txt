@@ -2,4 +2,8 @@ Since ConditionScheduleables return true to finish when their condition is not m
 WhenAnyGroups will finish as soon as any internal ConditionScheduleable's condition is not met
 
 Scheduleables with no requirements are not guaranteed to be safe if they take more than one cycle
-to run. This is because two no requirement scheduleables could run in parallel
+to run. This is because two no requirement scheduleables could run in parallel (As in don't schedule
+them with initialization or cleanup scheduleables)
+
+LoopGroups Initialize every time they re-loop. This is actually something I might change. Like, if you want to initialize
+do it in functions you schedule. The Loop initialize should be for resetting an important variable or something...

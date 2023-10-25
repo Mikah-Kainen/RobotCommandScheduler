@@ -86,5 +86,9 @@ public:
 	bool SetInitializationScheduleable(std::shared_ptr<Scheduleable> scheduleable);
 
 	bool SetCleanupScheduleable(std::shared_ptr<Scheduleable> scheduleable);
-
 };
+
+//std::shared_ptr<ConditionWrapper> ConditionWrapper::RunConditionally(std::shared_ptr<Scheduleable> scheduleable, std::function<bool()> condition)
+//{
+//	return std::make_shared<ConditionWrapper>(ConditionWrapper(scheduleable, condition));
+//}

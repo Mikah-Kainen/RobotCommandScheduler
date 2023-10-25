@@ -45,6 +45,7 @@ protected:
 		Conditional,
 		TryCatch,
 		WhenAny,
+		FSM,
 	};
 
 	enum class GroupFlags : unsigned char

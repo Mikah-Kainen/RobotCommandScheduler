@@ -1,0 +1,9 @@
+Rename LoopGroup to LoopWrapper
+Rename CommandBuilder to ScheduleableBuilder
+Rename CreateCommand to CreateScheduleable
+
+//Sidenote, add ApplyParameters function to CommandBuilder, that returns a ScheduleableWrapper that has its own CreateCommand,
+//SetInitialization, SetCleanup, and also eventually AddEndCheck
+
+//Ok another sidenote: LoopGroup which will be LoopWrapper should totally have some function that runs every loop. This could
+//make it way more flexible. Think for loop

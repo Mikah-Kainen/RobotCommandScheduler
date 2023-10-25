@@ -7,7 +7,7 @@
 #include "ParallelGroup.h"
 #include "SequentialGroup.h"
 #include "LoopGroup.h"
-#include "ConditionScheduleable.h"
+#include "ConditionWrapper.h"
 #include "WhenAnyGroup.h"
 #include "Robot.h"
 #include "Motor.h"
@@ -437,16 +437,31 @@ int main() //Unit tests with GoogleTest
 	int basicConditionScheduleableTestInt = 0;
 	std::shared_ptr<SequentialGroup> basicConditionScheduleableTest = std::make_shared<SequentialGroup>(SequentialGroup({
 		Increment.CreateCommand(basicConditionScheduleableTestInt),
-		std::make_shared<ConditionScheduleable>(Display.CreateCommand("YYAYAY, SHOULD RUN"), [&]() {return basicConditionScheduleableTestInt > 0; }),
-		std::make_shared<ConditionScheduleable>(Display.CreateCommand("NOOOOO, SHOULDNT RUN"), [&]() {return basicConditionScheduleableTestInt < 0; }),
+		std::make_shared<ConditionWrapper>(Display.CreateCommand("YYAYAY, SHOULD RUN"), [&]() {return basicConditionScheduleableTestInt > 0; }),
+		std::make_shared<ConditionWrapper>(Display.CreateCommand("NOOOOO, SHOULDNT RUN"), [&]() {return basicConditionScheduleableTestInt < 0; }),
 		}));
 
 	int basicRunConditionallyTestInt = 0;
 	std::shared_ptr<SequentialGroup> basicRunConditionallyTest = std::make_shared<SequentialGroup>(SequentialGroup({
 		Increment.CreateCommand(basicRunConditionallyTestInt),
-		std::make_shared<ConditionScheduleable>(Display.CreateCommand("YYAYAY, SHOULD RUN"), [&]() {return basicRunConditionallyTestInt > 0; }),
-		std::make_shared<ConditionScheduleable>(Display.CreateCommand("NOOOOOO, SHOULDNT RUN"), [&]() {return basicRunConditionallyTestInt < 0; }),
+		std::make_shared<ConditionWrapper>(Display.CreateCommand("YYAYAY, SHOULD RUN"), [&]() {return basicRunConditionallyTestInt > 0; }),
+		std::make_shared<ConditionWrapper>(Display.CreateCommand("NOOOOOO, SHOULDNT RUN"), [&]() {return basicRunConditionallyTestInt < 0; }),
 		}));
+
+	int loopOverConditionTestInt = 0;
+	CommandBuilder<> LoopCore = CommandBuilder<>([&]() { std::cout << "Loop: " << loopOverConditionTestInt << std::endl; loopOverConditionTestInt++; return true; }, Systems::Six);
+
+	std::shared_ptr<LoopGroup> loopOverConditionTest = std::make_shared<LoopGroup>(LoopGroup({
+		std::make_shared<ConditionWrapper>(ConditionWrapper(LoopCore.CreateCommand(), [&]() {return loopOverConditionTestInt < 5; }))
+		}, 10));
+	//loopOverConditionTest->SetInitializationScheduleable(SetInt.CreateCommand(loopOverConditionTestInt, 0));
+
+	std::shared_ptr<Scheduleable> LoopCoreScheduleable = LoopCore.CreateCommand();
+	LoopCoreScheduleable->SetInitializationScheduleable(SetInt.CreateCommand(loopOverConditionTestInt, 0));
+	std::shared_ptr<LoopGroup> loopOverConditionTest2 = std::make_shared<LoopGroup>(LoopGroup({
+		std::make_shared<ConditionWrapper>(ConditionWrapper(LoopCoreScheduleable, [&]() {return loopOverConditionTestInt < 5; }))
+		}, 10));
+	//loopOverConditionTest2->SetInitializationScheduleable(SetInt.CreateCommand(loopOverConditionTestInt, 0));
 #pragma endregion
 
 #pragma region WhenAnyGroupTests
@@ -472,7 +487,7 @@ int main() //Unit tests with GoogleTest
 		}));
 
 	std::shared_ptr<WhenAnyGroup> WhenAnyGroupConditionTest = std::make_shared<WhenAnyGroup>(WhenAnyGroup({
-		std::make_shared<ConditionScheduleable>(Display.CreateCommand("BADDD"), [&]() {return false; }),
+		std::make_shared<ConditionWrapper>(Display.CreateCommand("BADDD"), [&]() {return false; }),
 		std::make_shared<SequentialGroup>(SequentialGroup({
 			//CountLeftMotor.CreateCommand(3),
 			//CountLeftMotor.CreateCommand(3),
@@ -488,7 +503,7 @@ int main() //Unit tests with GoogleTest
 			Display.CreateCommand("Writing something random for padding"),
 			UltraDisplay.CreateCommand("Ok I think I'm almost done"),
 			Display.CreateCommand("Finishedddd"),
-			std::make_shared<ConditionScheduleable>(Display.CreateCommand("BADDD"), [&]() {return false; })})),
+			std::make_shared<ConditionWrapper>(Display.CreateCommand("BADDD"), [&]() {return false; })})),
 		std::make_shared<SequentialGroup>(SequentialGroup({
 			//CountLeftMotor.CreateCommand(3),
 			//CountLeftMotor.CreateCommand(3),
@@ -610,8 +625,8 @@ int main() //Unit tests with GoogleTest
 	
 	//scheduler.Schedule(testSystemsNone);
 	//scheduler.Schedule(testNoRequirements);
-	scheduler.Schedule(std::make_shared<ConditionScheduleable>(ConditionScheduleable(parallelGroupCombinationTest, [&]() {return 1 > 0; })));
 	//scheduler.Schedule(basicConditionScheduleableTest);
+	scheduler.Schedule(loopOverConditionTest2);
 	//scheduler.Schedule(basicRunConditionallyTest);
 	//scheduler.Schedule(WhenAnyGroupAdvancedConditionTest);
 	//scheduler.Schedule(InitInitCleanCleanTest);

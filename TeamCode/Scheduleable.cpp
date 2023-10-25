@@ -1,4 +1,4 @@
-//#include "../../inc/SchedulerInc/Scheduleable.h"
+//#include "../../inc/Scheduler/Scheduleable.h"
 #include "Scheduleable.h"
 
 
@@ -98,10 +98,6 @@ bool Scheduleable::RunFSM()
 		if (initializationScheduleable->RunFSM())
 		{
 			currentState = GetNextState(currentState);
-			//if (currentState == endingState)
-			//{
-			//	//std::cout << "ReturningTrue" << std::endl;
-			//}
 			return currentState == endingState;
 		}
 		break;
@@ -110,10 +106,6 @@ bool Scheduleable::RunFSM()
 		if (Run())
 		{
 			currentState = GetNextState(currentState);
-			//if (currentState == endingState)
-			//{
-			//	//std::cout << "ReturningTrue" << std::endl;
-			//}
 			return currentState == endingState;
 		}
 		break;
@@ -122,10 +114,6 @@ bool Scheduleable::RunFSM()
 		if (cleanupScheduleable->RunFSM())
 		{
 			currentState = GetNextState(currentState);
-			//if (currentState == endingState)
-			//{
-			//	//std::cout << "ReturningTrue" << std::endl;
-			//}
 			return currentState == endingState;
 		}
 		break;

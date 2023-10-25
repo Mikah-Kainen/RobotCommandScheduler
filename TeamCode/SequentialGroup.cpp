@@ -1,4 +1,4 @@
-//#include "../../inc/SchedulerInc/SequentialGroup.h"
+//#include "../../inc/Scheduler/SequentialGroup.h"
 #include "SequentialGroup.h"
 
 SequentialGroup::SequentialGroup(std::vector<std::shared_ptr<Scheduleable>> scheduleablesToSchedule)

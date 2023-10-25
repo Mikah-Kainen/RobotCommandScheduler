@@ -1,4 +1,4 @@
-//#include "../../inc/SchedulerInc/Scheduler.h"
+//#include "../../inc/Scheduler/Scheduler.h"
 #include "Scheduler.h"
 
 Scheduler::Scheduler()
