@@ -13,6 +13,43 @@ even if a scheduleable is interrupted.
 I might add such functions anyway at some point, so if I do, I will probably add back locks.
 
 
+UPDATEEEEEEEEEEEEEEEEEEEEE:
+I think I'll make FSMGroups only change state after a Scheduleable returns true.
+If I could encode automatic unlocking into Scheduleables with no requirements, this would make FSMGroups much more viable.
+For WhenAnyGroups, I would still have to manually unlock every no requirements Scheduleable once the Group returns true.
+To automatically unlock, in Run AND the locked boolean by the inverse of the return value of backingFunction
+
+Also, Scheduleable::Run() would not need to take in a runningID, since the Scheduleable calling another Scheduleable's Run
+	could first TryUnlock the other Scheduleable with it's own lockingID
+The only change this would require, is setting the lockingID for Scheduleables with requirements, which can be done with a
+	function called "SetRunningID" or something like that
+
+Okay acutally it's probably just better for Scheduleable::Run() to take in a runningID.
+The beginning of Run could be:
+if(!lockinigID)
+{
+	lockingID = runningID;
+}
+else if(lockingID != runningID)
+{
+	return false;
+}
+
+The end of Run could be:
+lockingID *= !result; //result is bool returned by Run()
+
+If I go this route, I will probably have Run() return a flags enum instead of a boolean:
+enum class ReturnFlags : unsigned char
+{
+	ReturnBit = 1,
+	FailedUnlock = 2,
+	FailedCondition = 4, //Can be used to make it so WhenAnyGroup doesn't return if a condition fails
+	ReturnedEarly = 8, //Can be used to make TryCatchGroup
+	//And maybe others if I think of it
+};
+
+
+
 To make locks work:
 
 I would need a function to get a unique ID for any scheduleable, which could be a combination of

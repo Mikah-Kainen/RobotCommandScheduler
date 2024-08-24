@@ -146,13 +146,8 @@ std::shared_ptr<ScheduledCommand<Ts...>> CommandBuilder<Ts...>::CreateCommand(Ts
 	return returnScheduleable;
 }
 
-	//std::shared_ptr<ScheduledCommand> ScheduleWith(bool useNothing) //function for debugging
-	//{
-	//	return std::make_shared<ScheduledCommand>([&]() {std::cout << "Yay this ran\n";  return true; }, requirementFlags, true);
-	//}
-
 template <typename... Ts>
-bool CommandBuilder<Ts...>::SetInitialization(std::shared_ptr<Scheduleable> scheduleable)
+bool CommandBuilder<Ts...>::SetInitialization(std::shared_ptr<Scheduleable> scheduleable) //Fails if scheduleable requirements are not a subset of requirementFlags
 {
 	if (!IsSubset(scheduleable->requirementFlags, requirementFlags))
 	{
@@ -164,7 +159,7 @@ bool CommandBuilder<Ts...>::SetInitialization(std::shared_ptr<Scheduleable> sche
 }
 
 template <typename... Ts>
-bool CommandBuilder<Ts...>::SetCleanup(std::shared_ptr<Scheduleable> scheduleable)
+bool CommandBuilder<Ts...>::SetCleanup(std::shared_ptr<Scheduleable> scheduleable) //Fails if scheduleable requirements are not a subset of requirementFlags
 {
 	if (!IsSubset(scheduleable->requirementFlags, requirementFlags))
 	{

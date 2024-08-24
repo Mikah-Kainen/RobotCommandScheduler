@@ -81,6 +81,12 @@
     <ClCompile Include="FSMGroup.cpp">
       <Filter>src\Scheduler</Filter>
     </ClCompile>
+    <ClCompile Include="ScheduleableWrapper.cpp">
+      <Filter>src\Scheduler</Filter>
+    </ClCompile>
+    <ClCompile Include="SharedState.cpp">
+      <Filter>src\Scheduler</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scheduler.h">
@@ -129,6 +135,9 @@
       <Filter>inc\Scheduler</Filter>
     </ClInclude>
     <ClInclude Include="FSMGroup.h">
+      <Filter>inc\Scheduler</Filter>
+    </ClInclude>
+    <ClInclude Include="ScheduleableWrapper.h">
       <Filter>inc\Scheduler</Filter>
     </ClInclude>
   </ItemGroup>

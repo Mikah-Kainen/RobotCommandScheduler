@@ -141,10 +141,12 @@
     <ClCompile Include="RescheduleableGroup.cpp" />
     <ClCompile Include="Robot.cpp" />
     <ClCompile Include="Scheduleable.cpp" />
+    <ClCompile Include="ScheduleableWrapper.cpp" />
     <ClCompile Include="Scheduler.cpp" />
     <ClCompile Include="GroupBase.cpp" />
     <ClCompile Include="SchedulerProject.cpp" />
     <ClCompile Include="SequentialGroup.cpp" />
+    <ClCompile Include="SharedState.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="TryCatchGroup.cpp" />
     <ClCompile Include="WhenAnyGroup.cpp" />
@@ -159,6 +161,7 @@
     <ClInclude Include="RescheduleableGroup.h" />
     <ClInclude Include="Robot.h" />
     <ClInclude Include="Scheduleable.h" />
+    <ClInclude Include="ScheduleableWrapper.h" />
     <ClInclude Include="Scheduler.h" />
     <ClInclude Include="SequentialGroup.h" />
     <ClInclude Include="Static.h" />
