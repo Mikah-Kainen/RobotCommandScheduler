@@ -5,11 +5,11 @@ The goal of the command scheduler is to improve the ease with which programmers 
 All advanced autonomous robotics teams eventually face the challenge of scheduling a movement route that coordinates actions between multiple parts of a robot
 (e.g. moves the robot and some actuator simultaneously at specified times).
 
-With a round robin scheduling algorithm and an easy user interface, the Robot Command Scheduler improves the speed and accuracy of competition programming.
+With a round robin scheduling algorithm and easy to use functionality, the Robot Command Scheduler improves the speed and accuracy of competition programming.
 
-## User Interface
+## API
 
-What does this "easy" user interface involve? It's simple. Users must tag any function with a requirement, and no two functions with the same requirements will be run at once.
+At it's core the API simple. Users must tag any function with a requirement, and no two functions with the same requirements will be run at once.
 To support this, functions return a bool with true if they have finished running or false if they need to be called again. This means a simple movement function might look like:
 
 ```
