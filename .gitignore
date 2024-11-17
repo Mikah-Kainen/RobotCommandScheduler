@@ -364,3 +364,4 @@ FodyWeavers.xsd
 
 x64\**
 *.vcxproj*
+*.sln
