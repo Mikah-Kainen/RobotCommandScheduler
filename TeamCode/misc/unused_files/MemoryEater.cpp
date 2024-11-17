@@ -2,6 +2,8 @@
 #include <iostream>
 #include <vector>
 
+//PLEASE NOTE, DO NOT USE THIS!!
+//If think you have a good use case, contact the project maintainers to talk about it first
 class MemoryEater
 {
 private:
