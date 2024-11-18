@@ -7,6 +7,13 @@ All advanced autonomous robotics teams eventually face the challenge of scheduli
 
 With a round robin scheduling algorithm and easy to use functionality, the Robot Command Scheduler improves the speed and accuracy of competition programming.
 
+## Recommended Development Setup
+To ensure the best experience working on this project, we recommend the following setup:
+
+- Operating System: A Linux-based environment. Windows users can use Windows Subsystem for Linux (WSL) to achieve a Linux-like environment.
+- Editor: Visual Studio Code (VS Code) is highly recommended for its robust extension ecosystem and seamless integration with WSL.
+  
+This setup helps to streamline development and align with the project's tooling and dependencies.
 ## API
 
 At it's core the API simple. Users must tag any function with a requirement, and no two functions with the same requirements will be run at once.
