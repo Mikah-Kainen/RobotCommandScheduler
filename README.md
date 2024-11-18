@@ -14,6 +14,11 @@ To ensure the best experience working on this project, we recommend the followin
 - Editor: Visual Studio Code (VS Code) is highly recommended for its robust extension ecosystem and seamless integration with WSL.
   
 This setup helps to streamline development and align with the project's tooling and dependencies.
+
+## Code Standards
+This project follows Google's code standards as outlined here: https://google.github.io/styleguide/cppguide.html. \
+It's a long document, so I recommend using ctrl-f to find the "Naming" and "Comments" sections, which should be enough to get started.
+
 ## API
 
 At it's core the API simple. Users must tag any function with a requirement, and no two functions with the same requirements will be run at once.
