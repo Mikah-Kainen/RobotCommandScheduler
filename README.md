@@ -15,6 +15,10 @@ To ensure the best experience working on this project, we recommend the followin
   
 This setup helps to streamline development and align with the project's tooling and dependencies.
 
+## Building the Project
+This project is built using CMake. \
+If you don’t already have CMake installed, see the CMake installation guide here: https://cmake.org/resources/.
+
 ## Code Standards
 This project follows Google's code standards as outlined here: https://google.github.io/styleguide/cppguide.html. \
 It's a long document, so I recommend using ctrl-f to find the "Naming" and "Comments" sections, which should be enough to get started.
