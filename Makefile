@@ -6,6 +6,7 @@ OBJ_DIR = obj
 LIB_DIR = lib
 INC_DIR = inc
 SRC_DIR = src
+EXEC = rcs
 ccs = $(shell find $(SRC_DIR) -name '*.cc')
 objects = $(patsubst $(SRC_DIR)/%.cc, $(OBJ_DIR)/%.o, $(ccs))
 
@@ -16,7 +17,7 @@ CXX = g++
 CPPFLAGS = -c -Wall -I. -MD -MP
 
 all: $(OBJ_DIR) $(objects)
-> $(CXX) -o rcs $(objects)
+> $(CXX) -o $(EXEC) $(objects)
 #$(LIB_DIR)/libev3dev.a
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cc
