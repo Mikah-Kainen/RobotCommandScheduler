@@ -6,37 +6,38 @@ OBJ_DIR = obj
 LIB_DIR = lib
 INC_DIR = inc
 SRC_DIR = src
-cpps = $(wildcard $(SRC_DIR)/**/*.cpp)
-# could add something like $(wildcard $(SRC_DIR)/SystemMonitorSrc/*.cpp) if there are nested folders
-objects = $(patsubst $(SRC_DIR)/**/%.cpp, $(OBJ_DIR)/**/%.o, $(cpps))
+ccs = $(shell find $(SRC_DIR) -name '*.cc')
+objects = $(patsubst $(SRC_DIR)/%.cc, $(OBJ_DIR)/%.o, $(ccs))
+
+#ccs = $(wildcard $(SRC_DIR)/**/*.cc) $(MAIN_FILE)
+#objects = $(patsubst **/%.cc, **/%.o, $(ccs))
+
 CXX = g++
 CPPFLAGS = -c -Wall -I. -MD -MP
 
-
-all : $(OBJ_DIR) $(objects)
+all: $(OBJ_DIR) $(objects)
 > $(CXX) -o rcs $(objects)
 #$(LIB_DIR)/libev3dev.a
 
-
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cc
 > @mkdir -p $(dir $@)
 > $(CXX) $(CPPFLAGS) -c $< -o $@
-
 
 $(OBJ_DIR):
 > mkdir -p $(OBJ_DIR)
 
+debug:
+> @echo "ccs: $(ccs)"
+> @echo "objects: $(objects)"
 
-.PHONY : clean
-clean :
-> rm $(objects)
-> rm $(wildcard $(OBJ_DIR)/*.d)
-#  rm $(wildcard $(OBJ_DIR)/<foldername>/*.d)
+.PHONY: clean
+clean:
+> rm -f $(EXEC)
+> $(shell find $(OBJ_DIR) -name '*.o' -exec rm -f {} +)
+> $(shell find $(OBJ_DIR) -name '*.d' -exec rm -f {} +)
 
+.PHONY: cleanD
+cleanD:
+> $(shell find $(OBJ_DIR) -name '*.d' -exec rm -f {} +)
 
-.PHONY : cleanD
-cleanD :
-> rm $(wildcard $(OBJ_DIR)/*.d)
-#   rm $(wildcard $(OBJ_DIR)/<foldername>/*.d)
-
--include $(wildcard $(OBJ_DIR)/*.d)
+-include $(shell find $(OBJ_DIR) -name '*.d')
