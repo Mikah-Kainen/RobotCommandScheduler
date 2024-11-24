@@ -3,20 +3,20 @@
 #include <list>
 
 //scheduler includes
-#include "inc/scheduler/static.h"
-#include "inc/scheduler/schedulable_groups/scheduler.h"
-#include "inc/scheduler/schedulable_groups/parallel_group.h"
-#include "inc/scheduler/schedulable_groups/sequential_group.h"
-#include "inc/scheduler/schedulable_groups/loop_group.h"
-#include "inc/scheduler/schedulable_groups/condition_group.h"
-#include "inc/scheduler/schedulable_groups/when_any_group.h"
+#include "../inc/scheduler/static.h"
+#include "../inc/scheduler/schedulable_groups/scheduler.h"
+#include "../inc/scheduler/schedulable_groups/parallel_group.h"
+#include "../inc/scheduler/schedulable_groups/sequential_group.h"
+#include "../inc/scheduler/schedulable_groups/loop_group.h"
+#include "../inc/scheduler/schedulable_groups/condition_group.h"
+#include "../inc/scheduler/schedulable_groups/when_any_group.h"
 
-#include "src/scheduler/command_builder.cc"
+#include "scheduler/command_builder.cc"
 
 //virtual robot includes
-#include "inc/virtual_robot/robot.h"
-#include "inc/virtual_robot/motor.h"
-#include "inc/virtual_robot/timer.h"
+#include "../inc/virtual_robot/robot.h"
+#include "../inc/virtual_robot/motor.h"
+#include "../inc/virtual_robot/timer.h"
 
 #pragma region CatStuff
 class Cat

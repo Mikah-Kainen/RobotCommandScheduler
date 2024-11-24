@@ -1,0 +1,5 @@
+#!/bin/bash
+
+./build_script
+cd build
+ctest
