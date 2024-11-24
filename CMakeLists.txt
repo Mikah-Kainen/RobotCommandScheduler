@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
 
-
 # Project setup
 project(rcs LANGUAGES CXX)
 
@@ -8,7 +7,6 @@ project(rcs LANGUAGES CXX)
 set(SRC_DIR src)
 set(INC_DIR inc)
 set(EXEC rcs)
-#set(EXEC_TEST hello_test)
 
 # Compiler settings
 # GoogleTest requires at least C++14
@@ -29,35 +27,22 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 add_subdirectory(tests)
 
-# Find all source and header files
+# Find all source files
 file(GLOB_RECURSE SOURCE_FILES ${SRC_DIR}/*.cc)
-file(GLOB_RECURSE HEADER_FILES ${INC_DIR}/*.h)
 
 add_executable(
   ${EXEC}
   ${SOURCE_FILES}
-  ${HEADER_FILES}
 )
-# add_executable(
-#   ${EXEC_TEST}
-#   hello_test.cc
-
-# )
-# target_link_libraries(
-#   ${EXEC_TEST}
-#   GTest::gtest_main
-# )
-
-# include(GoogleTest)
-# gtest_discover_tests(${EXEC_TEST})
 
 # Automatically include the directory of each header
-foreach(header ${HEADER_FILES})
-    get_filename_component(header_dir ${header} DIRECTORY)
-    list(APPEND INCLUDE_DIRS ${header_dir})
-endforeach()
-list(REMOVE_DUPLICATES INCLUDE_DIRS)
-target_include_directories(${EXEC} PRIVATE ${INCLUDE_DIRS})
+# foreach(header ${HEADER_FILES})
+#     get_filename_component(header_dir ${header} DIRECTORY)
+#     list(APPEND INCLUDE_DIRS ${header_dir})
+# endforeach()
+# list(REMOVE_DUPLICATES INCLUDE_DIRS)
+# target_include_directories(${EXEC} PRIVATE ${INCLUDE_DIRS})
+target_include_directories(${EXEC} PRIVATE ${INC_DIR})
 
 # Define build options (Debug/Release)
 #set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type: Debug or Release")

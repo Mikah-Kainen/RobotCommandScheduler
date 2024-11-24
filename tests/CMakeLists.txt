@@ -1,45 +1,21 @@
-cmake_minimum_required(VERSION 3.14)
-
-
-# Project setup
-project(rcs LANGUAGES CXX)
-
 # Directories
-# set(SRC_DIR src)
-# set(INC_DIR inc)
-# set(EXEC_MAIN rcs)
-set(EXEC_TEST hello_test)
+set(TEST_SRC_DIR src)
+set(TEST_INC_DIR inc)
+set(TEST_EXEC rcs_tests)
 
-# Compiler settings
-# GoogleTest requires at least C++14
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -MD -MP")
-
-include(FetchContent)
-FetchContent_Declare(
-  googletest
-  URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
-)
-
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
-
-enable_testing()
-
-# Find all source and header files
-# file(GLOB_RECURSE SOURCE_FILES ${SRC_DIR}/*.cc)
-# file(GLOB_RECURSE HEADER_FILES ${INC_DIR}/*.h)
+# Find all source files
+file(GLOB_RECURSE TEST_SOURCE_FILES ${TEST_SRC_DIR}/*.cc)
 
 add_executable(
-  ${EXEC_TEST}
-  hello_test.cc
+  ${TEST_EXEC}
+  ${TEST_SOURCE_FILES}
 )
 target_link_libraries(
-  ${EXEC_TEST}
+  ${TEST_EXEC}
   GTest::gtest_main
 )
 
+target_include_directories(${TEST_EXEC} PRIVATE ${TEST_INC_DIR})
+
 include(GoogleTest)
-gtest_discover_tests(${EXEC_TEST})
+gtest_discover_tests(${TEST_EXEC})

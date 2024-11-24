@@ -9,12 +9,11 @@ jobs:
         run: sudo apt-get install cmake g++ -y
       - name: Build
         run: |
-          cd tests
           mkdir build
           cd build
           cmake ..
           make
       - name: Run tests
         run: |
-          cd tests/build
+          cd build
           ctest
