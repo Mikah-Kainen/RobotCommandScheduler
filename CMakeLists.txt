@@ -1,12 +1,20 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.16)
 
-# Project setup
-project(rcs LANGUAGES CXX)
+# Set subproject directories
+set(SCHEDULER_LIBRARY_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scheduler)
+set(SCHEDULER_TESTS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+set(VIRTUAL_ROBOT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/virtual_robot)
+set(PHYSICAL_ROBOT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/physical_robot)
+set(SHARED_FILES_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/common)
 
-# Directories
-set(SRC_DIR src)
-set(INC_DIR inc)
-set(EXEC rcs)
+# Set output names
+set(PROJECT_EXECUTABLE_NAME rcs)
+set(SCHEDULER_LIBRARY_NAME scheduler_build)
+set(SCHEDULER_TESTS_NAME scheduler_tests_build)
+set(PHYSICAL_ROBOT_EXECUTABLE_NAME physical_robot_build)
+set(VIRTUAL_ROBOT_EXECUTABLE_NAME virtual_robot_build)
+
+project(${PROJECT_EXECUTABLE_NAME})
 
 # Compiler settings
 # GoogleTest requires at least C++14
@@ -14,6 +22,24 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -MD -MP")
 
+# Set default build type
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Debug)
+endif()
+
+# Define options for build targets
+option(BUILD_FOR_PHYSICAL "Build for the physical robot" OFF) # Default OFF
+
+add_subdirectory(${SCHEDULER_LIBRARY_DIRECTORY})
+add_subdirectory(${SHARED_FILES_DIRECTORY})
+
+if(BUILD_FOR_PHYSICAL)
+message(STATUS "Building for the physical robot.")
+add_subdirectory(${PHYSICAL_ROBOT_DIRECTORY})
+else()
+message(STATUS "Building for the virtual robot.")
+
+# Only include Google Test when running the virtual robot
 include(FetchContent)
 FetchContent_Declare(
   googletest
@@ -25,25 +51,7 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 enable_testing()
-add_subdirectory(tests)
 
-# Find all source files
-file(GLOB_RECURSE SOURCE_FILES ${SRC_DIR}/*.cc)
-
-add_executable(
-  ${EXEC}
-  ${SOURCE_FILES}
-)
-
-# Automatically include the directory of each header
-# foreach(header ${HEADER_FILES})
-#     get_filename_component(header_dir ${header} DIRECTORY)
-#     list(APPEND INCLUDE_DIRS ${header_dir})
-# endforeach()
-# list(REMOVE_DUPLICATES INCLUDE_DIRS)
-# target_include_directories(${EXEC} PRIVATE ${INCLUDE_DIRS})
-target_include_directories(${EXEC} PRIVATE ${INC_DIR})
-
-# Define build options (Debug/Release)
-#set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type: Debug or Release")
-#set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
+add_subdirectory(${VIRTUAL_ROBOT_DIRECTORY})
+add_subdirectory(${SCHEDULER_TESTS_DIRECTORY})
+endif()

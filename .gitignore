@@ -368,3 +368,4 @@ x64\**
 rcs
 build/**
 **/build/**
+**/*.json
