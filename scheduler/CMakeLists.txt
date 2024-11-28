@@ -9,5 +9,6 @@ add_library(${SCHEDULER_LIBRARY_NAME} STATIC
   ${SCHEDULER_INCLUDE_FILES}
 )
 
-# Needs to be public so when tests link against it include directories are propagated
+# Should be public so when programs link against it include directories are propagated
+# I am including source directories as well for generic classes that don't have header files
 target_include_directories(${SCHEDULER_LIBRARY_NAME} PUBLIC ${SCHEDULER_SOURCE_DIRECTORY} ${SCHEDULER_INCLUDE_DIRECTORY})

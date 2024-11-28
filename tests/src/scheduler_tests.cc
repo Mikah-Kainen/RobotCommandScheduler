@@ -20,136 +20,134 @@
 #include "motor.h"
 #include "timer.h"
 
-#include "rcs.cc"
+#pragma region CatStuff
+class Cat
+{
+public:
+	int Age;
+	std::string Name;
+	bool IsDead;
 
-// #pragma region CatStuff
-// class Cat
-// {
-// public:
-// 	int Age;
-// 	std::string Name;
-// 	bool IsDead;
+	Cat(int age, std::string name)
+		: Age{ age }, Name{ name }, IsDead{ false }
+	{
+		//std::cout << "Cat Made" << std::endl;
+	}
 
-// 	Cat(int age, std::string name)
-// 		: Age{ age }, Name{ name }, IsDead{ false }
-// 	{
-// 		//std::cout << "Cat Made" << std::endl;
-// 	}
+	Cat(const Cat& copyCat)
+		: Age{ copyCat.Age }, Name{ copyCat.Name }, IsDead{ copyCat.IsDead }
+	{
+		//std::cout << "Cat Copied" << std::endl;
+	}
 
-// 	Cat(const Cat& copyCat)
-// 		: Age{ copyCat.Age }, Name{ copyCat.Name }, IsDead{ copyCat.IsDead }
-// 	{
-// 		//std::cout << "Cat Copied" << std::endl;
-// 	}
+	~Cat()
+	{
+		if (IsDead)
+		{
+			std::cout << "A Dead Cat is Back" << std::endl;
+		}
+		//std::cout << "A Cat Just Died\n";
+		IsDead = true;
+	}
 
-// 	~Cat()
-// 	{
-// 		if (IsDead)
-// 		{
-// 			std::cout << "A Dead Cat is Back" << std::endl;
-// 		}
-// 		//std::cout << "A Cat Just Died\n";
-// 		IsDead = true;
-// 	}
+	bool Display()
+	{
+		if (IsDead)
+		{
+			std::cout << "Displaying Dead Cat!" << std::endl;
+		}
+		else
+		{
+			std::cout << "Name: " << Name << ", Age: " << Age << std::endl;
+		}
+		return true;
+	}
+};
 
-// 	bool Display()
-// 	{
-// 		if (IsDead)
-// 		{
-// 			std::cout << "Displaying Dead Cat!" << std::endl;
-// 		}
-// 		else
-// 		{
-// 			std::cout << "Name: " << Name << ", Age: " << Age << std::endl;
-// 		}
-// 		return true;
-// 	}
-// };
+//class OldCat : public Cat
+//{
+//public:
+//
+//	OldCat(std::string name)
+//		: Cat(38, name)
+//	{
+//	}
+//
+//	~OldCat()
+//	{
+//
+//	}
+//};
 
-// //class OldCat : public Cat
-// //{
-// //public:
-// //
-// //	OldCat(std::string name)
-// //		: Cat(38, name)
-// //	{
-// //	}
-// //
-// //	~OldCat()
-// //	{
-// //
-// //	}
-// //};
+bool CoolFunction()
+{
+	std::cout << "Wow this is so cool!\n";
+	return true;
+}
 
-// bool CoolFunction()
-// {
-// 	std::cout << "Wow this is so cool!\n";
-// 	return true;
-// }
+bool CatFunction(Cat cat)
+{
+	std::cout << "Age: " << cat.Age << " Name: " << cat.Name << std::endl;
+	return true;
+}
 
-// bool CatFunction(Cat cat)
-// {
-// 	std::cout << "Age: " << cat.Age << " Name: " << cat.Name << std::endl;
-// 	return true;
-// }
+bool CoolCatFunction()
+{
+	Cat bobCat = Cat(10, "Bob");
+	return CatFunction(bobCat);
+}
+#pragma endregion
 
-// bool CoolCatFunction()
-// {
-// 	Cat bobCat = Cat(10, "Bob");
-// 	return CatFunction(bobCat);
-// }
-// #pragma endregion
+Motor MotorA = Motor(Systems::MotorA);
+Motor MotorB = Motor(Systems::MotorB);
+Motor MotorC = Motor(Systems::MotorC);
 
-// Motor MotorA = Motor(Systems::MotorA);
-// Motor MotorB = Motor(Systems::MotorB);
-// Motor MotorC = Motor(Systems::MotorC);
+bool test()
+{
+	return MotorA.MultiStepMove(5);
+}
 
-// bool test()
-// {
-// 	return MotorA.MultiStepMove(5);
-// }
+#pragma region WrapperFunctions
 
-// #pragma region WrapperFunctions
+bool MotorAMultiStepMove(int params, std::vector<int>* loggingVector)
+{
+	return MotorA.MultiStepMove(params, loggingVector);
+}
 
-// bool MotorAMultiStepMove(int params, std::vector<int>* loggingVector)
-// {
-// 	return MotorA.MultiStepMove(params, loggingVector);
-// }
+bool MotorBMultiStepMove(int params, std::vector<int>* loggingVector)
+{
+	return MotorB.MultiStepMove(params, loggingVector);
+}
 
-// bool MotorBMultiStepMove(int params, std::vector<int>* loggingVector)
-// {
-// 	return MotorB.MultiStepMove(params, loggingVector);
-// }
+bool MotorCMultiStepMove(int params, std::vector<int>* loggingVector)
+{
+	return MotorC.MultiStepMove(params, loggingVector);
+}
 
-// bool MotorCMultiStepMove(int params, std::vector<int>* loggingVector)
-// {
-// 	return MotorC.MultiStepMove(params, loggingVector);
-// }
+bool MotorAResetCurrentStep()
+{
+	return MotorA.ResetCurrentStep();
+}
 
-// bool MotorAResetCurrentStep()
-// {
-// 	return MotorA.ResetCurrentStep();
-// }
+bool MotorBResetCurrentStep()
+{
+	return MotorB.ResetCurrentStep();
+}
 
-// bool MotorBResetCurrentStep()
-// {
-// 	return MotorB.ResetCurrentStep();
-// }
+bool MotorCResetCurrentStep()
+{
+	return MotorC.ResetCurrentStep();
+}
 
-// bool MotorCResetCurrentStep()
-// {
-// 	return MotorC.ResetCurrentStep();
-// }
-
-// #pragma endregion
+#pragma endregion
 
 
-// Robot& robot = Robot::GetInstance();
+Robot& robot = Robot::GetInstance();
 
-// void TakeConstRef(const int& constRef)
-// {
-// 	std::cout << constRef << std::endl;
-// }
+void TakeConstRef(const int& constRef)
+{
+	std::cout << constRef << std::endl;
+}
 
 
 TEST(SequentialGroup, BasicAssertions) {

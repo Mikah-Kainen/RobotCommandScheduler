@@ -8,7 +8,6 @@ file(GLOB_RECURSE TESTS_INCLUDE_FILES ${TESTS_INCLUDE_DIRECTORY}/*.h)
 
 message(STATUS "Scheduler tests target name: ${SCHEDULER_TESTS_NAME}")
 message(STATUS "Source files: ${TESTS_SOURCE_FILES}")
-execute_process(COMMAND sleep 5)
 
 add_executable(
   ${SCHEDULER_TESTS_NAME}
@@ -24,8 +23,7 @@ target_link_libraries(
   ${SCHEDULER_TESTS_NAME} PUBLIC
   GTest::gtest_main
   ${SCHEDULER_LIBRARY_NAME}
-  #${VIRTUAL_ROBOT_EXECUTABLE_NAME}
-  virtual_robot_lib # Temporary lib while deciding how to organize robot code
+  ${VIRTUAL_ROBOT_LIBRARY_NAME}
 )
 
 include(GoogleTest)
