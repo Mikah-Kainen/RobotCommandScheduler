@@ -369,3 +369,4 @@ rcs
 build/**
 **/build/**
 **/*.json
+**/gmr_*

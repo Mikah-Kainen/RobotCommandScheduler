@@ -50,7 +50,7 @@ public:
 		IsDead = true;
 	}
 
-	bool Display()
+	bool Display(std::vector<int>* logging_vector = nullptr)
 	{
 		if (IsDead)
 		{
@@ -59,6 +59,9 @@ public:
 		else
 		{
 			std::cout << "Name: " << Name << ", Age: " << Age << std::endl;
+			if (logging_vector != nullptr) {
+				logging_vector->push_back(Age);
+			}
 		}
 		return true;
 	}
@@ -150,7 +153,7 @@ void TakeConstRef(const int& constRef)
 }
 
 
-TEST(SequentialGroup, BasicAssertions) {
+TEST(SequentialGroup, SequentialGroup1) {
 	CommandBuilder<int, std::vector<int>*> MotorAMultiStepMoveCommand = CommandBuilder<int, std::vector<int>*>(MotorAMultiStepMove, Systems::MotorA);
 	CommandBuilder<int, std::vector<int>*> MotorBMultiStepMoveCommand = CommandBuilder<int, std::vector<int>*>(MotorBMultiStepMove, Systems::MotorB);
 	CommandBuilder<int, std::vector<int>*> MotorCMultiStepMoveCommand = CommandBuilder<int, std::vector<int>*>(MotorCMultiStepMove, Systems::MotorC);
@@ -186,6 +189,60 @@ TEST(SequentialGroup, BasicAssertions) {
 	}));
 
 	scheduler.Schedule(sequentialGroup);
+	while (!scheduler.Run()){}
+	std::cout << "Program Finished!";
+  bool inOrder = true;
+  int previous = -100;
+  for (int i : *loggingVector) {
+    if (i >= previous) {
+      i = previous;
+    }
+    else {
+      inOrder = false;
+      break;
+    }
+  }
+  EXPECT_EQ(inOrder, true);
+}
+
+
+TEST(SequentialGroup, SequentialGroupTest) {
+  std::vector<int>* loggingVector = new std::vector<int>();
+
+	CommandBuilder<Cat*, std::vector<int>*> DisplayCatPointerFive = CommandBuilder<Cat*, std::vector<int>*>([&](Cat* cat, std::vector<int>* logging_vector) {return cat->Display(logging_vector); }, Systems::Five);
+	CommandBuilder<Cat&, std::vector<int>*> DisplayCatReferenceFive = CommandBuilder<Cat&, std::vector<int>*>([&](Cat& cat, std::vector<int>* logging_vector) {return cat.Display(logging_vector); }, Systems::Five);
+	CommandBuilder<Cat, std::vector<int>*> DisplayCatValueFive = CommandBuilder<Cat, std::vector<int>*>([&](Cat cat, std::vector<int>* logging_vector) {return cat.Display(logging_vector); }, Systems::Five);
+
+	CommandBuilder<Cat*, std::vector<int>*> DisplayCatPointerFour = CommandBuilder<Cat*, std::vector<int>*>([&](Cat* cat, std::vector<int>* logging_vector) {return cat->Display(logging_vector); }, Systems::Four);
+	CommandBuilder<Cat&, std::vector<int>*> DisplayCatReferenceFour = CommandBuilder<Cat&, std::vector<int>*>([&](Cat& cat, std::vector<int>* logging_vector) {return cat.Display(logging_vector); }, Systems::Four);
+	CommandBuilder<Cat, std::vector<int>*> DisplayCatValueFour = CommandBuilder<Cat, std::vector<int>*>([&](Cat cat, std::vector<int>* logging_vector) {return cat.Display(logging_vector); }, Systems::Four);
+
+	CommandBuilder<Cat*, std::vector<int>*> DisplayCatPointerSix = CommandBuilder<Cat*, std::vector<int>*>([&](Cat* cat, std::vector<int>* logging_vector) {return cat->Display(logging_vector); }, Systems::Six);
+	CommandBuilder<Cat&, std::vector<int>*> DisplayCatReferenceSix = CommandBuilder<Cat&, std::vector<int>*>([&](Cat& cat, std::vector<int>* logging_vector) {return cat.Display(logging_vector); }, Systems::Six);
+	CommandBuilder<Cat, std::vector<int>*> DisplayCatValueSix = CommandBuilder<Cat, std::vector<int>*>([&](Cat cat, std::vector<int>* logging_vector) {return cat.Display(logging_vector); }, Systems::Six);
+	CommandBuilder<Cat&, int, std::vector<int>*> IncrimentCatAgeSix = CommandBuilder<Cat&, int, std::vector<int>*>([&](Cat& cat, int age, std::vector<int>* logging_vector) {cat.Age += age; std::cout << "System Six being used" << std::endl; logging_vector->push_back(cat.Age); return true; }, Systems::Six);
+
+	Scheduler scheduler = Scheduler::GetInstance();
+
+	Cat  sequentialGroupTestCat3 = Cat(3, "Systems 5");
+	Cat* sequentialGroupTestCat5 = new Cat(5, "Systems 4");
+	Cat  sequentialGroupTestCat6 = Cat(-1, "Systems 4");
+	Cat  sequentialGroupTestCat8and9 = Cat(8, "Systems 6");
+	std::shared_ptr<SequentialGroup> sequentialGroupTest = std::make_shared<SequentialGroup>(SequentialGroup({
+		DisplayCatValueFive.CreateCommand(Cat(1, "Systems 5"), loggingVector),
+		DisplayCatValueFour.CreateCommand(Cat(2, "Systems 4"), loggingVector),
+		DisplayCatReferenceFive.CreateCommand(sequentialGroupTestCat3, loggingVector),
+		DisplayCatPointerFour.CreateCommand(new Cat(4, "Systems 4"), loggingVector),
+		DisplayCatPointerFour.CreateCommand(sequentialGroupTestCat5, loggingVector),
+		DisplayCatReferenceFour.CreateCommand(sequentialGroupTestCat6, loggingVector),
+		DisplayCatValueFive.CreateCommand(Cat(sequentialGroupTestCat3.Age + 4, sequentialGroupTestCat3.Name), loggingVector),
+		DisplayCatValueSix.CreateCommand(sequentialGroupTestCat8and9, loggingVector),
+		DisplayCatReferenceSix.CreateCommand(sequentialGroupTestCat8and9, loggingVector),
+		}));
+	sequentialGroupTestCat6.Age = 6;
+	sequentialGroupTestCat8and9.Age = 9;
+
+	scheduler.Schedule(sequentialGroupTest);
 	while (!scheduler.Run()){}
 	std::cout << "Program Finished!";
   bool inOrder = true;

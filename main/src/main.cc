@@ -633,7 +633,10 @@ int main() //Unit tests with GoogleTest
 	//scheduler.Schedule(testSystemsNone);
 	//scheduler.Schedule(testNoRequirements);
 	//scheduler.Schedule(basicConditionSchedulableTest);
-	scheduler.Schedule(loopOverConditionTest2);
+
+	scheduler.Schedule(sequentialGroupTest);
+	//scheduler.Schedule(loopOverConditionTest2);
+	
 	//scheduler.Schedule(basicRunConditionallyTest);
 	//scheduler.Schedule(WhenAnyGroupAdvancedConditionTest);
 	//scheduler.Schedule(InitInitCleanCleanTest);
