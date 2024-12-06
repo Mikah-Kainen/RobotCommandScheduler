@@ -24,24 +24,47 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -MD -MP")
 
-include(FetchContent)
-FetchContent_Declare(
-  googletest
-  URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
-)
+option(BUILD_PHYSICAL "Build for physical robot" OFF)
 
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
+if(BUILD_PHYSICAL)
+  message(STATUS "BUILD_PHYSICAL is ON: Building through Docker.")
+else()
+  message(STATUS "BUILD_PHYSICAL is OFF: Setting up virtual tests.")
+endif()
 
-enable_testing()
+if (NOT BUILD_PHYSICAL)
+  include(FetchContent)
+  FetchContent_Declare(
+    googletest
+    URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+  )
+
+  # For Windows: Prevent overriding the parent project's compiler/linker settings
+  set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+  FetchContent_MakeAvailable(googletest)
+
+  enable_testing()
+endif()
 
 add_subdirectory(${SCHEDULER_LIBRARY_DIRECTORY})
 add_subdirectory(${ROBOT_LIBRARY_DIRECTORY})
-add_subdirectory(${VIRTUAL_ROBOT_DIRECTORY})
-add_subdirectory(${PHYSICAL_ROBOT_DIRECTORY})
+
+if (BUILD_PHYSICAL)
+  add_subdirectory(${PHYSICAL_ROBOT_DIRECTORY})
+else()
+  add_subdirectory(${VIRTUAL_ROBOT_DIRECTORY})
+endif()
+
 add_subdirectory(${MAIN_EXECUTABLE_DIRECTORY})
-add_subdirectory(${SCHEDULER_TESTS_DIRECTORY})
+
+if (NOT BUILD_PHYSICAL)
+  add_subdirectory(${SCHEDULER_TESTS_DIRECTORY})
+endif()
+
+# if(RUN_GMR_MAIN)
+# else()
+#   add_subdirectory(${SCHEDULER_TESTS_DIRECTORY})
+# endif()
 
 
 
