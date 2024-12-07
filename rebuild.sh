@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Default options
-CMAKE_OPTIONS="-DBUILD_PHYSICAL=ON -DCMAKE_TOOLCHAIN_FILE=toolchain.cmake"
+CMAKE_OPTIONS="-DBUILD_PHYSICAL=ON"
 
 # Override with user-provided arguments
 if [ "$#" -gt 0 ]; then
