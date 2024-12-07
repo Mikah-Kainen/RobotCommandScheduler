@@ -10,7 +10,6 @@ set(PHYSICAL_ROBOT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/physical_robot)
 set(MAIN_EXECUTABLE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/main)
 
 # Set output names
-set(PROJECT_EXECUTABLE_NAME rcs)
 set(SCHEDULER_LIBRARY_NAME scheduler_binary)
 set(SCHEDULER_TESTS_NAME scheduler_tests_build)
 set(ROBOT_LIBRARY_NAME robot_library_binary)
@@ -18,19 +17,38 @@ set(PHYSICAL_ROBOT_LIBRARY_NAME physical_robot_library_binary)
 set(VIRTUAL_ROBOT_LIBRARY_NAME virtual_robot_library_binary)
 set(MAIN_EXECUTABLE_NAME main_build)
 
-# Compiler settings
-# GoogleTest requires at least C++14
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -MD -MP")
-
 option(BUILD_PHYSICAL "Build for physical robot" OFF)
 
-if(BUILD_PHYSICAL)
+if (BUILD_PHYSICAL)
   message(STATUS "BUILD_PHYSICAL is ON: Building through Docker.")
+  set(CMAKE_SKIP_BUILD_RPATH YES)
 else()
   message(STATUS "BUILD_PHYSICAL is OFF: Setting up virtual tests.")
 endif()
+
+if (BUILD_PHYSICAL)
+  # set(CMAKE_C_COMPILER "arm-linux-gnueabi-gcc")
+  # set(CMAKE_CXX_COMPILER "arm-linux-gnueabi-g++")
+  set(CMAKE_TOOLCHAIN_FILE "/path/to/your/toolchain.cmake")
+else()
+  # Compiler settings
+  # GoogleTest requires at least C++14
+  set(CMAKE_CXX_STANDARD 17)
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -MD -MP")
+endif()
+
+# if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
+#   # Set compiler flags for x86_64 architecture
+#   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=x86-64")
+#   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=x86-64")
+# elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "arm64")
+#   # Set compiler flags for ARM 64-bit architecture
+#   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=armv8-a")
+#   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv8-a")
+# else()
+#   message(STATUS "UNKOWN SYSTEM PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR}.")
+# endif()
 
 if (NOT BUILD_PHYSICAL)
   include(FetchContent)

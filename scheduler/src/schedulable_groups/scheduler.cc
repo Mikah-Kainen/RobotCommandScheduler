@@ -1,4 +1,4 @@
-#include "schedulable_groups/scheduler.h"
+#include "../../include/schedulable_groups/scheduler.h"
 
 Scheduler::Scheduler()
 	: ConsumingGroup((unsigned char)Systems::All, GroupTypes::Base)

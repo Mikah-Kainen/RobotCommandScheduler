@@ -1,4 +1,4 @@
-#include "schedulable_groups/condition_group.h"
+#include "../../include/schedulable_groups/condition_group.h"
 
 ConditionWrapper::ConditionWrapper(std::shared_ptr<Schedulable> schedulableToWrap, std::function<bool()> condition)
 	:ReschedulableGroup(schedulableToWrap->GetRequirementFlags(), GroupTypes::Conditional), condition{ condition } 

@@ -8,8 +8,8 @@
 #include <unordered_set>
 #include <memory>
 
-#include "schedulable.h"
-#include "static.h"
+#include "../schedulable.h"
+#include "../static.h"
 
 
 //GroupBase uses PackedIDs to keep track of important flags, Database uses UnpackedIDs to abstract the flags away and for ease of debugging

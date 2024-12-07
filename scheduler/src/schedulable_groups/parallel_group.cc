@@ -1,4 +1,4 @@
-#include "schedulable_groups/parallel_group.h"
+#include "../../include/schedulable_groups/parallel_group.h"
 
 //Pretty sure this function is completely useless
 //ParallelGroup::ParallelGroup(std::vector<Schedulable> functionList, unsigned char requirements)

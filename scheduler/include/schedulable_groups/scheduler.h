@@ -1,5 +1,5 @@
 #pragma once
-#include "base_groups/consuming_group.h"
+#include "../base_groups/consuming_group.h"
 
 class Scheduler : public ConsumingGroup
 {

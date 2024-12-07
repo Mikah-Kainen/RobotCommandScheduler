@@ -1,4 +1,4 @@
-#include "schedulable_groups/loop_group.h"
+#include "../../include/schedulable_groups/loop_group.h"
 
 bool LoopGroup::Return(bool isFinished)
 {

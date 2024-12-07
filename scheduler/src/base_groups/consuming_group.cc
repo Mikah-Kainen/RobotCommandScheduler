@@ -1,4 +1,4 @@
-#include "base_groups/consuming_group.h"
+#include "../../include/base_groups/consuming_group.h"
 
 //void ConsumingGroup::InitializeGroup()
 //{

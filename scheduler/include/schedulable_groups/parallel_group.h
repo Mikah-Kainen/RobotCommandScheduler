@@ -1,5 +1,5 @@
 #pragma once
-#include "base_groups/reschedulable_group.h"
+#include "../base_groups/reschedulable_group.h"
 
 class ParallelGroup : public ReschedulableGroup
 {

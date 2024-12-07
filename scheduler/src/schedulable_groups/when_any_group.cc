@@ -1,4 +1,4 @@
-#include "schedulable_groups/when_any_group.h"
+#include "../../include/schedulable_groups/when_any_group.h"
 
 WhenAnyGroup::WhenAnyGroup(std::vector<std::shared_ptr<Schedulable>> schedulablesToSchedule)
 	:ReschedulableGroup(GetRequirementFlags(schedulablesToSchedule), GroupTypes::Sequential)

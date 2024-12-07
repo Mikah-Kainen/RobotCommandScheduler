@@ -1,4 +1,4 @@
-#include "schedulable_groups/sequential_group.h"
+#include "../../include/schedulable_groups/sequential_group.h"
 
 SequentialGroup::SequentialGroup(std::vector<std::shared_ptr<Schedulable>> schedulablesToSchedule)
 	:ReschedulableGroup(GetRequirementFlags(schedulablesToSchedule), GroupTypes::Sequential)

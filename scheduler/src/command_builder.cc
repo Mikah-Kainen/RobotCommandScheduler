@@ -6,9 +6,9 @@
 #include <utility>
 #include <memory>
 
-#include "schedulable.h"
-#include "static.h"
-#include "schedulable_groups/condition_group.h"
+#include "../include/schedulable.h"
+#include "../include/static.h"
+#include "../include/schedulable_groups/condition_group.h"
 #include "polyfills.cc"
 
 //class SchedulableCommand : Schedulable
